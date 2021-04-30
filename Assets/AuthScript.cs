@@ -1,6 +1,6 @@
 ﻿using Firebase;
 using Firebase.Auth;
-
+using Firebase.Database;
 
 using System.Collections;
 using System.Collections.Generic;
@@ -72,9 +72,31 @@ public class AuthScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
+        FirebaseDatabase.DefaultInstance
+     .GetReference("Monster")
+     .GetValueAsync().ContinueWith(task => {
+         if (task.IsFaulted)
+         {
+             Debug.Log("못찾았어요!!");
+             // Handle the error...
+         }
+         else if (task.IsCompleted)
+         {
+             Debug.Log("찾았어요!!");
+             DataSnapshot snapshot = task.Result;
+             foreach (DataSnapshot data in snapshot.Children)
+             {
+                 //받은 데이터들을 하나씩 잘라 string 배열에 저장
+                 IDictionary da = (IDictionary)data.Value;
+                 Debug.Log(da["name"]); 
 
+             }
+             // Do something with snapshot...
+         }
+     });
         //string monsterOption=Mycraw("https://waroforigin-default-rtdb.firebaseio.com/Monster.json");
-        
+
         authCode = null;
         PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
             .RequestServerAuthCode(false /* Don't force refresh */)
