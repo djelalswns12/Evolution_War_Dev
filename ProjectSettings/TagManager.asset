@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Bullet
+  - monster
+  - boss
+  - Test
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - uiground
+  - upground
+  - downground
+  - upunit
+  - downunit
+  - Nothing
+  - centerunit
+  - upflyunit
+  - downflyunit
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: background
+    uniqueID: 4011614277
+    locked: 0
+  - name: foreground
+    uniqueID: 2498144353
+    locked: 0
+  - name: UI
+    uniqueID: 84789805
+    locked: 0
+  - name: upunit
+    uniqueID: 3267362467
+    locked: 0
+  - name: upflyunit
+    uniqueID: 2111077409
+    locked: 0
+  - name: centerunit
+    uniqueID: 1802652015
+    locked: 0
+  - name: downunit
+    uniqueID: 176526479
+    locked: 0
+  - name: downflyunit
+    uniqueID: 3663033609
+    locked: 0
+  - name: Mask
+    uniqueID: 696735173
+    locked: 0
+  - name: redLine
+    uniqueID: 1858748487
+    locked: 0
+  - name: redLine2
+    uniqueID: 3694643369
+    locked: 0
