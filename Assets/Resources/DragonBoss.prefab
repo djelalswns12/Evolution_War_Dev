@@ -594,6 +594,7 @@ GameObject:
   - component: {fileID: 2395977875196682085}
   - component: {fileID: 2819657362551925487}
   - component: {fileID: 7588813359234223110}
+  - component: {fileID: 7627129893866248831}
   m_Layer: 0
   m_Name: DragonBoss
   m_TagString: boss
@@ -759,8 +760,10 @@ MonoBehaviour:
   myIndex: 0
   myName: 
   killTarget: 0
+  bossAttackSignal: 0
   redPoint: 0
   bluePoint: 0
+  stateText: {fileID: 0}
   redtxt: {fileID: 5834261465086832153}
   bluetxt: {fileID: 785658339160781176}
   mhp: 1000
@@ -982,6 +985,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   color: {r: 1, g: 0, b: 0, a: 1}
   outlineSize: 5
+--- !u!114 &7627129893866248831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6043057234834887913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters: []
+  m_SynchronizeLayers: []
 --- !u!1 &7528487824643830727
 GameObject:
   m_ObjectHideFlags: 0

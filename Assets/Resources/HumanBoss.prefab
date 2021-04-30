@@ -458,6 +458,7 @@ GameObject:
   - component: {fileID: 3838575136473368774}
   - component: {fileID: 5673917392986243735}
   - component: {fileID: 5100122571613651392}
+  - component: {fileID: 7167547656560214841}
   m_Layer: 0
   m_Name: HumanBoss
   m_TagString: boss
@@ -623,6 +624,7 @@ MonoBehaviour:
   myIndex: 0
   myName: 
   killTarget: 0
+  bossAttackSignal: 0
   redPoint: 0
   bluePoint: 0
   stateText: {fileID: 0}
@@ -862,6 +864,22 @@ PolygonCollider2D:
       - {x: 2.4634821, y: 2.1939564}
       - {x: 2.5294163, y: 2.0620883}
       - {x: 2.5513945, y: 2.0620883}
+--- !u!114 &7167547656560214841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7346986659133647341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters: []
+  m_SynchronizeLayers: []
 --- !u!1 &8618707922504988984
 GameObject:
   m_ObjectHideFlags: 0

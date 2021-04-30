@@ -1,6 +1,7 @@
 ﻿using Firebase;
 using Firebase.Auth;
 
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
@@ -11,7 +12,8 @@ using GooglePlayGames.BasicApi;
 using UnityEngine.SocialPlatforms;
 using System.Threading.Tasks;
 using TMPro;
-
+using System.Net;
+using System.IO;
 public class AuthScript : MonoBehaviour
 {
     public bool IsFirebaseReady;
@@ -31,6 +33,34 @@ public class AuthScript : MonoBehaviour
     public static FirebaseUser user;
 
     public string authCode;
+    public string Mycraw(string url)
+    {
+        // Create a request for the URL.
+        WebRequest request = WebRequest.Create(url);
+        // If required by the server, set the credentials.
+        request.Credentials = CredentialCache.DefaultCredentials;
+
+        // Get the response.
+        WebResponse response = request.GetResponse();
+        // Display the status.
+        //Console.WriteLine(((HttpWebResponse)response).StatusDescription);
+
+        // Get the stream containing content returned by the server.
+        // The using block ensures the stream is automatically closed.
+        using (Stream dataStream = response.GetResponseStream())
+        {
+            // Open the stream using a StreamReader for easy access.
+            StreamReader reader = new StreamReader(dataStream);
+            // Read the content.
+            string responseFromServer = reader.ReadToEnd();
+            // Display the content.
+            response.Close();
+            return responseFromServer;
+        }
+
+        // Close the response.
+
+    }
     private void Awake()
     {
         Screen.SetResolution(1920, 1080,true);
@@ -42,6 +72,9 @@ public class AuthScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        //string monsterOption=Mycraw("https://waroforigin-default-rtdb.firebaseio.com/Monster.json");
+        
         authCode = null;
         PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
             .RequestServerAuthCode(false /* Don't force refresh */)

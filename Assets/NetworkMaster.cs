@@ -47,8 +47,8 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 		Simian = 800,
 		OldHuman = 1100,
 		DragonBoss=5000,
-		MomBoss=5000,
-		HumanBoss = 2000,
+		MomBoss=9000,
+		HumanBoss = 20000,
 		MetalSoldier = 1800
 	}
 	enum monsterDamage
@@ -101,6 +101,11 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 
 	}
 	#endregion
+	private void ReadJson()
+    {
+	
+    }
+	
 	private GameObject instance;
 	// 0이름, 1비용 , 2드랍골드,3공중여부,4데미지 ,5최대체력 , 6이름,7스피드 
 	string[] monsterList = 
@@ -163,7 +168,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 
 			if (player == null)
 			{
-				int playerX = PhotonNetwork.IsMasterClient ? 1 : 0;//마스터 : 0//일반유저;
+				int playerX = PhotonNetwork.IsMasterClient ? 1 : 0;//1마스터 : 0일반유저;
 				dir = playerX==1 ? true : false;
                 if (playTest == -1)
                 {
@@ -179,7 +184,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 				
 				player = PhotonNetwork.Instantiate("Player", new Vector3(playerX == (1*playTest) ? -playerpos : playerpos, CreatposY, 0f), Quaternion.identity, 0);
 				player.GetComponent<monsterScript>().creatnumber = creatnumber++;
-				player.GetComponent<PlayerScript>().dir = playerX == (1* playTest) ? true : false;
+				player.GetComponent<PlayerScript>().dir = dir;
 				player.layer =  LayerMask.NameToLayer("centerunit");
                 if (photonView.IsMine)
                 {

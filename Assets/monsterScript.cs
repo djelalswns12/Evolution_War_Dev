@@ -32,8 +32,9 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     public string myName;
     public bool killTarget;
 
+    public int bossAttackSignal;
     public int redPoint, bluePoint;
-    public Text stateText;
+    public Text stateText; // 몬스터 체력바 위의 텍스트 이다.
     [Header("건들여야하는것")]
 
     public Text redtxt;
@@ -75,9 +76,9 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         pv = GetComponent<PhotonView>();
         setSpeed = speed;
         if (transform.tag != "Test")
-            dir = NetworkMaster.player.GetComponent<PlayerScript>().dir;
+            dir = NetworkMaster.player.GetComponent<PlayerScript>().dir; //테스트 몹이 아니라면 플레이어 dir을 받아온다
 
-        dir = pv.IsMine ? dir : !dir;
+        dir = pv.IsMine ? dir : !dir; // 나의 몬스터라면 플레이어의 dir을 아니라면 반대를 적용한다.
         sp.flipX = dir;
 
             if (transform.tag == "monster")
@@ -266,7 +267,26 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     }
     void PlayBoss()
     {
-
+        /*
+        n초 간격으로 공격 실행
+         */
+        if (bossAttackSignal == 0)
+        {
+            float attackTimer = Random.Range(3f, 7f);
+            StartCoroutine(bossHit(attackTimer));
+        }
+        //Debug.Log(anim.GetCurrentAnimatorStateInfo(0).IsName("attack")+ "//도착지점:"+ anim.GetCurrentAnimatorStateInfo(0).normalizedTime);
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack") && anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.99f)
+        {
+            animReset();
+        }
+    }
+    IEnumerator bossHit(float attackTimer)
+    {
+        bossAttackSignal = 1;
+        anim.SetBool("attack", true);
+        yield return new WaitForSeconds(attackTimer);
+        bossAttackSignal = 0;
     }
     public void Setdir()
     {

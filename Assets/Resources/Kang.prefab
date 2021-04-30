@@ -486,6 +486,7 @@ MonoBehaviour:
   myIndex: 0
   myName: 
   killTarget: 0
+  bossAttackSignal: 0
   redPoint: 0
   bluePoint: 0
   stateText: {fileID: 4033202591885137037}

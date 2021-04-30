@@ -1246,7 +1246,7 @@ MonoBehaviour:
   creatnumber: 0
   editorSpeed: 1
   setLayer: 0
-  playTest: 1
+  playTest: -1
   CreatposY: 0.7
   dir: 0
   endPoint: 0
