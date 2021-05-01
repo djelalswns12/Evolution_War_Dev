@@ -474,8 +474,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7346986659133647341}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.34, y: 0.88, z: 0}
-  m_LocalScale: {x: 0.7655761, y: 0.79608357, z: 1.9006}
+  m_LocalPosition: {x: 1.084, y: 0.88, z: 0}
+  m_LocalScale: {x: 0.6845782, y: 0.711858, z: 1.6995165}
   m_Children:
   - {fileID: 6000422605615448864}
   - {fileID: 8479082400016558088}
@@ -557,6 +557,7 @@ MonoBehaviour:
   - {fileID: 7346986659133647344}
   - {fileID: 7346986659133647347}
   - {fileID: 2058443249535804265}
+  - {fileID: 7167547656560214841}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -878,8 +879,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowLayerWeightsInspector: 1
   ShowParameterInspector: 1
-  m_SynchronizeParameters: []
-  m_SynchronizeLayers: []
+  m_SynchronizeParameters:
+  - Type: 4
+    SynchronizeType: 0
+    Name: attack
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0
 --- !u!1 &8618707922504988984
 GameObject:
   m_ObjectHideFlags: 0

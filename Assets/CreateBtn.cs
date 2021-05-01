@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class CreateBtn : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public Text mytxt;
-    public string name;
+    public string myname;
     public bool setImg;
     public GameObject img;
     int Index;
@@ -20,16 +20,14 @@ public class CreateBtn : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     // Update is called once per frame
     void Update()
     {
-        Index = NetworkMaster.Instance.SetMonsterNametoIndex(name);
         //mytxt.text = NetworkMaster.Instance.GetMonsterOption(Index, 6) + "\n"+ NetworkMaster.Instance.GetMonsterOption(Index, 1)+"원";
-        mytxt.text = NetworkMaster.Instance.GetMonsterOption(Index, 1)+" G";
+        mytxt.text = NetworkMaster.Instance.GetMonsterOption(myname,"cost")+" G";
     
     
     }
     public void Create()
     {
-
-        NetworkMaster.Instance.CreatMonster(name);
+        NetworkMaster.Instance.CreatMonster(myname);
     }
     public void CreatePopUp()
     {

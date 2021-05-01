@@ -19,7 +19,7 @@ public class AuthScript : MonoBehaviour
     public bool IsFirebaseReady;
     public bool IsSignInOnProgess;
 
-    public Text logo,logo2,logo3;
+    public Text logo, logo2, logo3;
 
     public GameObject tabToPlay;
 
@@ -63,7 +63,7 @@ public class AuthScript : MonoBehaviour
     }
     private void Awake()
     {
-        Screen.SetResolution(1920, 1080,true);
+        Screen.SetResolution(1920, 1080, true);
         Application.runInBackground = true;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
         //Screen.SetResolution(1280 ,1024, false);
@@ -72,29 +72,7 @@ public class AuthScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
-        FirebaseDatabase.DefaultInstance
-     .GetReference("Monster")
-     .GetValueAsync().ContinueWith(task => {
-         if (task.IsFaulted)
-         {
-             Debug.Log("못찾았어요!!");
-             // Handle the error...
-         }
-         else if (task.IsCompleted)
-         {
-             Debug.Log("찾았어요!!");
-             DataSnapshot snapshot = task.Result;
-             foreach (DataSnapshot data in snapshot.Children)
-             {
-                 //받은 데이터들을 하나씩 잘라 string 배열에 저장
-                 IDictionary da = (IDictionary)data.Value;
-                 Debug.Log(da["name"]); 
-
-             }
-             // Do something with snapshot...
-         }
-     });
+ 
         //string monsterOption=Mycraw("https://waroforigin-default-rtdb.firebaseio.com/Monster.json");
 
         authCode = null;

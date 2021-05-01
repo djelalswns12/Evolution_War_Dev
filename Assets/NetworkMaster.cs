@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 using Photon.Realtime;
 using Photon.Pun;
 using UnityEngine.UI;
+using Firebase.Database;
+using System.Collections;
 #pragma warning disable 649
 public class hihi
 {
@@ -20,87 +22,6 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 
     #region Private Fields
 
-    #region 몬스터 정보
-    enum monsterCost
-    {
-		Tutle = 30,
-		FlyDragon = 50,
-		Dragon = 130,
-		Kang = 250,
-		Moneky = 300,
-		Lion = 550,
-		Simian = 800,
-		OldHuman = 1100,
-		DragonBoss=0,
-		MomBoss=0,
-		HumanBoss = 0,
-		MetalSoldier = 1800
-	}
-	enum monsterDropCost
-	{
-		Tutle = 30,
-		FlyDragon = 50,
-		Dragon = 130,
-		Kang = 250,
-		Moneky = 300,
-		Lion = 550,
-		Simian = 800,
-		OldHuman = 1100,
-		DragonBoss=5000,
-		MomBoss=9000,
-		HumanBoss = 20000,
-		MetalSoldier = 1800
-	}
-	enum monsterDamage
-	{
-		//공격력
-		Tutle = 10,
-		FlyDragon = 25,
-		Dragon = 55,
-		Kang = 70,
-		Moneky = 43,
-		Lion = 130,
-		Simian = 100,
-		OldHuman = 170,
-		DragonBoss =10,
-		MomBoss=10,
-		HumanBoss = 19,
-		MetalSoldier = 220
-	}
-	enum monsterHp
-	{
-		//체력
-		Tutle = 90,
-		FlyDragon = 65,
-		Dragon = 200,
-		Kang = 170,
-		Moneky = 100,
-		Lion = 300,
-		Simian = 500,
-		OldHuman = 700,
-		DragonBoss = 18000,
-		MomBoss=39000,
-		HumanBoss = 90000,
-		MetalSoldier = 1000
-	}
-	enum monsterSpeed
-	{
-		//이동속도
-		Tutle = 10,
-		FlyDragon = 20,
-		Dragon = 15,
-		Kang = 30,
-		Moneky = 15,
-		Lion = 15,
-		Simian = 15,
-		OldHuman = 22,
-		DragonBoss = 0,
-		MomBoss=0,
-		HumanBoss=0,
-		MetalSoldier =20
-
-	}
-	#endregion
 	private void ReadJson()
     {
 	
@@ -108,21 +29,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	
 	private GameObject instance;
 	// 0이름, 1비용 , 2드랍골드,3공중여부,4데미지 ,5최대체력 , 6이름,7스피드 
-	string[] monsterList = 
-		{
-		$"Tutle,{(int)monsterCost.Tutle},{(int)monsterDropCost.Tutle},0,{(int)monsterDamage.Tutle},{(int)monsterHp.Tutle},거북이,{(int)monsterSpeed.Tutle}",
-		$"Kang,{(int)monsterCost.Kang},{(int)monsterDropCost.Kang},0,{(int)monsterDamage.Kang},{(int)monsterHp.Kang},캥거루,{(int)monsterSpeed.Kang}",
-		$"Dragon,{(int)monsterCost.Dragon},{(int)monsterDropCost.Dragon},0,{(int)monsterDamage.Dragon},{(int)monsterHp.Dragon},드래곤,{(int)monsterSpeed.Dragon}",
-		$"OldHuman,{(int)monsterCost.OldHuman},{(int)monsterDropCost.OldHuman},0,{(int)monsterDamage.OldHuman},{(int)monsterHp.OldHuman},원시인,{(int)monsterSpeed.OldHuman}",
-		$"Monkey,{(int)monsterCost.Moneky},{(int)monsterDropCost.Moneky},0,{(int)monsterDamage.Moneky},{(int)monsterHp.Moneky},원숭이,{(int)monsterSpeed.Moneky}",
-		$"FlyDragon,{(int)monsterCost.FlyDragon},{(int)monsterDropCost.FlyDragon},1,{(int)monsterDamage.FlyDragon},{(int)monsterHp.FlyDragon},익룡,{(int)monsterSpeed.FlyDragon}",
-		$"Lion,{(int)monsterCost.Lion},{(int)monsterDropCost.Lion},0,{(int)monsterDamage.Lion},{(int)monsterHp.Lion},사자,{(int)monsterSpeed.Lion}",
-		$"Simian,{(int)monsterCost.Simian},{(int)monsterDropCost.Simian},0,{(int)monsterDamage.Simian},{(int)monsterHp.Simian},유인원,{(int)monsterSpeed.Simian}",
-		$"DragonBoss,{(int)monsterCost.DragonBoss},{(int)monsterDropCost.DragonBoss},0,{(int)monsterDamage.DragonBoss},{(int)monsterHp.DragonBoss},드래곤보스,{(int)monsterSpeed.DragonBoss}",
-		$"MetalSoldier,{(int)monsterCost.MetalSoldier},{(int)monsterDropCost.MetalSoldier},0,{(int)monsterDamage.MetalSoldier},{(int)monsterHp.MetalSoldier},철갑병,{(int)monsterSpeed.MetalSoldier}",
-		$"MomBoss,{(int)monsterCost.MomBoss},{(int)monsterDropCost.MomBoss},0,{(int)monsterDamage.MomBoss},{(int)monsterHp.MomBoss},맘모스보스,{(int)monsterSpeed.MomBoss},",
-		$"HumanBoss,{(int)monsterCost.HumanBoss},{(int)monsterDropCost.HumanBoss},0,{(int)monsterDamage.HumanBoss},{(int)monsterHp.HumanBoss},인간보스,{(int)monsterSpeed.HumanBoss}"
-	};
+	
 	[Tooltip("The prefab to use for representing the player")]
 	[SerializeField]
 	private GameObject playerPrefab;
@@ -139,15 +46,21 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	public GameObject EndingMsgBox;
 	public Text EndingMsg;
 	public bool otherPlayerHasBeen; // 접속하여 생성되었는지 확인
-	#endregion
 
-	#region MonoBehaviour CallBacks
+	public IDictionary[] monsterOption;
+    #endregion
 
-	/// <summary>
-	/// MonoBehaviour method called on GameObject by Unity during initialization phase.
-	/// </summary>
-	void Start()
+    #region MonoBehaviour CallBacks
+    void Awake()
+    {
+	
+	}
+    /// <summary>
+    /// MonoBehaviour method called on GameObject by Unity during initialization phase.
+    /// </summary>
+    void Start()
 	{
+		monsterOption = SceneVarScript.Instance.monsterOption;
 		endPoint = 0;
 		Instance = this;
 		// in case we started this demo with the wrong scene being active, simply load the menu scene
@@ -188,12 +101,11 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 				player.layer =  LayerMask.NameToLayer("centerunit");
                 if (photonView.IsMine)
                 {
-					SetBoss("HumanBoss");
+					StartCoroutine(SetBoss("HumanBoss"));
 				}
 			}
 			else
 			{
-
 				Debug.LogFormat("해당씬에 플레이어생성이 무시됨 : {0}", SceneManagerHelper.ActiveSceneName);
 			}
 
@@ -203,8 +115,9 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	}
 	void Update()
 	{
+		monsterOption = SceneVarScript.Instance.monsterOption;
 		//Debug.Log(MainGameManager.mainGameManager.GetMoney());
-	if (PhotonNetwork.IsConnected == false)
+		if (PhotonNetwork.IsConnected == false)
 		{
 			SceneManager.LoadScene("LobbyScean");
 			//SceneManager.LoadScene("LoginScean");
@@ -274,33 +187,31 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 
 	#endregion
 	#region Public Methods
-	public string GetMonsterOption(int index0,int index1) 
+
+	public string GetMonsterOption(string index0, string index1)
 	{
-		return monsterList[index0].Split(',')[index1];
+		if(monsterOption!=null)
+		foreach(IDictionary option in monsterOption)
+        {
+            if (option["name"].ToString() == index0)
+            {
+				return option[index1].ToString();
+            }
+        }
+		return "null";
 	}
-	public bool DiscountCreatMoney(int monsterNum)
-    {
-		if (MainGameManager.mainGameManager.GetMoney() >=int.Parse(GetMonsterOption(monsterNum,1)))
+	
+	public bool DiscountCreatMoney(string name)
+	{
+		if (MainGameManager.mainGameManager.GetMoney() >= int.Parse(GetMonsterOption(name, "cost")))
 		{
-			MainGameManager.mainGameManager.CountMoney(-int.Parse(GetMonsterOption(monsterNum, 1)));
+			MainGameManager.mainGameManager.CountMoney(-int.Parse(GetMonsterOption(name, "cost")));
 			return true;
 		}
 		else
 		{
 			return false;
 		}
-	}
-	public int SetMonsterNametoIndex(string name){
-		int monsterNum = -1;
-		for(int i = 0; i < monsterList.Length; i++)
-		{
-				if(GetMonsterOption(i,0) == name)
-                {
-				monsterNum = i;
-				return monsterNum;
-                }
-		}
-		return monsterNum;
 	}
 	public void CreatThrow(string name,Vector2 creatpos,int damage,monsterScript creatmonster,GameObject targetmonster)
     {
@@ -312,13 +223,13 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	}
 	public void CreatMonster(string name)
 	{
-		int creatIndex = SetMonsterNametoIndex(name);
+		int creatIndex = GetMonsterOption(name, "name") == "null" ? -1 : 1;
 		if (creatIndex == -1)
 		{
-			Debug.Log($"존재하지 않는 몬스터입니다 IndexNumber:{creatIndex}");
+			Debug.Log($"존재하지 않는 몬스터입니다 요청 몬스터:{name}");
 			return;
 		}
-		if (!DiscountCreatMoney(creatIndex)) 
+		if (!DiscountCreatMoney(name)) 
 		{
 			Debug.Log($"소환에 필요한 돈이 부족합니다.");
 			return;
@@ -342,7 +253,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 			monster = PhotonNetwork.Instantiate(name, creatpos, Quaternion.identity, 0);
 		}
 		//공중 여부 결정
-		if (GetMonsterOption(creatIndex, 3) == "0")
+		if (GetMonsterOption(name, "flystate") == "0")
 		{
 			monster.layer = setLayer == 0 ? LayerMask.NameToLayer("downunit") : LayerMask.NameToLayer("upunit");
 
@@ -351,29 +262,47 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         {
 			monster.layer = setLayer == 0 ? LayerMask.NameToLayer("downflyunit") : LayerMask.NameToLayer("upflyunit");
 		}
-		SetCreatureInfo(monster, creatIndex);
+		SetCreatureInfo(monster, name);
 
 	}
-	void SetCreatureInfo(GameObject monster,int creatIndex)
-    {
-		monster.GetComponent<monsterScript>().creatnumber = creatnumber++;
-		monster.GetComponent<monsterScript>().dropMoney = (int)(int.Parse(GetMonsterOption(creatIndex, 2)));
-		monster.GetComponent<monsterScript>().flystate = (int)(int.Parse(GetMonsterOption(creatIndex, 3)));
-		monster.GetComponent<monsterScript>().damage = int.Parse(GetMonsterOption(creatIndex, 4));
-		monster.GetComponent<monsterScript>().mhp = int.Parse(GetMonsterOption(creatIndex, 5));
-		monster.GetComponent<monsterScript>().speed = int.Parse(GetMonsterOption(creatIndex, 7))*0.1f;
-		monster.GetComponent<monsterScript>().hp = monster.GetComponent<monsterScript>().mhp;
+	void SetCreatureInfo(GameObject monster, string name)
+	{
+		monsterScript instanceMonster = monster.GetComponent<monsterScript>();
+		instanceMonster.creatnumber = creatnumber++;
+		instanceMonster.dropMoney = int.Parse(GetMonsterOption(name, "dropcost"));
+		instanceMonster.flystate = int.Parse(GetMonsterOption(name, "flystate"));
+		instanceMonster.damage = int.Parse(GetMonsterOption(name, "damge"));
+		instanceMonster.mhp = int.Parse(GetMonsterOption(name, "mhp"));
+		instanceMonster.speed = int.Parse(GetMonsterOption(name, "speed")) * 0.1f;
+		instanceMonster.hp = monster.GetComponent<monsterScript>().mhp;
 	}
-	public void SetBoss(string name)
+	public IEnumerator SetBoss(string name)
     {
 		if (PhotonNetwork.IsMasterClient && pv.IsMine)
 		{
-			if (player == null)
-				return;
+			int dataParse = 0;
+			for (;dataParse==0 ; )
+			{
+				if (player == null)
+				{
+					Debug.Log("플레이어가 존재하지 않습니다. 보스 소환을 위해 재요청합니다.");
+					yield return new WaitForSeconds(0.1f);
+				}
+				int creatIndex = GetMonsterOption(name, "name") == "null" ? -1 : 1;
+				if (creatIndex == -1)
+				{
+					Debug.Log($"존재하지 않는 몬스터입니다. 요청 몬스터:{name} 보스 소환을 위해 재요청합니다.");
+					yield return new WaitForSeconds(0.1f);
+                }
+                else
+                {
+					dataParse = 1;
+                }
+			}
 			Vector3 pos = new Vector3(background.transform.position.x,CreatposY,background.transform.position.z);
 			GameObject monster=PhotonNetwork.Instantiate(name, pos, Quaternion.identity, 0);
 			monster.layer = LayerMask.NameToLayer("upunit");
-			SetCreatureInfo(monster, SetMonsterNametoIndex(name));
+			SetCreatureInfo(monster, name);
 		}
 
 	}
