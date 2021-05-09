@@ -15,6 +15,7 @@ public class GroundEffectScript : MonoBehaviourPunCallbacks
     public List<GameObject> hittedMonster;
     public PhotonView pv;
     public int dieMoneyGet;
+    public GameObject creator;
     // Start is called before the first frame update
     void Start()
     {
@@ -54,6 +55,7 @@ public class GroundEffectScript : MonoBehaviourPunCallbacks
                     {
                         hittedMonster.Add(hitArea[i].gameObject);
                         monsterScript target = hitArea[i].gameObject.GetComponent<monsterScript>();
+                        target.pv.RPC("CrowdControl", RpcTarget.All,creator.transform.position,3f,2f);
                         target.pv.RPC("GetDamage", RpcTarget.All, damage,dieMoneyGet, NetworkMaster.Instance.dir);
                     }
                 }

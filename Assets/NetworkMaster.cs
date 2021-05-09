@@ -6,10 +6,6 @@ using UnityEngine.UI;
 using Firebase.Database;
 using System.Collections;
 #pragma warning disable 649
-public class hihi
-{
-	public static int a;
-}
 public class NetworkMaster : MonoBehaviourPunCallbacks
 {
 	//RoomOptions.CleanupCacheOnLeave 룸설정을 이렇게 해놓으면 클라이언트 나가도 삭제하지 않는다.
@@ -46,14 +42,21 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	public GameObject EndingMsgBox;
 	public Text EndingMsg;
 	public bool otherPlayerHasBeen; // 접속하여 생성되었는지 확인
-
+	public TextExpress textExpress;
 	public IDictionary[] monsterOption;
+	public int gameStage;
     #endregion
 
     #region MonoBehaviour CallBacks
     void Awake()
     {
-	
+		if (!PhotonNetwork.IsConnected)
+		{
+			PhotonNetwork.LoadLevel("LobbyScean");
+			//SceneManager.LoadScene("PunBasics-Launcher");
+			return;
+		}
+		monsterOption = SceneVarScript.Instance.monsterOption;
 	}
     /// <summary>
     /// MonoBehaviour method called on GameObject by Unity during initialization phase.
@@ -66,8 +69,8 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 		// in case we started this demo with the wrong scene being active, simply load the menu scene
 		if (!PhotonNetwork.IsConnected)
 		{
-			//SceneManager.LoadScene("PunBasics-Launcher");
-			return;
+			
+			
 		}
 
 		if (playerPrefab == null)
@@ -101,7 +104,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 				player.layer =  LayerMask.NameToLayer("centerunit");
                 if (photonView.IsMine)
                 {
-					StartCoroutine(SetBoss("HumanBoss"));
+					StartCoroutine(SetBoss("DragonBoss"));
 				}
 			}
 			else
@@ -269,6 +272,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	{
 		monsterScript instanceMonster = monster.GetComponent<monsterScript>();
 		instanceMonster.creatnumber = creatnumber++;
+		instanceMonster.myName = GetMonsterOption(name, "name").ToString() ;
 		instanceMonster.dropMoney = int.Parse(GetMonsterOption(name, "dropcost"));
 		instanceMonster.flystate = int.Parse(GetMonsterOption(name, "flystate"));
 		instanceMonster.damage = int.Parse(GetMonsterOption(name, "damge"));
@@ -299,6 +303,22 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 					dataParse = 1;
                 }
 			}
+			if (name == "DragonBoss")
+			{
+				yield return new WaitForSeconds(1f);
+				if (!Application.isEditor)
+				{
+					SendGameMsgFunc("30초후 보스가 등장합니다.", 1);
+					yield return new WaitForSeconds(27f);
+				}
+				SendGameMsgFunc("3", 1);
+				yield return new WaitForSeconds(1f);
+				SendGameMsgFunc("2", 1);
+				yield return new WaitForSeconds(1f);
+				SendGameMsgFunc("1", 1);
+				yield return new WaitForSeconds(1f);
+			}
+			SendGameMsgFunc("보스가 등장했습니다.", 1);
 			Vector3 pos = new Vector3(background.transform.position.x,CreatposY,background.transform.position.z);
 			GameObject monster=PhotonNetwork.Instantiate(name, pos, Quaternion.identity, 0);
 			monster.layer = LayerMask.NameToLayer("upunit");
@@ -306,7 +326,65 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 		}
 
 	}
+	public void SetNextStage(string name)
+    {
+        if (name == "DragonBoss")
+        {
+			StartCoroutine(WaitNextStage(name));
+        }
+		if (name == "MomBoss")
+		{
+			StartCoroutine(WaitNextStage(name));
+		}
+		if (name == "HumanBoss")
+		{
+			StartCoroutine(WaitNextStage(name));
+		}
+	}
+	IEnumerator WaitNextStage(string name)
+    {
+		yield return new WaitForSeconds(3f);
+		if (name == "DragonBoss")
+		{
+			SendGameMsgFunc("잠시후 중생대가 다가옵니다.", 1);
+		}
+		if (name == "MomBoss")
+		{
+			SendGameMsgFunc("잠시후 신생대가 다가옵니다.", 1);
+		}
+		if (name == "HumanBoss")
+		{
+			SendGameMsgFunc("모든 보스를 처치하였습니다.", 1);
+		}
+		yield return new WaitForSeconds(6f);
+		if (name == "DragonBoss")
+		{
+			SendGameMsgFunc("중생대 유닛이 잠금 해제 되었습니다.", 1);
+			StartCoroutine(SetBoss("MomBoss"));
+		}
+		if (name == "MomBoss")
+		{
+			SendGameMsgFunc("신생대 유닛이 잠금 해제 되었습니다.", 1);
+			StartCoroutine(SetBoss("HumanBoss"));
+		}
+		if (name == "HumanBoss")
+		{
 
+		}
+
+	}
+	public void SendGameMsgFunc(string s,int type)
+    {
+        if (type == 0)
+        {
+			textExpress.setNewText(s);
+        }
+		else if (type == 1)
+		{
+			pv.RPC("SendGameMsg", RpcTarget.All, s);
+        }
+
+	}
 	//위아래 층 정하는 함수
 	public void SetLayer(int layernum)
     {
@@ -338,7 +416,11 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 		}
 	}
 	#endregion
-
+	[PunRPC]
+	public void SendGameMsg(string s)
+    {
+		textExpress.setNewText(s);
+	}
 	[PunRPC]
 	public void Win(bool Winner)
     {

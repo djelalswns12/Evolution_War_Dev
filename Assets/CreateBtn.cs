@@ -10,19 +10,29 @@ public class CreateBtn : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     public bool setImg;
     public GameObject img;
     int Index;
-
+    public GameObject blind;
+    public int cost;
     // Start is called before the first frame update
     void Start()
     {
+        blind = transform.Find("blind").gameObject;
         mytxt = GetComponentInChildren<Text>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        cost = int.Parse(NetworkMaster.Instance.GetMonsterOption(myname, "cost"));
         //mytxt.text = NetworkMaster.Instance.GetMonsterOption(Index, 6) + "\n"+ NetworkMaster.Instance.GetMonsterOption(Index, 1)+"원";
-        mytxt.text = NetworkMaster.Instance.GetMonsterOption(myname,"cost")+" G";
-    
+        mytxt.text =cost.ToString()+" G";
+        if (cost >= MainGameManager.mainGameManager.GetMoney())
+        {
+            blind.SetActive(true);
+        }
+        else
+        {
+            blind.SetActive(false);
+        }
     
     }
     public void Create()
@@ -36,8 +46,10 @@ public class CreateBtn : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
-        setImg = true;
-     
+        if (cost <= MainGameManager.mainGameManager.GetMoney())
+        {
+            setImg = true;
+        }
     }
 
     public void OnDrag(PointerEventData eventData)

@@ -15,7 +15,10 @@ public class AttackEffectScript : MonoBehaviour
         targetsp = transform.parent.GetComponent<SpriteRenderer>();
         mySp = GetComponent<SpriteRenderer>();
         mySp.sortingLayerName = targetsp.sortingLayerName;
-        mySp.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+        if (gameObject.tag != "Player")
+        {
+            mySp.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+        }
     }
 
     // Update is called once per frame

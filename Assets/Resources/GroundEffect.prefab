@@ -123,12 +123,13 @@ MonoBehaviour:
   attOffset: {x: 0, y: 2.02}
   size: {x: -0.57, y: 4.17}
   damage: 0
-  speed: 11
+  speed: 12.5
   dir: 0
-  settingSpeed: 2.5
+  settingSpeed: 3.5
   hittedMonster: []
   pv: {fileID: 0}
   dieMoneyGet: 0
+  creator: {fileID: 0}
 --- !u!114 &-7497988880079789333
 MonoBehaviour:
   m_ObjectHideFlags: 0

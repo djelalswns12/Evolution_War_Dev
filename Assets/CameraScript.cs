@@ -22,7 +22,10 @@ public class CameraScript : MonoBehaviour
         if (Instance == null)
             Instance = this;
     }
-
+    private void FixedUpdate()
+    {
+        
+    }
     // Update is called once per frame
     void Update()
     {
@@ -30,14 +33,25 @@ public class CameraScript : MonoBehaviour
         float backbounday = groundsize.GetComponent<SpriteRenderer>().bounds.size.x / 2 - back.GetComponent<SpriteRenderer>().bounds.size.x / 2;
         Vector2 backpos=new Vector2(backbounday*transform.position.x/cameraSquareR.transform.position.x,0);
         backpos.y = back.transform.position.y;
+        if (Rightfunc() == true && Leftfunc() == true)
         back.transform.position = backpos;
+
         if (moveStautu == 0)
         {
-            if (right)
-                Rightfunc();
-
-            if (left)
-                Leftfunc();
+            if (Rightfunc() == false)
+            {
+                for(;Rightfunc()==false ;)
+                {
+                    transform.position += Vector3.left * 0.01f;
+                }
+            }
+            if (Leftfunc() == false)
+            {
+                for (; Leftfunc() == false;)
+                {
+                    transform.position += Vector3.right * 0.01f;
+                }
+            }
         }
         else
         {
@@ -52,18 +66,26 @@ public class CameraScript : MonoBehaviour
                 }
         }
     }
-    public void Rightfunc()
+    public bool Rightfunc()
     {
         if (transform.position.x < cameraSquareR.transform.position.x)
         {
-            transform.position += Vector3.right * speed;
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
-    public void Leftfunc()
+    public bool Leftfunc()
     {
         if (transform.position.x > cameraSquareL.transform.position.x)
         {
-            transform.position += Vector3.left * speed;
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
     public void MoveStop()

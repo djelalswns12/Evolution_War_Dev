@@ -54,18 +54,20 @@ public class BossScripit : MonoBehaviourPunCallbacks,IPunObservable
     public void SpawnGroundEffect()
     {
         GroundEffectScript script;
-        GameObject LeftGroundEffect = GameObject.Instantiate(Effect1, transform.position + Vector3.left*3f, Quaternion.identity);
+        GameObject LeftGroundEffect = GameObject.Instantiate(Effect1, transform.position + Vector3.left*1.5f, Quaternion.identity);
         script = LeftGroundEffect.GetComponent<GroundEffectScript>();
         script.dir = false;
         script.whatIsLayer2 = monster.whatIsLayer2;
         script.damage = monster.damage;
         script.dieMoneyGet = 1;
-        GameObject RightGroundEffect = GameObject.Instantiate(Effect1, transform.position + Vector3.right*3f, Quaternion.identity);
+        script.creator=gameObject;
+        GameObject RightGroundEffect = GameObject.Instantiate(Effect1, transform.position + Vector3.right*1.5f, Quaternion.identity);
         script = RightGroundEffect.GetComponent<GroundEffectScript>();
         script.dir = true;
         script.whatIsLayer2 = monster.whatIsLayer2;
         script.damage = monster.damage;
         script.dieMoneyGet = 1;
+        script.creator=gameObject;
     }
 
     [PunRPC]

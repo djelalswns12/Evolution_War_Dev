@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-public class touch : MonoBehaviour,IPointerDownHandler,IPointerUpHandler
+public class touch : MonoBehaviour,IPointerDownHandler,IPointerUpHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [SerializeField]
     CameraScript camerascript;
@@ -46,5 +46,20 @@ public class touch : MonoBehaviour,IPointerDownHandler,IPointerUpHandler
             return;
         camerascript.MoveStop();
 
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        Debug.Log("hi"); 
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+       
     }
 }

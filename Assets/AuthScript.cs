@@ -1,6 +1,5 @@
 ﻿using Firebase;
 using Firebase.Auth;
-using Firebase.Database;
 
 using System.Collections;
 using System.Collections.Generic;
@@ -67,7 +66,7 @@ public class AuthScript : MonoBehaviour
         Application.runInBackground = true;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
         //Screen.SetResolution(1280 ,1024, false);
-
+         
     }
     // Start is called before the first frame update
     void Start()
