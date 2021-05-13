@@ -304,7 +304,6 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         if (bossAttackSignal == 0) 
         {
             float attackTimer = Random.Range(4.5f, 10f);
-            Debug.Log(attackTimer);
             StartCoroutine(bossHit(attackTimer));
         }
         //Debug.Log(anim.GetCurrentAnimatorStateInfo(0).IsName("attack")+ "//도착지점:"+ anim.GetCurrentAnimatorStateInfo(0).normalizedTime);
@@ -658,8 +657,15 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
             {
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    NetworkMaster.Instance.SendGameMsgFunc($"보스 처치보상", 1);
-                    NetworkMaster.Instance.SendGameMsgFunc($"<color=blue>BLUE:</color> {GetMoney}<color=yellow>G</color>  <color=red>RED:</color> {dropMoney - GetMoney}<color=yellow>G</color>", 1);
+                    if (redPoint > bluePoint)
+                    {
+                        NetworkMaster.Instance.SendGameMsgFunc($"<color=red>RED</color>팀이 보스에게 더많은 피해를 입혔습니다.", 1);
+                    }
+                    else
+                    {
+                        NetworkMaster.Instance.SendGameMsgFunc($"<color=blue>BLUE</color>팀이 보스에게 더많은 피해를 입혔습니다.", 1);
+                    }
+                    //NetworkMaster.Instance.SendGameMsgFunc($"<color=blue>BLUE:</color> {GetMoney}<color=yellow>G</color>  <color=red>RED:</color> {dropMoney - GetMoney}<color=yellow>G</color>", 1);
                     Debug.Log($"{myName} 다음 보스를 소환합니다.");
                     NetworkMaster.Instance.SetNextStage(myName);
                 }

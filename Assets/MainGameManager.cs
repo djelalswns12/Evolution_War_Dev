@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 public class MainGameManager : MonoBehaviour
 {
     public static MainGameManager mainGameManager;
@@ -14,8 +15,16 @@ public class MainGameManager : MonoBehaviour
     public Text goldText; 
     public float dropGoldEff; // 처치 골드 효율
     public GameObject focus; // 시야 포커스
+    public GameObject nowBoss; // 현재 소환된 보스
+    public GameObject bossUI;
+    public Image redBar, blueBar, bossHpBar;
+    public TextMeshProUGUI bossHp,redPointPer,bluePointPer;
+    public Text redGetMoney, blueGetMoney;
+    public int playerBuliding;
     [SerializeField]
     private int touchDamge;
+
+    private monsterScript nowBossScript;
     // Start is called before the first frame update
     void Start()
     {
@@ -35,6 +44,36 @@ public class MainGameManager : MonoBehaviour
         }
         goldText.text = StringDot(GetMoney().ToString())+" Gold";
 
+        if (nowBoss != null)
+        {
+            bossUI.SetActive(true);
+            nowBossScript = nowBoss.GetComponent<monsterScript>();
+            if (nowBossScript.redPoint + nowBossScript.bluePoint > 0)
+            {
+                redBar.fillAmount = (float)nowBossScript.redPoint / (nowBossScript.redPoint + nowBossScript.bluePoint);
+                redPointPer.text = (redBar.fillAmount * 100).ToString("N2")+"%";
+                blueBar.fillAmount = (float)nowBossScript.bluePoint / (nowBossScript.redPoint + nowBossScript.bluePoint);
+                bluePointPer.text = (blueBar.fillAmount * 100).ToString("N2") + "%";
+
+                redGetMoney.text = StringDot(Mathf.Floor(nowBossScript.dropMoney * redBar.fillAmount))+" Gold";
+                blueGetMoney.text = StringDot(Mathf.Floor(nowBossScript.dropMoney* blueBar.fillAmount))+ " Gold";
+            }
+            else
+            {
+                redPointPer.text = "0%";
+                bluePointPer.text = "0%";
+                redGetMoney.text = "0 GOLD";
+                blueGetMoney.text = "0 GOLD";
+                redBar.fillAmount = 0;
+                blueBar.fillAmount = 0;
+            }
+                bossHpBar.fillAmount = nowBossScript.hp / nowBossScript.mhp;
+            bossHp.text = Mathf.Floor(nowBossScript.hp / nowBossScript.mhp * 100)+"%";
+        }
+        else
+        {
+            bossUI.SetActive(false);
+        }
         //if (Input.GetKeyDown(KeyCode.D))
         //{
         //    CreatGoldEffect(Camera.main.ScreenToWorldPoint(Input.mousePosition), Random.Range(10, 5000));
@@ -84,5 +123,17 @@ public class MainGameManager : MonoBehaviour
     public void SetFocus(GameObject newOne)
     {
         this.focus = newOne;
+    }
+    public void SetNowBoss(GameObject obj)
+    {
+        nowBoss = obj;
+    }
+    public void SetPlayerBuliding(int n)
+    {
+        playerBuliding = n;
+    }
+    public int GetPlayerBuliding()
+    {
+        return playerBuliding;
     }
 }

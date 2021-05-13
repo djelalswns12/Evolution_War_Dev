@@ -25,7 +25,7 @@ public class creatImgScript : MonoBehaviour
     {
         if (myImg.enabled == true)
         {
-            transform.position = Input.mousePosition;
+            transform.position = Input.mousePosition+(Vector3.up*20);
             Vector2 pos=Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Collider2D[] hitArea = Physics2D.OverlapBoxAll(pos,new Vector2(1,1),0,targetLayer);
             if (hitArea.Length > 0)
@@ -38,7 +38,7 @@ public class creatImgScript : MonoBehaviour
                         NetworkMaster.Instance.SetLayer(1);
                         redLineCreateLayer = 2;
                         redLinepos = redLine.transform.position;
-                        redLinepos.y = -0.5f;
+                        redLinepos.y = NetworkMaster.Instance.upSetPos.y;
                         redLine.transform.position = redLinepos;
                         break;
                     }
@@ -47,7 +47,7 @@ public class creatImgScript : MonoBehaviour
                         NetworkMaster.Instance.SetLayer(0);
                         redLineCreateLayer = 1;
                         redLinepos = redLine.transform.position;
-                        redLinepos.y = -2f;
+                        redLinepos.y = NetworkMaster.Instance.downSetPos.y;;
                         redLine.transform.position = redLinepos;
                         break;
                     }

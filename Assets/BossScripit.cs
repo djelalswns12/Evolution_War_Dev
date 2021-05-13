@@ -36,6 +36,7 @@ public class BossScripit : MonoBehaviourPunCallbacks,IPunObservable
     // Update is called once per frame
     void Update()
     {
+        MainGameManager.mainGameManager.SetNowBoss(gameObject);
         if (Input.GetMouseButtonDown(0))
         {
             ray = new Ray2D(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);

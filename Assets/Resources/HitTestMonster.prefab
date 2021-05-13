@@ -82,6 +82,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 1
 --- !u!114 &4011520809254505789
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -311,24 +312,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a3e88a84f307be44ab6ff2a9b34f802, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  flystate: 0
   dir: 0
   movestate: 0
   movestateChange: 1
   creatnumber: 0
   someThingBlock: 0
   pv: {fileID: 0}
+  sp: {fileID: 0}
+  whatIsLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  whatIsLayer2:
+    serializedVersion: 2
+    m_Bits: 0
   attackPlayer: 0
-  txt: {fileID: 2447701437584075552}
+  myIndex: 0
+  myName: 
+  killTarget: 0
+  bossAttackSignal: 0
+  redPoint: 0
+  bluePoint: 0
+  stateText: {fileID: 0}
+  redtxt: {fileID: 0}
+  bluetxt: {fileID: 0}
   mhp: 50
   hp: 50
   speed: 0
+  dieMoneyGet: 0
   damage: 0
+  dropMoney: 0
   attOffset: {x: 0, y: 0.07}
   size: {x: 1.22, y: 0.53}
   attOffset2: {x: -0.79, y: 0}
   size2: {x: 0.15, y: 0.83}
   attOffset3: {x: -1.68, y: 0}
   size3: {x: -0.44, y: 2.13}
+  throwPos: {x: 0, y: 0}
 --- !u!114 &1887442827832059478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -377,7 +397,7 @@ Transform:
   m_GameObject: {fileID: 2927395433656774970}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.572, y: 0.01, z: 0}
-  m_LocalScale: {x: 1.0121875, y: 1.05, z: 1}
+  m_LocalScale: {x: 1.0121875, y: 1.0499998, z: 1}
   m_Children: []
   m_Father: {fileID: 5669425730809048297}
   m_RootOrder: 0

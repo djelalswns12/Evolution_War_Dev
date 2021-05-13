@@ -6,9 +6,8 @@ using Photon.Realtime;
 public class PlayerScript : MonoBehaviourPunCallbacks,IPunObservable
 {
     // Start is called before the first frame update
-    public int moveStautu;
+    public int playerSp;
 
-    public float speed;
     public PhotonView pv;
     public bool myplayer = false;
     public SpriteRenderer sp;
@@ -16,12 +15,9 @@ public class PlayerScript : MonoBehaviourPunCallbacks,IPunObservable
 
     public Rigidbody2D rigid;
 
-    public bool right, left;
+    public GameObject[] buliding;
     void Start()
     {
- 
-        right = false;
-        left = false;
         myplayer = pv.IsMine;
 
         //if (myplayer)
@@ -33,6 +29,19 @@ public class PlayerScript : MonoBehaviourPunCallbacks,IPunObservable
     // Update is called once per frame
     void Update()
     {
+        for(int i = 0; i < buliding.Length; i++)
+        {
+            if (playerSp == i)
+            {
+                buliding[i].SetActive(true);
+            }
+            else
+            {
+                buliding[i].SetActive(false);
+            }
+        }
+
+        
         sp.flipX = dir;
         if (myplayer == false)
         {
@@ -41,45 +50,26 @@ public class PlayerScript : MonoBehaviourPunCallbacks,IPunObservable
             return;
         }
         //아래부터 IsMine 이라면
+        playerSp = MainGameManager.mainGameManager.GetPlayerBuliding();
 
-        if (moveStautu == 0)
-        {
-            if (right)
-                Rightfunc();
-
-            if (left)
-                Leftfunc();
-        }
 
     }
-    public void Rightfunc()
+    public void SetPlayerSp()
     {
-        rigid.velocity = Vector2.right*speed;
+        //네트워크 마스터로 부터 플레이어 건물 상태 가져와서 해당스크립트 변수에 할당에서 공유
 
     }
-    public void Leftfunc()
-    {
-        rigid.velocity = Vector2.left*speed;
-    }
-    public void MoveStop()
-    {
-        if (moveStautu == 0)
-        {
-            left = false;
-            right = false;
-            rigid.velocity = Vector2.zero;
-        }
-    }
-
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
         {
             stream.SendNext(dir);
+            stream.SendNext(playerSp);
         }
         else
         {
             dir = (bool)stream.ReceiveNext();
+            playerSp = (int)stream.ReceiveNext();
             //float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
             //Debug.Log(lag);
         }

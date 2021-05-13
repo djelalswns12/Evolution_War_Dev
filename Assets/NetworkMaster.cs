@@ -6,8 +6,15 @@ using UnityEngine.UI;
 using Firebase.Database;
 using System.Collections;
 #pragma warning disable 649
+[System.Serializable]
+public class MapList
+{
+	public GameObject[] map;
+}
 public class NetworkMaster : MonoBehaviourPunCallbacks
 {
+
+
 	//RoomOptions.CleanupCacheOnLeave 룸설정을 이렇게 해놓으면 클라이언트 나가도 삭제하지 않는다.
 	//photonView.TransferOwnership() 오브젝트의 소유권을 이전한다
 	#region Public Fields
@@ -18,10 +25,6 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 
     #region Private Fields
 
-	private void ReadJson()
-    {
-	
-    }
 	
 	private GameObject instance;
 	// 0이름, 1비용 , 2드랍골드,3공중여부,4데미지 ,5최대체력 , 6이름,7스피드 
@@ -37,6 +40,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	public int setLayer; // 유닛 생성시 레이어 설정
 	public int playTest; // 1 : 왼쪽플레이어 생성 , -1:오른쪽 플레이어 생성
 	public float CreatposY;
+	public Vector2 upSetPos,downSetPos;
 	public bool dir;
 	public int endPoint; // 0 : 게임중  1: hp 계산완료 결과창 드랍 2:종료상태
 	public GameObject EndingMsgBox;
@@ -45,6 +49,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	public TextExpress textExpress;
 	public IDictionary[] monsterOption;
 	public int gameStage;
+	public MapList[] groundSp;
     #endregion
 
     #region MonoBehaviour CallBacks
@@ -98,7 +103,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 				Vector3 setCameraPosition=new Vector3(playerX == (1* playTest) ? -playerpos : playerpos, 0f, Camera.main.transform.position.z);
 				Camera.main.GetComponent<CameraScript>().SetCameraMove(setCameraPosition);
 				
-				player = PhotonNetwork.Instantiate("Player", new Vector3(playerX == (1*playTest) ? -playerpos : playerpos, CreatposY, 0f), Quaternion.identity, 0);
+				player = PhotonNetwork.Instantiate("Player", new Vector3(playerX == (1*playTest) ? -playerpos : playerpos, downSetPos.y, 0f), Quaternion.identity, 0);
 				player.GetComponent<monsterScript>().creatnumber = creatnumber++;
 				player.GetComponent<PlayerScript>().dir = dir;
 				player.layer =  LayerMask.NameToLayer("centerunit");
@@ -118,6 +123,22 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	}
 	void Update()
 	{
+		for (int i = 0; i < groundSp.Length; i++) {
+            if (gameStage == i)
+            {
+				foreach(var item in groundSp[i].map)
+                {
+					item.SetActive(true);
+                }
+            }
+            else
+            {
+				foreach (var item in groundSp[i].map)
+				{
+					item.SetActive(false);
+				}
+			}
+		}
 		monsterOption = SceneVarScript.Instance.monsterOption;
 		//Debug.Log(MainGameManager.mainGameManager.GetMoney());
 		if (PhotonNetwork.IsConnected == false)
@@ -240,7 +261,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 		GameObject monster;
 		Vector3 creatpos = player.transform.position;
 		SpriteRenderer sp=((GameObject)Resources.Load(name)).GetComponent<SpriteRenderer>();
-		creatpos.y += sp.bounds.size.y / 2 - (player.GetComponent<SpriteRenderer>().bounds.size.y / 2) + (setLayer == 0 ? 0.8f : 2.1f);
+		creatpos.y = (setLayer == 0 ? downSetPos.y : upSetPos.y)+sp.bounds.size.y/2;
 
 
 		if (player.GetComponent<PlayerScript>().dir == true)
@@ -305,21 +326,33 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 			}
 			if (name == "DragonBoss")
 			{
-				yield return new WaitForSeconds(1f);
+				yield return new WaitForSeconds(2f);
+				SendGameMsgFunc("- 고생대 -", 1);
+				SendGameMsgFunc("지구 태초의 생물들", 1);
 				if (!Application.isEditor)
 				{
-					SendGameMsgFunc("30초후 보스가 등장합니다.", 1);
-					yield return new WaitForSeconds(27f);
+					yield return new WaitForSeconds(15f);
+					SendGameMsgFunc("10초후 신생대 보스가 등장합니다.", 1);
+					yield return new WaitForSeconds(10f);
 				}
-				SendGameMsgFunc("3", 1);
-				yield return new WaitForSeconds(1f);
-				SendGameMsgFunc("2", 1);
-				yield return new WaitForSeconds(1f);
-				SendGameMsgFunc("1", 1);
-				yield return new WaitForSeconds(1f);
+			}else if(name == "MomBoss")
+            {
+				SendGameMsgFunc("잠시후 중생대 보스가 등장합니다.", 1);
+				yield return new WaitForSeconds(10f);
 			}
+			else if (name == "HumanBoss")
+            {
+				SendGameMsgFunc("잠시후 신생대 보스가 등장합니다.", 1);
+				yield return new WaitForSeconds(10f);
+			}
+			SendGameMsgFunc("3", 1);
+			yield return new WaitForSeconds(1f);
+			SendGameMsgFunc("2", 1);
+			yield return new WaitForSeconds(1f);
+			SendGameMsgFunc("1", 1);
+			yield return new WaitForSeconds(1f);
 			SendGameMsgFunc("보스가 등장했습니다.", 1);
-			Vector3 pos = new Vector3(background.transform.position.x,CreatposY,background.transform.position.z);
+			Vector3 pos = new Vector3(background.transform.position.x,upSetPos.y,background.transform.position.z);
 			GameObject monster=PhotonNetwork.Instantiate(name, pos, Quaternion.identity, 0);
 			monster.layer = LayerMask.NameToLayer("upunit");
 			SetCreatureInfo(monster, name);
@@ -359,13 +392,21 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 		yield return new WaitForSeconds(6f);
 		if (name == "DragonBoss")
 		{
-			SendGameMsgFunc("중생대 유닛이 잠금 해제 되었습니다.", 1);
+			SendGameMsgFunc("- 중생대 -", 1);
+			SendGameMsgFunc("포유류들의 시대 [ 포유류 소환 잠금 해제 완료]", 1);
+			pv.RPC("SetStage", RpcTarget.All, 1);
+			yield return new WaitForSeconds(10f);
 			StartCoroutine(SetBoss("MomBoss"));
+			yield return null;
 		}
 		if (name == "MomBoss")
 		{
-			SendGameMsgFunc("신생대 유닛이 잠금 해제 되었습니다.", 1);
+			SendGameMsgFunc("- 신생대 -", 1);
+			SendGameMsgFunc("태초의 인류 [ 인류 소환 잠금 해제 완료]", 1);
+			pv.RPC("SetStage", RpcTarget.All, 2);
+			yield return new WaitForSeconds(10f);
 			StartCoroutine(SetBoss("HumanBoss"));
+			yield return null;
 		}
 		if (name == "HumanBoss")
 		{
@@ -377,10 +418,12 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
     {
         if (type == 0)
         {
+			//개인 메세지
 			textExpress.setNewText(s);
         }
 		else if (type == 1)
 		{
+			//공통 메세지
 			pv.RPC("SendGameMsg", RpcTarget.All, s);
         }
 
@@ -433,6 +476,17 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 			EndAction("Lose");
 		}
     }
-
+	[PunRPC]
+	public void SetStage(int n)
+    {
+		gameStage = n;
+    }
+	void OnDrawGizmos()
+	{
+		Gizmos.color = Color.red;
+		Gizmos.DrawWireCube(new Vector2(0, upSetPos.y), new Vector3(10, 0.1f, 0));
+		Gizmos.color = Color.blue;
+		Gizmos.DrawWireCube(new Vector2(0, downSetPos.y), new Vector3(10, 0.1f, 0));
+	}
 
 }
