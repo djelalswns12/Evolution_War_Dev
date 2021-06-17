@@ -6,16 +6,17 @@ public class SceneVarScript : MonoBehaviour
 {
     public static SceneVarScript Instance;
 	public IDictionary[] monsterOption;
+	public bool isDataConnect;
     private void Awake()
     {
 		Instance = this;
 		DontDestroyOnLoad(gameObject);
-		StartCoroutine(ReRequst());
+		//StartCoroutine(ReRequst());
 	}
     // Start is called before the first frame update
     void Start()
     {
-        
+		RequestMonsterDB();
     }
 
     // Update is called once per frame
@@ -39,20 +40,22 @@ public class SceneVarScript : MonoBehaviour
 		.GetValueAsync().ContinueWith(task => {
 			if (task.IsFaulted)
 			{
+				isDataConnect = false;
 				Debug.Log("DB 연결 실패");
 				// Handle the error...
 			}
 			else if (task.IsCompleted)
 			{
 				int index = 0;
-				//Debug.Log("찾았어요!!");
+				isDataConnect = true;
+				Debug.Log("찾았어요!!");
 				DataSnapshot snapshot = task.Result;
 				monsterOption = new IDictionary[snapshot.ChildrenCount];
 				foreach (DataSnapshot data in snapshot.Children)
 				{
 					//받은 데이터들을 하나씩 잘라 string 배열에 저장
 					monsterOption[index] = (IDictionary)data.Value;
-					//Debug.Log(monsterOption[index]["name"]);
+					Debug.Log(monsterOption[index]["name"]+":"+ monsterOption[index]["icon"]);
 					index++;
 				}
 				// Do something with snapshot...

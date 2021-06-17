@@ -17,13 +17,17 @@ public class MainGameManager : MonoBehaviour
     public GameObject focus; // 시야 포커스
     public GameObject nowBoss; // 현재 소환된 보스
     public GameObject bossUI;
+    public GameObject RightNav;
     public Image redBar, blueBar, bossHpBar;
     public TextMeshProUGUI bossHp,redPointPer,bluePointPer;
     public Text redGetMoney, blueGetMoney;
-    public int playerBuliding;
+    public int playerBuliding,touchLevel;
+    public int touchDropGold;
+    public Sprite[] bossIconList;//보스 아이콘
+    public Sprite[] buildIconList;//건물 아이콘
+    public Image bossIcon;
     [SerializeField]
     private int touchDamge;
-
     private monsterScript nowBossScript;
     // Start is called before the first frame update
     void Start()
@@ -35,6 +39,8 @@ public class MainGameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        SetTouchDamge(TouchDamageTheory());
         getMoneyTime += Time.deltaTime;
         if (getMoneyTime >= getPerTime)
         {
@@ -46,6 +52,8 @@ public class MainGameManager : MonoBehaviour
 
         if (nowBoss != null)
         {
+            //Debug.Log(NetworkMaster.Instance.GetMonsterOption(nowBoss.GetComponent<monsterScript>().myName, "icon"));
+            bossIcon.sprite = bossIconList[int.Parse(NetworkMaster.Instance.GetMonsterOption(nowBoss.GetComponent<monsterScript>().myName,"icon"))-1000];
             bossUI.SetActive(true);
             nowBossScript = nowBoss.GetComponent<monsterScript>();
             if (nowBossScript.redPoint + nowBossScript.bluePoint > 0)
@@ -67,7 +75,7 @@ public class MainGameManager : MonoBehaviour
                 redBar.fillAmount = 0;
                 blueBar.fillAmount = 0;
             }
-                bossHpBar.fillAmount = nowBossScript.hp / nowBossScript.mhp;
+            bossHpBar.fillAmount = nowBossScript.hp / nowBossScript.mhp;
             bossHp.text = Mathf.Floor(nowBossScript.hp / nowBossScript.mhp * 100)+"%";
         }
         else
@@ -97,7 +105,7 @@ public class MainGameManager : MonoBehaviour
     {
         SetMoney(GetMoney() + value);
     }
-    string StringDot<T>(T str)
+    public string StringDot<T>(T str)
     {
         string answer="";
         string copy=str.ToString();
@@ -115,6 +123,45 @@ public class MainGameManager : MonoBehaviour
     public int GetTouchDamge()
     {
         return touchDamge;
+    }
+    public int GetNextTouchDamge()
+    {
+        return TouchDamageTheory(touchLevel+1);
+    }
+    public void SetTouchDamge(int n)
+    {
+        touchDamge = n;
+    }
+    public int TouchDamageTheory(int n=-1)
+    {
+        if (n == -1)
+        {
+            return 6 + (touchLevel * 3);
+        }
+        else
+        {
+            return 6 + (n * 3);
+        }
+    }
+    public void touchDamgeUp()
+    {
+        if (GetMoney() >=GetNextTouchCost())
+        {
+            CountMoney(-GetNextTouchCost());
+            touchLevel++;
+        }
+        else
+        {
+            NetworkMaster.Instance.SendGameMsgFunc("골드가 부족합니다", 0);
+        }
+    }
+    public int GetNextTouchCost()
+    {
+        return 10 + (touchLevel * 8);
+    }
+    public int GetTouchDropGold()
+    {
+        return touchDropGold;
     }
     public GameObject GetFocus()
     {

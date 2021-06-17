@@ -158,7 +158,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                 }
                 else
                 {
-                    pv.RPC("MonsterDie", RpcTarget.All);
+                    pv.RPC("MonsterDie", RpcTarget.All,killTarget);
                     //Destroy(gameObject);
                     return;
                 }
@@ -619,14 +619,20 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
            
             if ((bool)PhotonNetwork.CurrentRoom.CustomProperties["isTest"] || (NetworkMaster.otherPlayer && NetworkMaster.otherPlayer.GetComponent<monsterScript>().hp > 0))
             {
+                //상대방이 살아있고
                 if (hp - damage < 0)
                 {
+                    
                     if (moneyGet == 1)
                     {
+                        //죽기전 받은 공격의 소유자가 중립(보스 등)일 경우
+                        //killTarget은 false가 되고 돈을 받을 수 없다.
                         killTarget = false;
                     }
                     else
                     {
+                        //죽기전 받은 공격의 소유자가 상대방일 경우
+                        //killTarget은 true가 되고 돈을 받을 수 있다.
                         killTarget = true;
                     }
                 }
@@ -640,11 +646,11 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     }
 
     [PunRPC]
-    public void MonsterDie()
+    public void MonsterDie(bool isKillByEnemy=false)
     {
         if (pv.IsMine == false&& gameObject.tag=="monster")
         {
-            if (killTarget == true)
+            if (isKillByEnemy == true)
             {
                 //내가 죽인게 맞다면 돈을 준다.
             MainGameManager.mainGameManager.CreatGoldEffect(transform.position, (int)(dropMoney * MainGameManager.mainGameManager.dropGoldEff));

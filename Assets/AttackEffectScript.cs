@@ -15,6 +15,10 @@ public class AttackEffectScript : MonoBehaviour
         targetsp = transform.parent.GetComponent<SpriteRenderer>();
         mySp = GetComponent<SpriteRenderer>();
         mySp.sortingLayerName = targetsp.sortingLayerName;
+        mySp.flipX = targetsp.flipX;
+        pos = transform.localPosition;
+        pos.x = mySp.flipX == true ? -SetX : SetX;
+        transform.localPosition = pos;
         if (gameObject.tag != "Player")
         {
             mySp.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;

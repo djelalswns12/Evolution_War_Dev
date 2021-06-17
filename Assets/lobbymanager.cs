@@ -89,6 +89,14 @@ public class lobbymanager  : MonoBehaviourPunCallbacks
 
     public void Connect()
     {
+        //데이타베이스 연결되었을때만 실행
+        if (SceneVarScript.Instance.isDataConnect == false)
+        {
+            SceneVarScript.Instance.RequestMonsterDB();
+            Debug.Log("Error03, Check your Network!");
+            return;
+        }
+
         if (PhotonNetwork.IsConnected)
         {
             joinBtn.interactable = false;
@@ -114,7 +122,7 @@ public class lobbymanager  : MonoBehaviourPunCallbacks
     }
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        //빈방이 없을때 실행되는 함수 JoinRoom이 실패할경우 실행된다.
+        //빈방이 없을때 실행되는 함수 JoinRandomRoom이 실패할경우 실행된다.
         infotext.text = "빈방이 없으므로 방을 하나 새로 만듭니다.";
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = 2;

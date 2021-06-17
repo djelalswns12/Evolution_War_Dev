@@ -13,6 +13,7 @@ public class CameraScript : MonoBehaviour
 
     public float backspeed,setcameraspeed;
     public GameObject back,groundsize;
+    public GameObject[] backList;
     public GameObject cameraSquareL, cameraSquareR;
 
     public Vector3 setCameraPosition;
@@ -29,6 +30,18 @@ public class CameraScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        for (int i=0;i<backList.Length;i++)
+        {
+            if (NetworkMaster.Instance.gameStage == i)
+            {
+                back = backList[i];
+                backList[i].SetActive(true);
+            }
+            else
+            {
+                backList[i].SetActive(false);
+            }
+        }
         //back boundary : +- (groundsize.GetComponent<SpriteRenderer>().bounds.size.x / 2- back.GetComponent<SpriteRenderer>().bounds.size.x / 2)
         float backbounday = groundsize.GetComponent<SpriteRenderer>().bounds.size.x / 2 - back.GetComponent<SpriteRenderer>().bounds.size.x / 2;
         Vector2 backpos=new Vector2(backbounday*transform.position.x/cameraSquareR.transform.position.x,0);

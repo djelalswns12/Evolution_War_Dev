@@ -49,6 +49,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	public TextExpress textExpress;
 	public IDictionary[] monsterOption;
 	public int gameStage;
+	public GameObject[] spawnList;
 	public MapList[] groundSp;
     #endregion
 
@@ -104,8 +105,8 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 				Camera.main.GetComponent<CameraScript>().SetCameraMove(setCameraPosition);
 				
 				player = PhotonNetwork.Instantiate("Player", new Vector3(playerX == (1*playTest) ? -playerpos : playerpos, downSetPos.y, 0f), Quaternion.identity, 0);
-				player.GetComponent<monsterScript>().creatnumber = creatnumber++;
 				player.GetComponent<PlayerScript>().dir = dir;
+				SetCreatureInfo(player, "Player1");
 				player.layer =  LayerMask.NameToLayer("centerunit");
                 if (photonView.IsMine)
                 {
@@ -123,6 +124,17 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	}
 	void Update()
 	{
+		for(int k = 0; k < spawnList.Length; k++)
+        {
+            if (k <= gameStage)
+            {
+				spawnList[k].SetActive(true);
+            }
+            else
+            {
+				spawnList[k].SetActive(false);
+            }
+        }
 		for (int i = 0; i < groundSp.Length; i++) {
             if (gameStage == i)
             {
@@ -211,7 +223,13 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 
 	#endregion
 	#region Public Methods
-
+	public void UpgradeBuild()
+    {
+		var nowPlayerName = player.GetComponent<monsterScript>().myName;
+		var nowBuild = int.Parse(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "icon")) - 3000+1;
+		SetCreatureInfo(player, "Player"+(nowBuild+1));
+		MainGameManager.mainGameManager.SetPlayerBuliding(nowBuild);
+	}
 	public string GetMonsterOption(string index0, string index1)
 	{
 		if(monsterOption!=null)

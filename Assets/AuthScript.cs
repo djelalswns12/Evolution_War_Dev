@@ -74,7 +74,10 @@ public class AuthScript : MonoBehaviour
  
         //string monsterOption=Mycraw("https://waroforigin-default-rtdb.firebaseio.com/Monster.json");
 
+        
         authCode = null;
+        
+        //플레이게임 실행코드
         PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
             .RequestServerAuthCode(false /* Don't force refresh */)
             .Build();
@@ -86,6 +89,7 @@ public class AuthScript : MonoBehaviour
 
 
         //signinbtn.interactable = false;
+        //파이어베이스 준비코드
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
             var result = task.Result;
@@ -119,6 +123,11 @@ public class AuthScript : MonoBehaviour
             {
                 SceneManager.LoadScene("LobbyScean");
             }
+        }
+        if (authCode != null)
+        {
+            tabToPlay.SetActive(true);
+            Debug.Log("구글플레이 회원id를 받아왔습니다. 이값을 이제 파이어베이스로 넘기세요!");
         }
     }
 
@@ -182,9 +191,8 @@ public class AuthScript : MonoBehaviour
         {
             if (success)
             {
-                logo.text = "성공!";
+                logo.text = "구글플레이게임 로그인 및 활성 성공!";
                 authCode = PlayGamesPlatform.Instance.GetServerAuthCode();
-                tabToPlay.SetActive(true);
                 logo3.text = authCode;
                 //signinbtn.interactable = IsFirebaseReady;
             }
@@ -194,7 +202,7 @@ public class AuthScript : MonoBehaviour
                 {
                     tabToPlay.SetActive(true);
                 }
-                logo.text = "실패!";
+                logo.text = "구글플레이게임 로그인 및 활성 실패!";
             }
 
         });
@@ -219,14 +227,14 @@ public class AuthScript : MonoBehaviour
                 firebaseAuth.SignInWithCredentialAsync(credential).ContinueWith(task => {
                     if (task.IsCanceled)
                     {
-                        logo2.text = "파이어 실패1";
+                        tabToPlay.GetComponent<Text>().text = "Login Error01, Please restart or Check your Network";
                         Debug.LogError("SignInWithCredentialAsync was canceled.");
                         signinbtn.interactable = IsFirebaseReady;
                         return;
                     }
                     if (task.IsFaulted)
                     {
-                        logo2.text = "파이어 실패2";
+                        tabToPlay.GetComponent<Text>().text = "Login Error02, Please restart or Check your Network";
                         Debug.LogError("SignInWithCredentialAsync encountered an error: " + task.Exception);
                         signinbtn.interactable = IsFirebaseReady;
                         return;

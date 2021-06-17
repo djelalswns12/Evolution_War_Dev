@@ -45,7 +45,7 @@ public class BossScripit : MonoBehaviourPunCallbacks,IPunObservable
                 if (hit.transform.gameObject == gameObject)
                 {
                     Instantiate(touchEffectObj, (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition), Quaternion.identity);
-                    MainGameManager.mainGameManager.CreatGoldEffect(Camera.main.ScreenToWorldPoint(Input.mousePosition), bossDropGold);
+                    MainGameManager.mainGameManager.CreatGoldEffect(Camera.main.ScreenToWorldPoint(Input.mousePosition), bossDropGold+MainGameManager.mainGameManager.GetTouchDropGold());
                     monster.pv.RPC("GetDamage", RpcTarget.All, MainGameManager.mainGameManager.GetTouchDamge(),dieMoneyGet,NetworkMaster.Instance.dir);
                     StartCoroutine(colorCo());
                 }

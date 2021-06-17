@@ -41,8 +41,17 @@ public class CreateBtn : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     }
     public void CreatePopUp()
     {
-
-        //NetworkMaster.Instance.CreatMonster(name);
+        var nav = MainGameManager.mainGameManager.RightNav.GetComponent<RightNav>();
+        if (nav.GetMyName() != myname)
+        {
+            nav.OpenNav();
+            nav.ResetPopUp(0);
+            nav.SetMyName(myname);
+        }
+        else
+        {
+            nav.CloseNav();
+        }
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
