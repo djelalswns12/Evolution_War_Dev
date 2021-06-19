@@ -111,6 +111,7 @@ public class AuthScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        logo3.text = SceneVarScript.Instance.GetAuthCode();
         if (user != null)
         {
             SceneManager.LoadScene("LobbyScean"); 
@@ -194,17 +195,17 @@ public class AuthScript : MonoBehaviour
             {
                 logo.text = "구글플레이게임 로그인 및 활성 성공!";
                 authCode = PlayGamesPlatform.Instance.GetServerAuthCode();
-                SceneVarScript.Instance.SetAuthCode(PlayGamesPlatform.Instance.GetIdToken());
-                logo3.text = authCode;
                 //signinbtn.interactable = IsFirebaseReady;
             }
             else
             {
                 if (Application.isEditor)
                 {
+                    SceneVarScript.Instance.SetAuthCode("test");
                     tabToPlay.SetActive(true);
                 }
-                SceneVarScript.Instance.SetAuthCode("hihi");
+
+                logo3.text = SceneVarScript.Instance.GetAuthCode();
                 logo.text = "구글플레이게임 로그인 및 활성 실패!";
             }
 
@@ -247,6 +248,7 @@ public class AuthScript : MonoBehaviour
                         Debug.LogFormat("User signed in successfully: {0} ({1})",
                     newUser.DisplayName, newUser.UserId);
                     user = newUser;
-                    });
+                    SceneVarScript.Instance.SetAuthCode(user.UserId);
+                });
         }
         }
