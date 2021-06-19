@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using TMPro;
+using UnityEngine.SceneManagement;
+
 public class lobbymanager  : MonoBehaviourPunCallbacks
 {
     public GameObject matchingObj;
@@ -24,6 +26,10 @@ public class lobbymanager  : MonoBehaviourPunCallbacks
     public static readonly string gameVersion = "1";
     void Start()
     {
+        if(SceneVarScript.Instance==null){
+            SceneManager.LoadScene("LoginScean");
+            return;
+        }
         PhotonNetwork.AutomaticallySyncScene = true;
         if (AuthScript.user != null)
         {
@@ -41,6 +47,7 @@ public class lobbymanager  : MonoBehaviourPunCallbacks
         infotext.text = "연결중";
         SceneVarScript.Instance.LoginCourseFun(SceneVarScript.Instance.GetAuthCode());
         SetUserInfoUI();
+        
     }
 
     // Update is called once per frame
@@ -76,7 +83,7 @@ public class lobbymanager  : MonoBehaviourPunCallbacks
     }
     public void SetUserInfoUI()
     {
-        if (SceneVarScript.Instance.userInfo != null)
+        if (SceneVarScript.Instance!=null&& SceneVarScript.Instance.userInfo != null)
         {
             nameTxt.text = SceneVarScript.Instance.GetUserOption("username");
             tearTxt.text = SceneVarScript.Instance.GetUserOption("tear");

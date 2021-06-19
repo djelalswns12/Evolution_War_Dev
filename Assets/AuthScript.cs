@@ -71,7 +71,7 @@ public class AuthScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
- 
+       
         //string monsterOption=Mycraw("https://waroforigin-default-rtdb.firebaseio.com/Monster.json");
 
         
@@ -204,6 +204,7 @@ public class AuthScript : MonoBehaviour
                 {
                     tabToPlay.SetActive(true);
                 }
+                SceneVarScript.Instance.SetAuthCode("hihi");
                 logo.text = "구글플레이게임 로그인 및 활성 실패!";
             }
 

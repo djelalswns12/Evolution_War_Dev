@@ -164,7 +164,7 @@ public class SceneVarScript : MonoBehaviour
 				{
 					//받은 데이터들을 하나씩 잘라 string 배열에 저장
 					monsterOption[index] = (IDictionary)data.Value;
-					Debug.Log(monsterOption[index]["name"]+":"+ monsterOption[index]["icon"]);
+					//Debug.Log(monsterOption[index]["name"]+":"+ monsterOption[index]["icon"]);
 					index++;
 				}
 				// Do something with snapshot...
