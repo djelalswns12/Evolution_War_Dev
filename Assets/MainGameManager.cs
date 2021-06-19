@@ -143,6 +143,19 @@ public class MainGameManager : MonoBehaviour
             return 6 + (n * 3);
         }
     }
+    public bool SpentGold(int num)
+    {
+        if (GetMoney() >= num)
+        {
+            CountMoney(-num);
+            return true;
+        }
+        else
+        {
+            NetworkMaster.Instance.SendGameMsgFunc("골드가 부족합니다", 0);
+            return false;
+        }
+    }
     public void touchDamgeUp()
     {
         if (GetMoney() >=GetNextTouchCost())

@@ -593,7 +593,7 @@ MonoBehaviour:
     type: 3}
   Effect1: {fileID: 877455057852851377, guid: 23d32d5fedcd1d24c8102bf399827b3b, type: 3}
   pv: {fileID: 7346986659133647345}
-  bossDropGold: 8
+  bossDropGold: 15
   dieMoneyGet: 0
 --- !u!114 &2058443249535804265
 MonoBehaviour:

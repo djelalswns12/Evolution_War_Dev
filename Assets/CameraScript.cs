@@ -61,7 +61,7 @@ public class CameraScript : MonoBehaviour
             if (Leftfunc() == false)
             {
                 for (; Leftfunc() == false;)
-                {
+                { 
                     transform.position += Vector3.right * 0.01f;
                 }
             }

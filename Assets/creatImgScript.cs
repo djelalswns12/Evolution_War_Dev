@@ -82,4 +82,9 @@ public class creatImgScript : MonoBehaviour
 
 
     }
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(Camera.main.ScreenToWorldPoint(Input.mousePosition),new Vector2(3, 3));
+    }
 }

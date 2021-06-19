@@ -12,9 +12,11 @@ public class lobbymanager  : MonoBehaviourPunCallbacks
     public Text nametext;
     public Text infotext;
     public Button joinBtn,StopBtn;
-
+    public Text Temp_authId;
     public TextMeshProUGUI timeStamp;
 
+    public TextMeshProUGUI tearTxt,winPointTxt,losePointTxt,goldTxt;
+    public Text nameTxt;
 
     public bool testUser,isStart;
     public float FindTime;
@@ -37,11 +39,15 @@ public class lobbymanager  : MonoBehaviourPunCallbacks
 
         joinBtn.interactable = false;
         infotext.text = "연결중";
+        SceneVarScript.Instance.LoginCourseFun(SceneVarScript.Instance.GetAuthCode());
+        SetUserInfoUI();
     }
 
     // Update is called once per frame
     void Update()
     {
+        SetUserInfoUI();
+        //Temp_authId.text = SceneVarScript.Instance.GetAuthCode();
         if (PhotonNetwork.CurrentRoom == null)
         {
             StopBtn.interactable = false;
@@ -66,6 +72,26 @@ public class lobbymanager  : MonoBehaviourPunCallbacks
 
             }
         }
+    
+    }
+    public void SetUserInfoUI()
+    {
+        if (SceneVarScript.Instance.userInfo != null)
+        {
+            nameTxt.text = SceneVarScript.Instance.GetUserOption("username");
+            tearTxt.text = SceneVarScript.Instance.GetUserOption("tear");
+            winPointTxt.text = "WIN : " + SceneVarScript.Instance.GetUserOption("win");
+            losePointTxt.text = "LOSE : " + SceneVarScript.Instance.GetUserOption("lose");
+            goldTxt.text = "GOLD : " + SceneVarScript.Instance.GetUserOption("money") + " G";
+        }
+        else
+        {
+            nameTxt.text = "null";
+            tearTxt.text = "null";
+            winPointTxt.text = "WIN : " + 0;
+            losePointTxt.text = "LOSE : " + 0;
+            goldTxt.text = "GOLD : " + 0 + " G";
+        }
     }
     public void IntoTheRoom()
     {
@@ -89,6 +115,7 @@ public class lobbymanager  : MonoBehaviourPunCallbacks
 
     public void Connect()
     {
+        SceneVarScript.Instance.RequestMonsterDB();
         //데이타베이스 연결되었을때만 실행
         if (SceneVarScript.Instance.isDataConnect == false)
         {

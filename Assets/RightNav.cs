@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 public class RightNav : MonoBehaviour
 {
+    public AudioSource myAudio;
+    public AudioClip[] audioClips;
+
     public string myname;
     public Image[] imageList;
     public GameObject uiImage;
@@ -38,6 +41,7 @@ public class RightNav : MonoBehaviour
     }
     void Start()
     {
+        myAudio = GetComponent<AudioSource>();
         CloseBtn.transform.SetAsLastSibling();
     }
 
@@ -77,7 +81,7 @@ public class RightNav : MonoBehaviour
                 uiBuildImg.sprite = MainGameManager.mainGameManager.buildIconList[int.Parse(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "icon")) - 3000];
                 uiBuildName.text = NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "nickname");
                 uiBuildHp.text ="Hp : "+NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "mhp");
-                uiBuildNextName.text = NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "nickname");
+                uiBuildNextName.text = NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "nickname")!="null"? NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "nickname"):"-";
                 uiBuildCost.text =MainGameManager.mainGameManager.StringDot(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "cost")) + " G";
 
             }
@@ -100,8 +104,10 @@ public class RightNav : MonoBehaviour
     {
         if (isON == true)
         {
+            
             myname = "";
             isON = false;
+            turnPageSoundPlay();
             StartCoroutine(Closing());
         }
     }
@@ -111,6 +117,7 @@ public class RightNav : MonoBehaviour
         if (isON == false)
         {
             isON = true;
+            turnPageSoundPlay();
             StartCoroutine(Opening());
         }
     }
@@ -128,6 +135,10 @@ public class RightNav : MonoBehaviour
                 popUpList[i].SetActive(true);
             }
         }
+    }
+    public void turnPageSoundPlay()
+    {
+        myAudio.PlayOneShot(audioClips[0]);
     }
     IEnumerator Opening()
     {

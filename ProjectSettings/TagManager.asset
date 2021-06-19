@@ -8,6 +8,7 @@ TagManager:
   - monster
   - boss
   - Test
+  - trap
   layers:
   - Default
   - TransparentFX
@@ -25,8 +26,8 @@ TagManager:
   - centerunit
   - upflyunit
   - downflyunit
-  - 
-  - 
+  - downTrap
+  - upTrap
   - 
   - 
   - 
@@ -60,6 +61,9 @@ TagManager:
   - name: upflyunit
     uniqueID: 2111077409
     locked: 0
+  - name: upTrap
+    uniqueID: 487221527
+    locked: 0
   - name: centerunit
     uniqueID: 1802652015
     locked: 0
@@ -68,6 +72,9 @@ TagManager:
     locked: 0
   - name: downflyunit
     uniqueID: 3663033609
+    locked: 0
+  - name: downTrap
+    uniqueID: 2228979753
     locked: 0
   - name: Mask
     uniqueID: 696735173

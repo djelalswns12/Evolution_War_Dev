@@ -80,6 +80,7 @@ public class AuthScript : MonoBehaviour
         //플레이게임 실행코드
         PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
             .RequestServerAuthCode(false /* Don't force refresh */)
+            .RequestIdToken()
             .Build();
 
         PlayGamesPlatform.InitializeInstance(config);
@@ -193,6 +194,7 @@ public class AuthScript : MonoBehaviour
             {
                 logo.text = "구글플레이게임 로그인 및 활성 성공!";
                 authCode = PlayGamesPlatform.Instance.GetServerAuthCode();
+                SceneVarScript.Instance.SetAuthCode(PlayGamesPlatform.Instance.GetIdToken());
                 logo3.text = authCode;
                 //signinbtn.interactable = IsFirebaseReady;
             }

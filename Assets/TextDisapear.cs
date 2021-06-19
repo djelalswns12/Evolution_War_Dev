@@ -24,7 +24,7 @@ public class TextDisapear : MonoBehaviour
 
     IEnumerator DecreaseAlpha()
     {
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(1.2f);
         while (myText.alpha > 0)
         {
             myText.alpha -= 0.05f;

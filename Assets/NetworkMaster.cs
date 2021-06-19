@@ -51,6 +51,9 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	public int gameStage;
 	public GameObject[] spawnList;
 	public MapList[] groundSp;
+
+	[Header("플레이어 건물 갯수")]
+	public int buildMaxCnt;
     #endregion
 
     #region MonoBehaviour CallBacks
@@ -224,12 +227,34 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	#endregion
 	#region Public Methods
 	public void UpgradeBuild()
-    {
-		var nowPlayerName = player.GetComponent<monsterScript>().myName;
-		var nowBuild = int.Parse(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "icon")) - 3000+1;
-		SetCreatureInfo(player, "Player"+(nowBuild+1));
-		MainGameManager.mainGameManager.SetPlayerBuliding(nowBuild);
+	{
+		var playerScript = player.GetComponent<monsterScript>();
+		var nowPlayerName = playerScript.myName;
+		var nowBuild = int.Parse(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "icon")) - 3000 + 1;
+		var buildCost = int.Parse(GetMonsterOption(nowPlayerName, "cost"));
+		if (nowBuild - 1 < gameStage)
+		{
+			if (MainGameManager.mainGameManager.SpentGold(buildCost))
+			{
+				if (nowBuild + 1 < buildMaxCnt)
+				{
+					var nextPlayerName = "Player" + (int.Parse(NetworkMaster.Instance.GetMonsterOption(NetworkMaster.player.GetComponent<monsterScript>().myName, "icon")) - 3000 + 2);
+					playerScript.hp += int.Parse(NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "mhp")) * 0.5f;
+					SetCreatureInfo(player, "Player" + (nowBuild + 1));
+					MainGameManager.mainGameManager.SetPlayerBuliding(nowBuild);
+				}
+				else
+				{
+					Debug.Log("플레이어 건물 종류를 넘어서서 업그레이드 하려합니다.");
+				}
+			}
+        }
+        else
+        {
+			SendGameMsgFunc("알맞지 않은 시대라 업그레이드 할 수 없습니다.", 0);
+        }
 	}
+
 	public string GetMonsterOption(string index0, string index1)
 	{
 		if(monsterOption!=null)
@@ -263,7 +288,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 		throwObject.GetComponent<ThrowScript>().dir = creatmonster.dir;
 		throwObject.GetComponent<ThrowScript>().whatIsLayer2 = creatmonster.whatIsLayer2;
 	}
-	public void CreatMonster(string name)
+	public void CreatMonster(string name,int createType=0,float posX=0)
 	{
 		int creatIndex = GetMonsterOption(name, "name") == "null" ? -1 : 1;
 		if (creatIndex == -1)
@@ -280,29 +305,46 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 		Vector3 creatpos = player.transform.position;
 		SpriteRenderer sp=((GameObject)Resources.Load(name)).GetComponent<SpriteRenderer>();
 		creatpos.y = (setLayer == 0 ? downSetPos.y : upSetPos.y)+sp.bounds.size.y/2;
-
-
-		if (player.GetComponent<PlayerScript>().dir == true)
-        {
-			//왼쪽 진영 소환
-			creatpos.x += 3+(setLayer == 0 ? 0 : 1.0f);
-			monster=PhotonNetwork.Instantiate(name, creatpos, Quaternion.identity, 0);
-        }
-        else
-        {
-			//오른쪽 진영 소환
-			creatpos.x += -3 + (setLayer == 0 ? 0 : -1.0f);
-			monster = PhotonNetwork.Instantiate(name, creatpos, Quaternion.identity, 0);
-		}
-		//공중 여부 결정
-		if (GetMonsterOption(name, "flystate") == "0")
+		if (createType == 0)
 		{
-			monster.layer = setLayer == 0 ? LayerMask.NameToLayer("downunit") : LayerMask.NameToLayer("upunit");
-
-		}
-		else
+			if (player.GetComponent<PlayerScript>().dir == true)
+			{
+				//왼쪽 진영 소환
+				creatpos.x += 3 + (setLayer == 0 ? 0 : 1.0f);
+			}
+			else
+			{
+				//오른쪽 진영 소환
+				creatpos.x += -3 + (setLayer == 0 ? 0 : -1.0f);
+			}
+		}else if (createType == 1)
         {
-			monster.layer = setLayer == 0 ? LayerMask.NameToLayer("downflyunit") : LayerMask.NameToLayer("upflyunit");
+			creatpos.x = posX;
+		}
+		monster = PhotonNetwork.Instantiate(name, creatpos, Quaternion.identity, 0);
+
+		if (monster.tag != "trap")
+		{
+			//공중 여부 결정
+			if (GetMonsterOption(name, "flystate") == "0")
+			{
+				monster.layer = setLayer == 0 ? LayerMask.NameToLayer("downunit") : LayerMask.NameToLayer("upunit");
+			}
+			else
+			{
+				monster.layer = setLayer == 0 ? LayerMask.NameToLayer("downflyunit") : LayerMask.NameToLayer("upflyunit");
+			}
+        }
+        else if (monster.tag == "trap")
+        {
+			if (GetMonsterOption(name, "flystate") == "0")
+			{
+				monster.layer = setLayer == 0 ? LayerMask.NameToLayer("downTrap") : LayerMask.NameToLayer("upTrap");
+			}
+			else
+			{
+				monster.layer = setLayer == 0 ? LayerMask.NameToLayer("downTrap") : LayerMask.NameToLayer("upTrap");
+			}
 		}
 		SetCreatureInfo(monster, name);
 
@@ -317,7 +359,10 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 		instanceMonster.damage = int.Parse(GetMonsterOption(name, "damge"));
 		instanceMonster.mhp = int.Parse(GetMonsterOption(name, "mhp"));
 		instanceMonster.speed = int.Parse(GetMonsterOption(name, "speed")) * 0.1f;
-		instanceMonster.hp = monster.GetComponent<monsterScript>().mhp;
+		if (instanceMonster.tag != "Player")
+		{
+			instanceMonster.hp = monster.GetComponent<monsterScript>().mhp;
+		}
 	}
 	public IEnumerator SetBoss(string name)
     {
@@ -344,32 +389,37 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 			}
 			if (name == "DragonBoss")
 			{
-				yield return new WaitForSeconds(2f);
-				SendGameMsgFunc("- 고생대 -", 1);
-				SendGameMsgFunc("지구 태초의 생물들", 1);
+				yield return new WaitForSeconds(1f);
+				SendMainMsgFunc("- 고생대 -\n지구 태초의 생물들", 1);
 				if (!Application.isEditor)
 				{
 					yield return new WaitForSeconds(15f);
-					SendGameMsgFunc("10초후 신생대 보스가 등장합니다.", 1);
+					SendMainMsgFunc("10초후 고생대 보스가 등장합니다.", 1);
 					yield return new WaitForSeconds(10f);
+                }
+                else
+                {
+					yield return new WaitForSeconds(2f);
+					SendMainMsgFunc("3초후 고생대 보스가 등장합니다.", 1);
+					yield return new WaitForSeconds(3f);
 				}
 			}else if(name == "MomBoss")
             {
-				SendGameMsgFunc("잠시후 중생대 보스가 등장합니다.", 1);
+				SendMainMsgFunc("잠시후 중생대 보스가 등장합니다.", 1);
 				yield return new WaitForSeconds(10f);
 			}
 			else if (name == "HumanBoss")
             {
-				SendGameMsgFunc("잠시후 신생대 보스가 등장합니다.", 1);
+				SendMainMsgFunc("잠시후 신생대 보스가 등장합니다.", 1);
 				yield return new WaitForSeconds(10f);
 			}
-			SendGameMsgFunc("3", 1);
+			SendMainMsgFunc("3", 1);
 			yield return new WaitForSeconds(1f);
-			SendGameMsgFunc("2", 1);
+			SendMainMsgFunc("2", 1);
 			yield return new WaitForSeconds(1f);
-			SendGameMsgFunc("1", 1);
+			SendMainMsgFunc("1", 1);
 			yield return new WaitForSeconds(1f);
-			SendGameMsgFunc("보스가 등장했습니다.", 1);
+			SendMainMsgFunc("보스가 등장했습니다.", 1);
 			Vector3 pos = new Vector3(background.transform.position.x,upSetPos.y,background.transform.position.z);
 			GameObject monster=PhotonNetwork.Instantiate(name, pos, Quaternion.identity, 0);
 			monster.layer = LayerMask.NameToLayer("upunit");
@@ -397,21 +447,20 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 		yield return new WaitForSeconds(3f);
 		if (name == "DragonBoss")
 		{
-			SendGameMsgFunc("잠시후 중생대가 다가옵니다.", 1);
+			SendMainMsgFunc("잠시후 중생대가 다가옵니다.", 1);
 		}
 		if (name == "MomBoss")
 		{
-			SendGameMsgFunc("잠시후 신생대가 다가옵니다.", 1);
+			SendMainMsgFunc("잠시후 신생대가 다가옵니다.", 1);
 		}
 		if (name == "HumanBoss")
 		{
-			SendGameMsgFunc("모든 보스를 처치하였습니다.", 1);
+			SendMainMsgFunc("잠시후 문명시대가 다가옵니다.", 1);
 		}
 		yield return new WaitForSeconds(6f);
 		if (name == "DragonBoss")
 		{
-			SendGameMsgFunc("- 중생대 -", 1);
-			SendGameMsgFunc("포유류들의 시대 [ 포유류 소환 잠금 해제 완료]", 1);
+			SendMainMsgFunc("- 중생대 -\n포유류들의 시대 [ 포유류 소환 잠금 해제 완료]", 1);
 			pv.RPC("SetStage", RpcTarget.All, 1);
 			yield return new WaitForSeconds(10f);
 			StartCoroutine(SetBoss("MomBoss"));
@@ -419,8 +468,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 		}
 		if (name == "MomBoss")
 		{
-			SendGameMsgFunc("- 신생대 -", 1);
-			SendGameMsgFunc("태초의 인류 [ 인류 소환 잠금 해제 완료]", 1);
+			SendMainMsgFunc("- 신생대 -\n태초의 인류 [ 인류 소환 잠금 해제 완료]", 1);
 			pv.RPC("SetStage", RpcTarget.All, 2);
 			yield return new WaitForSeconds(10f);
 			StartCoroutine(SetBoss("HumanBoss"));
@@ -428,7 +476,9 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 		}
 		if (name == "HumanBoss")
 		{
-
+			SendMainMsgFunc("- 문명시대 -\n상대방의 기지를 파괴하여 본인의 문명을 지키세요!", 1);
+			pv.RPC("SetStage", RpcTarget.All, 3);
+			yield return null;
 		}
 
 	}
@@ -444,15 +494,31 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 			//공통 메세지
 			pv.RPC("SendGameMsg", RpcTarget.All, s);
         }
-
+	}
+	public void SendMainMsgFunc(string s, int type)
+	{
+		if (type == 0)
+		{
+			//개인 메세지
+			textExpress.setMainText(s);
+		}
+		else if (type == 1)
+		{
+			//공통 메세지
+			pv.RPC("SendMainMsg", RpcTarget.All, s);
+		}
 	}
 	//위아래 층 정하는 함수
 	public void SetLayer(int layernum)
     {
 		if (Application.isEditor)
-			MainGameManager.mainGameManager.CountMoney(500000);
+			MainGameManager.mainGameManager.CountMoney(500);
 		setLayer = layernum;
     }
+	public int GetLayer()
+	{
+		return setLayer;
+	}
 	public void LeaveRoom()
 	{
 		PhotonNetwork.LeaveRoom();
@@ -481,6 +547,11 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 	public void SendGameMsg(string s)
     {
 		textExpress.setNewText(s);
+	}
+	[PunRPC]
+	public void SendMainMsg(string s)
+	{
+		textExpress.setMainText(s);
 	}
 	[PunRPC]
 	public void Win(bool Winner)

@@ -758,6 +758,7 @@ PolygonCollider2D:
       - {x: 3.1484137, y: 0.84885466}
       - {x: 3.1093512, y: 0.7511984}
       - {x: 3.4218512, y: 0.61447966}
+      - {x: 3.67577, y: 0.59496176}
       - {x: 3.6757574, y: 0.5949484}
       - {x: 3.792945, y: 0.65354216}
       - {x: 3.8515387, y: 0.80979216}
@@ -899,6 +900,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 2
     Name: attack
+  - Type: 4
+    SynchronizeType: 0
+    Name: SingleAttack
   m_SynchronizeLayers:
   - SynchronizeType: 2
     LayerIndex: 0
