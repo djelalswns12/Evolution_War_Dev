@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class BossScripit : MonoBehaviourPunCallbacks,IPunObservable
 {
@@ -13,6 +14,7 @@ public class BossScripit : MonoBehaviourPunCallbacks,IPunObservable
     public int dieMoneyGet;
     Color orginColor = new Color(1, 1, 1);
     Color redColor = new Color(1, 0, 0);
+    public List<GameObject> hittedList;
     // Start is called before the first frame update
     Ray2D ray;
 
@@ -36,20 +38,52 @@ public class BossScripit : MonoBehaviourPunCallbacks,IPunObservable
     // Update is called once per frame
     void Update()
     {
+        bossDropGold =int.Parse(SceneVarScript.Instance.GetOptionByName(monster.myName, "touchDropGold", SceneVarScript.Instance.bossOption));
         MainGameManager.mainGameManager.SetNowBoss(gameObject);
-        if (Input.GetMouseButtonDown(0))
+        if (MainGameManager.mainGameManager.GetCanTouchAttack())
         {
-            ray = new Ray2D(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-            foreach (RaycastHit2D hit in Physics2D.RaycastAll(ray.origin, ray.direction))
+            if (Input.GetMouseButtonDown(0))
             {
-                if (hit.transform.gameObject == gameObject)
+                PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+
+                eventDataCurrentPosition.position = Input.mousePosition;
+                List<RaycastResult> results = new List<RaycastResult>();
+                EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+                if (results.Count >0)
                 {
-                    Instantiate(touchEffectObj, (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition), Quaternion.identity);
-                    MainGameManager.mainGameManager.CreatGoldEffect(Camera.main.ScreenToWorldPoint(Input.mousePosition), bossDropGold+MainGameManager.mainGameManager.GetTouchDropGold());
-                    monster.pv.RPC("GetDamage", RpcTarget.All, MainGameManager.mainGameManager.GetTouchDamge(),dieMoneyGet,NetworkMaster.Instance.dir);
-                    StartCoroutine(colorCo());
+                    if (results.Count == 1)
+                    {
+                        if (results[0].gameObject != MainGameManager.mainGameManager.moveUI)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                
+
+
+                ray = new Ray2D(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+                foreach (RaycastHit2D hit in Physics2D.RaycastAll(ray.origin, ray.direction))
+                {
+                    if (hit.transform.gameObject == gameObject)
+                    {
+                        Instantiate(touchEffectObj, (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition), Quaternion.identity);
+                        MainGameManager.mainGameManager.CreatGoldEffect(Camera.main.ScreenToWorldPoint(Input.mousePosition), bossDropGold + MainGameManager.mainGameManager.GetTouchDropGold());
+                        monster.RpcCallGetDamage(MainGameManager.mainGameManager.GetTouchDamge(), dieMoneyGet, NetworkMaster.Instance.dir);
+                        StartCoroutine(colorCo());
+                        MainGameManager.mainGameManager.CoolTouchAttack();
+                        break;
+                    }
                 }
             }
+        }
+        if (pv.IsMine)
+        {
+            MonsterAttack();
         }
      }
     public void SpawnGroundEffect()
@@ -70,7 +104,35 @@ public class BossScripit : MonoBehaviourPunCallbacks,IPunObservable
         script.dieMoneyGet = 1;
         script.creator=gameObject;
     }
-
+    public void SpawnSingleGroundEffect()
+    {
+        Vector3 groundEffPos = transform.position + Vector3.right * 1.5f*(monster.GetTargetPlayer()==true?1f:-1f);
+        GroundEffectScript script;
+        GameObject GroundEffect = GameObject.Instantiate(Effect1, groundEffPos, Quaternion.identity);
+        script = GroundEffect.GetComponent<GroundEffectScript>();
+        script.dir = monster.GetTargetPlayer();
+        script.whatIsLayer2 = monster.whatIsLayer2;
+        script.damage = monster.damage;
+        script.dieMoneyGet = 1;
+        script.creator = gameObject;
+    }
+    public void MonsterAttack()
+    {
+        Collider2D[] hitArea = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + monster.attOffset3.x, transform.position.y + monster.attOffset3.y), monster.size3, 0, monster.whatIsLayer2);
+        if (hitArea.Length > 0)
+        {
+            for (int i = 0; i < hitArea.Length; i++)
+            {
+                if (hitArea[i].tag != "boss" && !hittedList.Contains(hitArea[i].gameObject))
+                {
+                    hittedList.Add(hitArea[i].gameObject);
+                    monsterScript target = hitArea[i].gameObject.GetComponent<monsterScript>();
+                    target.pv.RPC("CrowdControl", RpcTarget.All, transform.position, 5f, 4f);
+                    target.pv.RPC("GetDamage", RpcTarget.All, monster.damage, dieMoneyGet, NetworkMaster.Instance.dir);
+                }
+            }
+        }
+    }
     [PunRPC]
     void BossHit(int damage)
     {

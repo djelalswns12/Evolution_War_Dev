@@ -14,7 +14,7 @@ public class RightNav : MonoBehaviour
     
     [Header("Type0:유닛소환 팝업 내용")]
     public Text uiName; 
-    public Text uiDamage,uiHp,uiSpeed,uiDesc;
+    public Text uiDamage,uiHp,uiSpeed,uiSpawnTime,uiDesc;
 
     [Header("Type1:터치 업그레이드 팝업 내용")]
     public Text uiTouchName; 
@@ -22,10 +22,19 @@ public class RightNav : MonoBehaviour
     public Text uiTouchNowGold, uiTouchNowLevel, uiTouchNextDamage,uiTouchNextGold,uiTouchCost;
 
     [Header("Type2:건물진화 팝업 내용")]
-    public Image uiBuildImg;
-    public Text uiBuildName;
-    public Text uiBuildHp, uiBuildNextName,uiBuildCost;
+    public Image uiBuildImg,uiBuildNextImg;
+    public Text uiBuildName,uiBuildPerMoney;
+    public Text uiBuildHp, uiBuildNextName, uiBuildNextHp, uiBuildNextPerMoney,uiBuildCost;
 
+    [Header("Type4:트랩세부옵션 팝업 내용")]
+    public Text uiTrapName, uiTrapCost;
+    public Image uiTrapImg,uiTrapBar;
+    public Text uiTrapAllHp, uiTrapDesc;
+    [Header("Type5:스킬세부옵션 팝업 내용")]
+    public Text uiSkillName, uiSkillNeed, uiSkillDesc;
+    public Image uiSkillImg, uiSkillMask;
+    [Header("기타")]
+    public bool isRend;
     public bool isON;
     public GameObject CloseBtn;
     public Vector3 startPosX,endPosX;
@@ -42,7 +51,7 @@ public class RightNav : MonoBehaviour
     void Start()
     {
         myAudio = GetComponent<AudioSource>();
-        CloseBtn.transform.SetAsLastSibling();
+        CloseBtn.transform.SetAsLastSibling();//하이라이키 가장 마지막으로 순서 변경
     }
 
     // Update is called once per frame
@@ -54,9 +63,10 @@ public class RightNav : MonoBehaviour
             {
                 uiImage.GetComponent<Image>().sprite = imageList[int.Parse(NetworkMaster.Instance.GetMonsterOption(myname, "icon"))].sprite;
                 uiName.text = NetworkMaster.Instance.GetMonsterOption(myname, "name");
-                uiDamage.text = "DAMAGE : " + NetworkMaster.Instance.GetMonsterOption(myname, "damge");
-                uiHp.text = "HP : " + NetworkMaster.Instance.GetMonsterOption(myname, "mhp");
-                uiSpeed.text = "SPEED : " + NetworkMaster.Instance.GetMonsterOption(myname, "speed");
+                uiDamage.text = "Damage : " + NetworkMaster.Instance.GetMonsterOption(myname, "damge");
+                uiHp.text = "Hp : " + NetworkMaster.Instance.GetMonsterOption(myname, "mhp");
+                uiSpeed.text = "Spedd : " + NetworkMaster.Instance.GetMonsterOption(myname, "speed");
+                uiSpawnTime.text = "Spawn Time : " + SceneVarScript.Instance.GetOptionByName(myname,"cool", SceneVarScript.Instance.monsterOption)+" / s";
                 uiDesc.text = NetworkMaster.Instance.GetMonsterOption(myname, "desc");
             }
             else if (openedType == 1)
@@ -71,6 +81,7 @@ public class RightNav : MonoBehaviour
                 uiTouchNextDamage.text = "Damage + " +(MainGameManager.mainGameManager.GetNextTouchDamge()- MainGameManager.mainGameManager.GetTouchDamge());
                 uiTouchNextGold.text = "Gold + " + 0;
 
+
                 uiTouchCost.text= MainGameManager.mainGameManager.StringDot(MainGameManager.mainGameManager.GetNextTouchCost()) + " G";
             }
             else if (openedType == 2)
@@ -78,17 +89,56 @@ public class RightNav : MonoBehaviour
                 var nowPlayerName = NetworkMaster.player.GetComponent<monsterScript>().myName;
                 var nextPlayerName = "Player"+(int.Parse(NetworkMaster.Instance.GetMonsterOption(NetworkMaster.player.GetComponent<monsterScript>().myName, "icon"))-3000+2);
                 //건물진화
+                
                 uiBuildImg.sprite = MainGameManager.mainGameManager.buildIconList[int.Parse(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "icon")) - 3000];
                 uiBuildName.text = NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "nickname");
                 uiBuildHp.text ="Hp : "+NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "mhp");
+                uiBuildPerMoney.text = "Gold/s : " + SceneVarScript.Instance.GetOptionByName(nowPlayerName, "perMoney",SceneVarScript.Instance.playerOption);
                 uiBuildNextName.text = NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "nickname")!="null"? NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "nickname"):"-";
+                uiBuildNextHp.text = "Hp : " + (SceneVarScript.Instance.GetOptionByName(nextPlayerName, "mhp",SceneVarScript.Instance.monsterOption) != "null" ? SceneVarScript.Instance.GetOptionByName(nextPlayerName, "mhp", SceneVarScript.Instance.monsterOption) : "-");
+                uiBuildNextPerMoney.text= "Gold/s : " + (SceneVarScript.Instance.GetOptionByName(nextPlayerName, "perMoney", SceneVarScript.Instance.playerOption) != "null" ? SceneVarScript.Instance.GetOptionByName(nextPlayerName, "perMoney", SceneVarScript.Instance.playerOption): "-");
                 uiBuildCost.text =MainGameManager.mainGameManager.StringDot(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "cost")) + " G";
-
+                uiBuildNextImg.sprite = NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "icon")!="null"? MainGameManager.mainGameManager.buildIconList[int.Parse(NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "icon")) - 3000]:uiBuildImg.sprite;
             }
             else if (openedType == 3)
             {
                 //덫 소환
 
+            }
+            else if (openedType == 4)
+            {
+                if (MainGameManager.mainGameManager.GetNowMonster() != null)
+                {
+                    //덫 클릭
+                    var monster = MainGameManager.mainGameManager.GetNowMonster().GetComponent<monsterScript>();
+                    uiTrapName.text = NetworkMaster.Instance.GetMonsterOption(monster.myName, "nickname");
+                    uiTrapImg.sprite = MainGameManager.mainGameManager.trapIconList[int.Parse(NetworkMaster.Instance.GetMonsterOption(monster.myName, "icon")) - 1000];
+                    uiTrapBar.fillAmount = monster.hp / monster.mhp;
+                    uiTrapAllHp.text = monster.hp + "/" + monster.mhp;
+                    uiTrapDesc.text = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByName(monster.myName, "desc", SceneVarScript.Instance.trapOption));
+                    uiTrapCost.text = SceneVarScript.Instance.GetOptionByName(monster.myName, "upgradeCost", SceneVarScript.Instance.trapOption) =="null"?"-": SceneVarScript.Instance.GetOptionByName(monster.myName, "upgradeCost", SceneVarScript.Instance.trapOption);
+                }
+                else
+                {
+                    popUpList[4].SetActive(false);
+                }
+            }
+            else if (openedType == 5)
+            {
+                if (MainGameManager.mainGameManager.GetNowSkill() != null)
+                {
+                    //덫 클릭
+                    var skillName = MainGameManager.mainGameManager.GetNowSkill().GetComponent<SkillBtn>().myName;
+                    uiSkillName.text = SceneVarScript.Instance.GetOptionByName(skillName, "nickname", SceneVarScript.Instance.skillOption);
+                    uiSkillDesc.text = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByName(skillName, "desc", SceneVarScript.Instance.skillOption));
+                    uiSkillNeed.text = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByName(skillName, "needDesc", SceneVarScript.Instance.skillOption));
+                    uiSkillImg.sprite = SceneVarScript.Instance.skillIcon[int.Parse(SceneVarScript.Instance.GetOptionByName(skillName, "icon", SceneVarScript.Instance.skillOption))];
+                    uiSkillMask.enabled = !SkillManager.Instance.skillActiveList[int.Parse(SceneVarScript.Instance.GetOptionByName(skillName, "index", SceneVarScript.Instance.skillOption))];
+                }
+                else
+                {
+                    popUpList[5].SetActive(false);
+                }
             }
         }
     }
@@ -104,7 +154,6 @@ public class RightNav : MonoBehaviour
     {
         if (isON == true)
         {
-            
             myname = "";
             isON = false;
             turnPageSoundPlay();
@@ -142,6 +191,11 @@ public class RightNav : MonoBehaviour
     }
     IEnumerator Opening()
     {
+        if (isRend == false)
+        {
+            SetUIPosByDir();
+        }
+        isRend = true;
         while (Mathf.Abs(startPosX.x - transform.localPosition.x) > 1)
         {
             transform.localPosition = Vector3.Lerp( transform.localPosition, startPosX, Time.deltaTime*speed);
@@ -163,5 +217,20 @@ public class RightNav : MonoBehaviour
             }
             yield return new WaitForEndOfFrame();
         }
+    }
+    public void SetUIPosByDir() {
+        if (NetworkMaster.Instance.dir == true)
+        {
+            endPosX = new Vector3(startPosX.x + 600f, startPosX.y, startPosX.z);
+        }
+        else
+        {
+            var pos = CloseBtn.transform.localPosition;
+            pos.x*=-1;
+            CloseBtn.transform.localPosition = pos;
+            startPosX.x *= -1;
+            endPosX = new Vector3(startPosX.x - 600f, startPosX.y, startPosX.z);
+        }
+        transform.localPosition = endPosX;
     }
 }

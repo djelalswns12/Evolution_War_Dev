@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class SetPopUP : MonoBehaviour
 {
+    public RightNav nav;
     // Start is called before the first frame update
     void Start()
     {
-        
+        nav= MainGameManager.mainGameManager.RightNav.GetComponent<RightNav>();
     }
 
     // Update is called once per frame
@@ -15,21 +16,18 @@ public class SetPopUP : MonoBehaviour
     {
         
     }
-    public void TouchUpPopUp()
+    public void RefreshPopUpContents(int num)
     {
-        var nav = MainGameManager.mainGameManager.RightNav.GetComponent<RightNav>();
         nav.OpenNav();
-        nav.ResetPopUp(1);
+        nav.ResetPopUp(num);
     }
     public void BulidingUpPopUp()
     {
-        var nav = MainGameManager.mainGameManager.RightNav.GetComponent<RightNav>();
         nav.OpenNav();
         nav.ResetPopUp(2);
     }
     public void UpPopUp(int num)
     {
-        var nav = MainGameManager.mainGameManager.RightNav.GetComponent<RightNav>();
         if (nav.openedType != num)
         {
             nav.OpenNav();

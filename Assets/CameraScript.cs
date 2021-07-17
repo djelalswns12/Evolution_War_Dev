@@ -40,30 +40,30 @@ public class CameraScript : MonoBehaviour
             else
             {
                 backList[i].SetActive(false);
+                var pos = backList[i].transform.position;
+                pos.x= back.transform.position.x;
+                backList[i].transform.position = pos;
             }
         }
         //back boundary : +- (groundsize.GetComponent<SpriteRenderer>().bounds.size.x / 2- back.GetComponent<SpriteRenderer>().bounds.size.x / 2)
         float backbounday = groundsize.GetComponent<SpriteRenderer>().bounds.size.x / 2 - back.GetComponent<SpriteRenderer>().bounds.size.x / 2;
         Vector2 backpos=new Vector2(backbounday*transform.position.x/cameraSquareR.transform.position.x,0);
         backpos.y = back.transform.position.y;
-        if (Rightfunc() == true && Leftfunc() == true)
-        back.transform.position = backpos;
+        backpos.x= Mathf.Clamp(backpos.x, -Mathf.Abs(groundsize.GetComponent<SpriteRenderer>().bounds.size.x / 2), Mathf.Abs(groundsize.GetComponent<SpriteRenderer>().bounds.size.x / 2));
+        if (Rightfunc() && Leftfunc())
+        {
+            back.transform.position = backpos;
+        }
 
         if (moveStautu == 0)
         {
             if (Rightfunc() == false)
             {
-                for(;Rightfunc()==false ;)
-                {
-                    transform.position += Vector3.left * 0.01f;
-                }
+
             }
             if (Leftfunc() == false)
             {
-                for (; Leftfunc() == false;)
-                { 
-                    transform.position += Vector3.right * 0.01f;
-                }
+         
             }
         }
         else
@@ -81,7 +81,7 @@ public class CameraScript : MonoBehaviour
     }
     public bool Rightfunc()
     {
-        if (transform.position.x < cameraSquareR.transform.position.x)
+        if (transform.position.x <= cameraSquareR.transform.position.x)
         {
             return true;
         }
@@ -90,15 +90,37 @@ public class CameraScript : MonoBehaviour
             return false;
         }
     }
+    public float Rightfunc(float num)
+    {
+        if (num < cameraSquareR.transform.position.x)
+        {
+            return 0;
+        }
+        else
+        {
+            return cameraSquareR.transform.position.x - num; 
+        }
+    }
     public bool Leftfunc()
     {
-        if (transform.position.x > cameraSquareL.transform.position.x)
+        if (transform.position.x >= cameraSquareL.transform.position.x)
         {
             return true;
         }
         else
         {
             return false;
+        }
+    }
+    public float Leftfunc(float num)
+    {
+        if (num > cameraSquareL.transform.position.x)
+        {
+            return 0;
+        }
+        else
+        {
+            return cameraSquareL.transform.position.x - num;
         }
     }
     public void MoveStop()

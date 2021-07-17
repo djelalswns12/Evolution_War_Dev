@@ -423,6 +423,11 @@ MonoBehaviour:
   dieMoneyGet: 0
   damage: 10
   dropMoney: 0
+  attackSpeed: 0
+  bonusAttackSpeed: 0
+  bonusMoney: 0
+  bossBonusDamage: 0
+  bonusDamage: 0
   attOffset: {x: 0, y: 0.07}
   size: {x: 0.21, y: 0.53}
   attOffset2: {x: -0.81, y: 0}
@@ -430,6 +435,8 @@ MonoBehaviour:
   attOffset3: {x: -0.89, y: 0}
   size3: {x: 0.24, y: 0.83}
   throwPos: {x: 0, y: 0}
+  spawnPos: {x: 0, y: -0.41}
+  hitParticle: {fileID: 0}
 --- !u!114 &568385568633542560
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -448,6 +455,9 @@ MonoBehaviour:
   - Type: 9
     SynchronizeType: 2
     Name: attack
+  - Type: 1
+    SynchronizeType: 0
+    Name: AttackSpeed
   m_SynchronizeLayers:
   - SynchronizeType: 2
     LayerIndex: 0
@@ -562,6 +572,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Instance: {fileID: 0}
+  myText: {fileID: 0}
 --- !u!1 &7741122361505265317
 GameObject:
   m_ObjectHideFlags: 0

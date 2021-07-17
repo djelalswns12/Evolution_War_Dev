@@ -244,13 +244,20 @@ MonoBehaviour:
   dieMoneyGet: 0
   damage: 30
   dropMoney: 0
+  attackSpeed: 0
+  bonusAttackSpeed: 0
+  bonusMoney: 0
+  bossBonusDamage: 0
+  bonusDamage: 0
   attOffset: {x: 0, y: 0.06}
-  size: {x: 0.52, y: 1.07}
+  size: {x: 0.17, y: 1.07}
   attOffset2: {x: -1.38, y: 0.06}
   size2: {x: 0.28, y: 1.96}
   attOffset3: {x: -2.12, y: 0.11}
   size3: {x: 1.78, y: 1.99}
   throwPos: {x: 0, y: 0}
+  spawnPos: {x: 0, y: -0.57}
+  hitParticle: {fileID: 0}
 --- !u!114 &8717258438285173630
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -383,6 +390,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Instance: {fileID: 0}
+  myText: {fileID: 0}
 --- !u!1 &3643748293362793800
 GameObject:
   m_ObjectHideFlags: 0

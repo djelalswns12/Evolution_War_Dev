@@ -35,7 +35,7 @@ public class CreateBtn : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     {
         cost = int.Parse(NetworkMaster.Instance.GetMonsterOption(myname, "cost"));
         //mytxt.text = NetworkMaster.Instance.GetMonsterOption(Index, 6) + "\n"+ NetworkMaster.Instance.GetMonsterOption(Index, 1)+"원";
-        mytxt.text =cost.ToString()+" G";
+        mytxt.text =cost.ToString()+"G";
         if (cost >= MainGameManager.mainGameManager.GetMoney())
         {
             blind.SetActive(true);
@@ -74,29 +74,30 @@ public class CreateBtn : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
             NetworkMaster.Instance.SendGameMsgFunc("근처에 이미 다른 트랩이 존재합니다.", 0);
             return;
         }
-        if (NetworkMaster.Instance.dir == true)
+        if (SceneVarScript.Instance.GetOptionByName(myname, "outsideFocus", SceneVarScript.Instance.trapOption) == "0")
         {
-            if (GradiantPos.Instance.transform.position.x > mousePos.x)
+           if (NetworkMaster.Instance.dir == true)
             {
-                NetworkMaster.Instance.CreatMonster(myname, 1, mousePos.x);
+                if (GradiantPos.Instance.transform.position.x < mousePos.x)
+                {
+                    NetworkMaster.Instance.SendGameMsgFunc("시야가 없습니다.", 0);
+                    return;
+                }
             }
             else
             {
-                NetworkMaster.Instance.SendGameMsgFunc("시야가 없습니다.", 0);
+                if (GradiantPos.Instance.transform.position.x > mousePos.x )
+                {
+                    NetworkMaster.Instance.SendGameMsgFunc("시야가 없습니다.", 0);
+                    return;
+                }
             }
         }
-        else
+        if (!MainGameManager.mainGameManager.SpentGold(int.Parse(SceneVarScript.Instance.GetOptionByName(myname, "cost", SceneVarScript.Instance.monsterOption))))
         {
-            if (GradiantPos.Instance.transform.position.x < mousePos.x)
-            {
-                NetworkMaster.Instance.CreatMonster(myname, 1, mousePos.x);
-            }
-            else
-            {
-                NetworkMaster.Instance.SendGameMsgFunc("시야가 없습니다.", 0);
-            }
+            return;
         }
-   
+         NetworkMaster.Instance.CreatMonster(myname, 1, mousePos.x);
     }
     public void SetMyName(string s)
     {
@@ -138,18 +139,32 @@ public class CreateBtn : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     public void OnEndDrag(PointerEventData eventData)
     {
         EventSystem.current.SetSelectedGameObject(null);
+        img.GetComponent<Image>().enabled = false;
         if (img.GetComponent<creatImgScript>().redLineCreateLayer==1 || img.GetComponent<creatImgScript>().redLineCreateLayer == 2)
         {
+            /*
+             * redLineCreateLayer=1 : down 
+             * redLineCreateLayer=2 : up
+             */
             if (createType == 0)
             {
-                Create();
+                if (SpawnManager.IsListFull(NetworkMaster.Instance.GetLayer()))
+                {
+                    NetworkMaster.Instance.SendGameMsgFunc("대기열이 꽉 찼습니다.", 0);
+                    return;
+                }
+                if (!MainGameManager.mainGameManager.SpentGold(int.Parse(SceneVarScript.Instance.GetOptionByName(myname, "cost", SceneVarScript.Instance.monsterOption))))
+                {
+                    return;
+                }
+                SpawnManager.AddSpawnerList(myname,NetworkMaster.Instance.GetLayer());
             }
             else if(createType==1)
             {
                 TrapCreate();
             }
         }
-        img.GetComponent<Image>().enabled = false;
+        
 
     }
     public void CanNotSelect()

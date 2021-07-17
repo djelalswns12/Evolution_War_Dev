@@ -97,6 +97,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Instance: {fileID: 0}
+  myText: {fileID: 0}
 --- !u!1 &332837726172031257
 GameObject:
   m_ObjectHideFlags: 0
@@ -329,6 +330,8 @@ MonoBehaviour:
   attOffset3: {x: -0.98, y: 0}
   size3: {x: 0.83, y: 2.22}
   throwPos: {x: 0, y: 0}
+  spawnPos: {x: 0, y: -0.9}
+  hitParticle: {fileID: 0}
 --- !u!114 &8591231701755528788
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -527,7 +530,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4418860470357071970}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.55, y: -3.13, z: -2.9852643}
+  m_LocalPosition: {x: 0.01, y: -3.13, z: -2.9852643}
   m_LocalScale: {x: 26.308828, y: 6.6270323, z: 3.6308117}
   m_Children: []
   m_Father: {fileID: 332837726172031263}
@@ -623,7 +626,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4880021131699918333}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.45, y: 4.09, z: 0}
+  m_LocalPosition: {x: -1.99, y: 4.09, z: 0}
   m_LocalScale: {x: 3.322578, y: 4.5265336, z: 1.3737516}
   m_Children:
   - {fileID: 6446642088785043914}

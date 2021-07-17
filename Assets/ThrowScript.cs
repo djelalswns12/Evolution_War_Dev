@@ -18,10 +18,10 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
     public LayerMask whatIsLayer2;
     public int lostTarget;
     public int dieMoneyGet;
+    public float bonusMoney;
     // Start is called before the first frame update
     void Start()
     {
-        
         lostTarget = 0;
         canAttack = true;
         pv = GetComponent<PhotonView>();
@@ -97,6 +97,10 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
                     }
                     canAttack = false;
                     pv.RPC("Hitted", RpcTarget.All); // 애니메이션 변경
+                    if ((int)bonusMoney > 0)
+                    {
+                        MainGameManager.mainGameManager.CreatGoldEffect(transform.position,(int)bonusMoney);
+                    }
                     target.pv.RPC("GetDamage", RpcTarget.All, damage,dieMoneyGet, NetworkMaster.Instance.dir); //데미지 삽입
                   
                     return;

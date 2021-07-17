@@ -362,6 +362,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Instance: {fileID: 0}
+  myText: {fileID: 0}
 --- !u!1 &5524899748686676424
 GameObject:
   m_ObjectHideFlags: 0
@@ -613,6 +614,8 @@ MonoBehaviour:
   attOffset3: {x: -2.64, y: 0}
   size3: {x: 4.19, y: 1.54}
   throwPos: {x: -0.99, y: 0.26}
+  spawnPos: {x: 0, y: -0.87}
+  hitParticle: {fileID: 0}
 --- !u!114 &4541940269968191109
 MonoBehaviour:
   m_ObjectHideFlags: 0

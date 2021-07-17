@@ -28,9 +28,25 @@ public class SliceTouch : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
 
         if (Mathf.Abs(CameraSpeed) > toZeroSpeed && moveBySpeed==true)
         {
-            Camera.main.transform.position += Vector3.left * CameraSpeed*Time.deltaTime;
-            CameraSpeed = Mathf.Lerp(CameraSpeed,0, Time.deltaTime*cameraDeSpeed);
-            //Debug.Log("값:"+CameraSpeed);
+            if (camerascript.Rightfunc() == true && camerascript.Leftfunc() == true)
+            {
+                var newPos = Vector3.left * CameraSpeed * Time.deltaTime;
+                if (newPos.x>0)
+                {
+                    newPos.x+= camerascript.Rightfunc(newPos.x+Camera.main.transform.position.x);
+                }
+                else
+                {
+                    newPos.x += camerascript.Leftfunc(newPos.x + Camera.main.transform.position.x);
+                }
+                Camera.main.transform.position += newPos;
+                CameraSpeed = Mathf.Lerp(CameraSpeed, 0, Time.deltaTime * cameraDeSpeed);
+                //Debug.Log("값:"+CameraSpeed);
+            }
+            else
+            {
+                CameraSpeed = 0f;
+            }
         }
 
     }
@@ -61,7 +77,9 @@ public class SliceTouch : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
         {
             if (camerascript.Rightfunc() == true)
             {
-               Camera.main.transform.position=new Vector3(cameraStartPos.x-(Camera.main.ScreenToWorldPoint(eventData.position).x - Camera.main.ScreenToWorldPoint(startPos).x),0,-10);
+                var newPos=new Vector3(cameraStartPos.x-(Camera.main.ScreenToWorldPoint(eventData.position).x - Camera.main.ScreenToWorldPoint(startPos).x),0,-10);
+                newPos.x += camerascript.Rightfunc(newPos.x);
+                Camera.main.transform.position = newPos;
                 cameraStartPos = Camera.main.transform.position;
                 startPos = eventData.position;
             }
@@ -70,19 +88,14 @@ public class SliceTouch : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
         {
             if (camerascript.Leftfunc() == true)
             {
-              Camera.main.transform.position=new Vector3(cameraStartPos.x-(Camera.main.ScreenToWorldPoint(eventData.position).x - Camera.main.ScreenToWorldPoint(startPos).x),0,-10);
-            cameraStartPos = Camera.main.transform.position;
-            startPos = eventData.position;
+                var newPos = new Vector3(cameraStartPos.x - (Camera.main.ScreenToWorldPoint(eventData.position).x - Camera.main.ScreenToWorldPoint(startPos).x), 0, -10);
+                newPos.x += camerascript.Leftfunc(newPos.x);
+                Camera.main.transform.position = newPos;
+                cameraStartPos = Camera.main.transform.position;
+                startPos = eventData.position;
             }
         }
-        //if (timer > speedChkTime)
-        //{
-        //    Debug.Log($"{speedChkTime}초이상 드래그 했으므로 초기화");
-        //    timer = 0;
-        //    slicePos = eventData.position;
-        //}
         CameraSpeed = (Camera.main.ScreenToWorldPoint(eventData.position).x - Camera.main.ScreenToWorldPoint(slicePos).x) / Time.deltaTime;
-       //Debug.Log($"distance:{(eventData.position.x)},{(slicePos.x)}>>{(eventData.position.x - slicePos.x)} speed:{(Camera.main.ScreenToWorldPoint(eventData.position).x - Camera.main.ScreenToWorldPoint(slicePos).x) /Time.deltaTime}");
         slicePos = eventData.position;
     }
 

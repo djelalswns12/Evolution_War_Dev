@@ -83,6 +83,7 @@ MonoBehaviour:
     m_Bits: 0
   lostTarget: 0
   dieMoneyGet: 0
+  bonusMoney: 0
 --- !u!1 &8201807384159134537
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,16 +11,19 @@ public class TrapBtn : MonoBehaviour
     Vector2 prePos,preParSize;
     Coroutine myRoutine;
 
+    private AudioSource myAudio;
 
     public float speed;
     public Text nameTxt,optionTxt;
 
+    public Image myImage;
     public string myname;
 
     public CreateBtn btn;
     // Start is called before the first frame update
     void Start()
     {
+        myAudio = GetComponent<AudioSource>();
         btn.SetMyName(myname);
         preParSize = parObj.sizeDelta;
         prePos = obj.anchoredPosition;
@@ -31,12 +34,14 @@ public class TrapBtn : MonoBehaviour
     {
         optionTxt.text = NetworkMaster.Instance.GetMonsterOption(myname, "desc");
         nameTxt.text = NetworkMaster.Instance.GetMonsterOption(myname, "nickname");
-      
+        myImage.sprite= MainGameManager.mainGameManager.trapIconList[int.Parse(NetworkMaster.Instance.GetMonsterOption(myname, "icon"))-1000];
+
     }
     public void StartOpitonMove()
     {
         if (myRoutine != null)
         {
+            //만약 현재 실행중인 코루틴이 있다면 제거
             StopCoroutine(myRoutine);
         }
         myRoutine=StartCoroutine(OptionObjMove());
@@ -44,6 +49,7 @@ public class TrapBtn : MonoBehaviour
     }
     IEnumerator OptionObjMove()
     {
+        myAudio.PlayOneShot(myAudio.clip);
         if (!isOn)
         {
             while (Vector2.Distance(obj.anchoredPosition, new Vector2(obj.anchoredPosition.x, -141f)) > 1)

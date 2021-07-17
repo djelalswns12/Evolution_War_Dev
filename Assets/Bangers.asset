@@ -59,9 +59,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
   m_Name: Bangers
   m_EditorClassIdentifier: 
-  hashCode: 0
+  hashCode: -1188743986
   material: {fileID: 3781255078593703824}
-  materialHashCode: 0
+  materialHashCode: 982049326
   m_Version: 1.1.0
   m_SourceFontFileGUID: 5dd49b3eacc540408c98eee0de38e0f1
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: 5dd49b3eacc540408c98eee0de38e0f1,

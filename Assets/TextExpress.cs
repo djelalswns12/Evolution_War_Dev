@@ -15,7 +15,7 @@ public class TextExpress : MonoBehaviour
     Coroutine mainTextDisapear;
     bool isDisapearing;
 
-    Color preMainTextColor, preMainImgColor;
+    public Color preMainTextColor, preMainImgColor;
     // Start is called before the first frame update
     void Start()
     {
@@ -60,10 +60,10 @@ public class TextExpress : MonoBehaviour
             newColor.a -= 0.1f;
             mainText.color = newColor;
 
-            newColor2.a = newColor.a;
+            newColor2.a -= 0.1f;
             mainTextImg.color = newColor2;
 
-            if (newColor.a <= 0)
+            if (newColor.a <= 0 || newColor2.a <= 0)
             {
                 textMainObj.SetActive(false);
                 yield return null;

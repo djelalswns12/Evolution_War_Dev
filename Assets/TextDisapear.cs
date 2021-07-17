@@ -10,6 +10,7 @@ public class TextDisapear : MonoBehaviour
     void Start()
     {
         myText = GetComponent<TextMeshProUGUI>();
+        myText.raycastTarget = false;
     }
 
     // Update is called once per frame

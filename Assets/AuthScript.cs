@@ -30,7 +30,7 @@ public class AuthScript : MonoBehaviour
     public static FirebaseAuth firebaseAuth;
 
     public static FirebaseUser user;
-
+    public static int wwww=2;
     public string authCode;
     public string Mycraw(string url)
     {
@@ -111,19 +111,26 @@ public class AuthScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        logo3.text = SceneVarScript.Instance.GetAuthCode();
-        if (user != null)
+        if (user != null && SceneVarScript.Instance.isDataConnect==true)
         {
-            SceneManager.LoadScene("LobbyScean"); 
+            logo3.text = "실행2";
+            SceneManager.LoadScene("LobbyScean");
+        }
+        else
+        {
+            logo3.text = "DB연결:"+SceneVarScript.Instance.isDataConnect.ToString();
         }
         if (Input.GetMouseButtonDown(0))
         {
             if (authCode != null)
             {
+                logo3.text = "실행1";
                 GoogleToFireBase();
             }else if (Application.isEditor)
             {
+                Debug.Log("구글플레이 인증에 실패해서 파이어베이스에 접근할수 없었지만 디버그 모드라서 구글플레이 인증을 완료했다 친후 파이어베이스 접근 코드를 test로 임의부여후 실행하였습니다.");
                 SceneManager.LoadScene("LobbyScean");
+
             }
         }
         if (authCode != null)
@@ -204,8 +211,6 @@ public class AuthScript : MonoBehaviour
                     SceneVarScript.Instance.SetAuthCode("test");
                     tabToPlay.SetActive(true);
                 }
-
-                logo3.text = SceneVarScript.Instance.GetAuthCode();
                 logo.text = "구글플레이게임 로그인 및 활성 실패!";
             }
 
@@ -225,12 +230,14 @@ public class AuthScript : MonoBehaviour
     }
     public void GoogleToFireBase()
             {
-            signinbtn.interactable = false;
+        logo3.text = "실행4";
+        signinbtn.interactable = false;
             firebaseAuth = Firebase.Auth.FirebaseAuth.DefaultInstance;
                 Firebase.Auth.Credential credential =Firebase.Auth.PlayGamesAuthProvider.GetCredential(authCode);
                 firebaseAuth.SignInWithCredentialAsync(credential).ContinueWith(task => {
                     if (task.IsCanceled)
                     {
+                        logo3.text = "실행5";
                         tabToPlay.GetComponent<Text>().text = "Login Error01, Please restart or Check your Network";
                         Debug.LogError("SignInWithCredentialAsync was canceled.");
                         signinbtn.interactable = IsFirebaseReady;
@@ -238,6 +245,7 @@ public class AuthScript : MonoBehaviour
                     }
                     if (task.IsFaulted)
                     {
+                        logo3.text = "실행6";
                         tabToPlay.GetComponent<Text>().text = "Login Error02, Please restart or Check your Network";
                         Debug.LogError("SignInWithCredentialAsync encountered an error: " + task.Exception);
                         signinbtn.interactable = IsFirebaseReady;
@@ -248,7 +256,9 @@ public class AuthScript : MonoBehaviour
                         Debug.LogFormat("User signed in successfully: {0} ({1})",
                     newUser.DisplayName, newUser.UserId);
                     user = newUser;
+                    SceneVarScript.Instance.SetFirebaseUser(user);
                     SceneVarScript.Instance.SetAuthCode(user.UserId);
+                 
                 });
         }
         }

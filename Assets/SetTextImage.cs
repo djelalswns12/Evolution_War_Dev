@@ -9,6 +9,7 @@ public class SetTextImage : MonoBehaviour
     public RectTransform target;
     public float xOffset,yOffset;
     public Vector3 prePos;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -19,7 +20,25 @@ public class SetTextImage : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        target.anchoredPosition = prePos+ new Vector3(xOffset+(-myText.preferredWidth / 2), yOffset, 0);
+        SetImage();
+    }
+    public void SetImage()
+    {
+        int set;
+        if (myText.alignment == TextAnchor.MiddleCenter)
+        {
+            set = 2;
+        }else if (myText.alignment == TextAnchor.MiddleLeft)
+        {
+            set = -1;
+        }else if (myText.alignment == TextAnchor.MiddleRight)
+        {
+            set = 1;
+        }
+        else
+        {
+            set = 2;
+        }
+        target.anchoredPosition = prePos + new Vector3(xOffset + (-myText.preferredWidth / set), yOffset, 0);
     }
 }
