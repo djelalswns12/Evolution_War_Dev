@@ -559,7 +559,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                MainGameManager.mainGameManager.CountMoney(500);
+                MainGameManager.mainGameManager.CountMoney(50000);
             }
         }
         setLayer = layernum;

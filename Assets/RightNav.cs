@@ -33,6 +33,9 @@ public class RightNav : MonoBehaviour
     [Header("Type5:스킬세부옵션 팝업 내용")]
     public Text uiSkillName, uiSkillNeed, uiSkillDesc;
     public Image uiSkillImg, uiSkillMask;
+    public RectTransform skillDescRayout;
+    public RectTransform skillNeedDescRayout;
+    public GameObject uiSkillActiveBtn;
     [Header("기타")]
     public bool isRend;
     public bool isON;
@@ -62,7 +65,7 @@ public class RightNav : MonoBehaviour
             if (openedType == 0)
             {
                 uiImage.GetComponent<Image>().sprite = imageList[int.Parse(NetworkMaster.Instance.GetMonsterOption(myname, "icon"))].sprite;
-                uiName.text = NetworkMaster.Instance.GetMonsterOption(myname, "name");
+                uiName.text = NetworkMaster.Instance.GetMonsterOption(myname, "nickname");
                 uiDamage.text = "Damage : " + NetworkMaster.Instance.GetMonsterOption(myname, "damge");
                 uiHp.text = "Hp : " + NetworkMaster.Instance.GetMonsterOption(myname, "mhp");
                 uiSpeed.text = "Spedd : " + NetworkMaster.Instance.GetMonsterOption(myname, "speed");
@@ -102,14 +105,14 @@ public class RightNav : MonoBehaviour
             }
             else if (openedType == 3)
             {
-                //덫 소환
+                //덫 소환 창
 
             }
             else if (openedType == 4)
             {
                 if (MainGameManager.mainGameManager.GetNowMonster() != null)
                 {
-                    //덫 클릭
+                    //내 트랩 선택창
                     var monster = MainGameManager.mainGameManager.GetNowMonster().GetComponent<monsterScript>();
                     uiTrapName.text = NetworkMaster.Instance.GetMonsterOption(monster.myName, "nickname");
                     uiTrapImg.sprite = MainGameManager.mainGameManager.trapIconList[int.Parse(NetworkMaster.Instance.GetMonsterOption(monster.myName, "icon")) - 1000];
@@ -127,13 +130,23 @@ public class RightNav : MonoBehaviour
             {
                 if (MainGameManager.mainGameManager.GetNowSkill() != null)
                 {
-                    //덫 클릭
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(skillDescRayout);
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(skillNeedDescRayout);
+                    //스킬창
                     var skillName = MainGameManager.mainGameManager.GetNowSkill().GetComponent<SkillBtn>().myName;
                     uiSkillName.text = SceneVarScript.Instance.GetOptionByName(skillName, "nickname", SceneVarScript.Instance.skillOption);
                     uiSkillDesc.text = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByName(skillName, "desc", SceneVarScript.Instance.skillOption));
                     uiSkillNeed.text = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByName(skillName, "needDesc", SceneVarScript.Instance.skillOption));
                     uiSkillImg.sprite = SceneVarScript.Instance.skillIcon[int.Parse(SceneVarScript.Instance.GetOptionByName(skillName, "icon", SceneVarScript.Instance.skillOption))];
-                    uiSkillMask.enabled = !SkillManager.Instance.skillActiveList[int.Parse(SceneVarScript.Instance.GetOptionByName(skillName, "index", SceneVarScript.Instance.skillOption))];
+                    if (SceneVarScript.Instance.GetOptionByName(skillName, "state", SceneVarScript.Instance.skillOption) == "Active") {
+                        uiSkillActiveBtn.SetActive(true);
+                        uiSkillMask.enabled = !SkillManager.Instance.skillActiveList[int.Parse(SceneVarScript.Instance.GetOptionByName(skillName, "index", SceneVarScript.Instance.skillOption))];
+                    }
+                    else
+                    {
+                        uiSkillActiveBtn.SetActive(false);
+                    }
+                    
                 }
                 else
                 {

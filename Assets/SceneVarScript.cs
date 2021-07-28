@@ -310,8 +310,13 @@ public class SceneVarScript : MonoBehaviour
     }
 	public void test()
     {
-		Debug.Log("Test 함수 실행");
-    }
+		if (Application.isEditor)
+		{
+			SpawnManager.Instance.spawnSpeed += 3;
+			NetworkMaster.Instance.gameStage++;
+			MainGameManager.mainGameManager.CountMoney(1000);
+		}
+	}
 	public string GetOptionByIndex(string index, string colume,IDictionary[] db)
 	{
 		if (db != null)

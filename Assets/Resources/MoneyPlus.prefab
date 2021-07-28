@@ -145,14 +145,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   setGravity: 10
-  jumpPower: 4
+  yPower: 4
   scalePower: 4
-  gotGold: 0
   txt: {fileID: 5636818621049495676}
-  tarX: 90
-  tarY: 980
-  speed: 1.2
-  addSpeed: 0.04
 --- !u!1 &5636818620945733183
 GameObject:
   m_ObjectHideFlags: 0

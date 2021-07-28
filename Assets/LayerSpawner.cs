@@ -29,8 +29,8 @@ public class LayerSpawner : MonoBehaviour
             transform.localScale = startPos;
         }
         else
-        {   
-            var newPos= startPos;
+        {
+            var newPos = startPos;
             newPos.x *= -1;
             transform.localScale = newPos;
         }
@@ -46,7 +46,7 @@ public class LayerSpawner : MonoBehaviour
             if (i < myList.Count)
             {
                 creatures[i].SetActive(true);
-                creatures[i].GetComponent<Image>().sprite = RightNav.imageList[int.Parse(SceneVarScript.Instance.GetOptionByName(myList[i][0],"icon", SceneVarScript.Instance.monsterOption))].sprite;
+                creatures[i].GetComponent<Image>().sprite = RightNav.imageList[int.Parse(SceneVarScript.Instance.GetOptionByName(myList[i][0], "icon", SceneVarScript.Instance.monsterOption))].sprite;
             }
             else
             {
@@ -57,7 +57,7 @@ public class LayerSpawner : MonoBehaviour
     public void SpawnByNum(int num)
     {
         NetworkMaster.Instance.CreatMonster(myList[num][0], 0, 0, int.Parse(myList[num][2]));
-        DeleteCreature(creatures[num],false);
+        DeleteCreature(creatures[num], false);
     }
     public void DeleteCreature(GameObject obj)
     {
@@ -69,24 +69,24 @@ public class LayerSpawner : MonoBehaviour
             }
         }
     }
-    public void DeleteCreature(GameObject obj,bool moneyBack)
+    public void DeleteCreature(GameObject obj, bool moneyBack)
     {
         for (int i = 0; i < creatures.Length; i++)
         {
             if (creatures[i] == obj)
             {
-                SpawnManager.DeleteSpawnerList(myLayer, i,moneyBack);
+                SpawnManager.DeleteSpawnerList(myLayer, i, moneyBack);
             }
         }
     }
     public void ManageCool(int num)
     {
         for (int i = 0; i < myList.Count; i++)
+        {
+            if (setCool.Count < myList.Count)
             {
-                if (setCool.Count < myList.Count)
-                {
-                    setCool.Add(99999);
-                    nowCool.Add(0);
+                setCool.Add(99999);
+                nowCool.Add(0);
             }
             else
             {
@@ -100,7 +100,7 @@ public class LayerSpawner : MonoBehaviour
             }
             setCool[i] = (float.Parse(cool));
         }
-        nowCool[num] += Time.deltaTime;
+        nowCool[num] += Time.deltaTime*(1+SpawnManager.Instance.spawnSpeed);
         if (nowCool[num] >= setCool[num])
         {
             SpawnByNum(num);
@@ -119,7 +119,7 @@ public class LayerSpawner : MonoBehaviour
         }
         else
         {
-            bar[num].fillAmount  = Mathf.Lerp(bar[0].fillAmount, nowCool[0] / setCool[0], 0.5f);
+            bar[num].fillAmount = Mathf.Lerp(bar[0].fillAmount, nowCool[0] / setCool[0], 0.5f);
         }
     }
 }

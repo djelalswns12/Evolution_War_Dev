@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 public class PopUpSkill : MonoBehaviour
 {
+    public RectTransform rayout;
     SkillBtn skillBtn;
     // Start is called before the first frame update
     void Start()
@@ -20,7 +21,8 @@ public class PopUpSkill : MonoBehaviour
     }
     void ClickCheck()
     {
-        if (Input.GetMouseButtonUp(0))
+
+        if (Input.GetMouseButtonUp(0)&&skillBtn.myName!="null")
         {
             //마우스 클릭시 나를 클릭한거라면
             PointerEventData useSkillBtn = new PointerEventData(EventSystem.current);
@@ -46,13 +48,13 @@ public class PopUpSkill : MonoBehaviour
             {
                 MainGameManager.mainGameManager.SetNowSkill(gameObject);
                 MainGameManager.mainGameManager.popUpMaster.RefreshPopUpContents(5);
-
             }
             else
             {
                 MainGameManager.mainGameManager.SetNowSkill(null);
                 MainGameManager.mainGameManager.popUpMaster.UpPopUp(5);
             }
+          
         }
     }
 }

@@ -12,6 +12,7 @@ public class SpawnManager : MonoBehaviour
     private List<string[]> Spawner=new List<string[]>();
     private List<string[]> DownSpawner = new List<string[]>();
     public int createCnt;
+    public float spawnSpeed;
     // Start is called before the first frame update
     private void Awake()
     {

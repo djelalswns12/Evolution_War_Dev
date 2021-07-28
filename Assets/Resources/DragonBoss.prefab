@@ -876,6 +876,8 @@ MonoBehaviour:
   bonusMoney: 0
   bossBonusDamage: 0
   bonusDamage: 0
+  thornsSpeed: 0
+  oldHumanBuffSpeed: 0
   attOffset: {x: 0, y: 0}
   size: {x: 0, y: 0}
   attOffset2: {x: 0, y: 0}
@@ -885,6 +887,11 @@ MonoBehaviour:
   throwPos: {x: 0, y: 0}
   spawnPos: {x: 0, y: 0}
   hitParticle: {fileID: 0}
+  hasLionBuffFlag: 0
+  hasGoldBananaFlag: 0
+  hasOldHumanBuffFlag: 0
+  hasThornsBuffFlag: 0
+  hasPoisionFlag: 0
 --- !u!50 &7235073620437742222
 Rigidbody2D:
   serializedVersion: 4

@@ -212,14 +212,11 @@ public class SkillManager : MonoBehaviour
         {
             //10마리 모두 사망시키기
             list[settingName][i].GetComponent<monsterScript>().hp = 0;
-            if (i == settingNeed-1)
-            {
-                spawnLayer = list[settingName][i].GetComponent<monsterScript>().GetLayerNum();
-            }
         }
+        list[settingName][list[settingName].Count-1].GetComponent<monsterScript>().GetLayerNum();
         //저장된 레이어에 거북이 소환시키기
         NetworkMaster.Instance.CreatMonster(spawnMonster, 1, NetworkMaster.Instance.CreatPosXOffset(), spawnLayer);
-        NetworkMaster.Instance.SendGameMsgFunc("<color=#ff0000>슈퍼 거북이가 전장에 출현했습니다!</color>",1);
+        NetworkMaster.Instance.SendGameMsgFunc("슈퍼 거북이가 전장에 출현했습니다!",1);
     }
 
 
@@ -232,12 +229,26 @@ public class SkillManager : MonoBehaviour
         {
             item.GetComponent<monsterScript>().FuncLionAttackSpeedBuff(perTime,perAttackSpeed);
         }
-        NetworkMaster.Instance.SendGameMsgFunc("<color=#ff0000>약육강식이 발동되었습니다!</color>");
+        //foreach(var item in list)
+        //{
+        //    foreach(var ele in list[item.Key])
+        //    {
+        //        ele.GetComponent<monsterScript>().FuncLionAttackSpeedBuff(perTime, perAttackSpeed);
+        //    }
+        //}
+        NetworkMaster.Instance.SendGameMsgFunc("약육강식이 발동되었습니다!");
     }
     public void skill4_PoisonSpear_Active(string index)
     {
         skillCool[int.Parse(index)] = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "cool", SceneVarScript.Instance.skillOption));
-
+        var perTime = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "perTime", SceneVarScript.Instance.skillOption)); // 지속시간
+        var addSpeed = (100-float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "addSpeed", SceneVarScript.Instance.skillOption))) / 100; //이속 감소량
+        var addDamage = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "addDamage", SceneVarScript.Instance.skillOption)) / 100; // 도트 데미지량
+        foreach (var item in list["OldHuman"])
+        {
+            item.GetComponent<monsterScript>().FuncOldHumanBuff(perTime, addDamage,addSpeed);
+        }
+        NetworkMaster.Instance.SendGameMsgFunc("독창 전술이 발동되었습니다!");
     }
     #endregion
 
@@ -254,7 +265,8 @@ public class SkillManager : MonoBehaviour
             {
                 assembleTime = 0;
                 string data = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByIndex(skill_Index, "needMonster", SceneVarScript.Instance.skillOption));
-                int perMoney = int.Parse(SceneVarScript.Instance.GetOptionByIndex(skill_Index, "perMoney", SceneVarScript.Instance.skillOption));
+                string[] moneys= SceneVarScript.Instance.GetOptionByIndex(skill_Index, "perMoney", SceneVarScript.Instance.skillOption).Split('/');
+                int perMoney = int.Parse(moneys[MainGameManager.mainGameManager.GetPlayerBuliding()]);
                 //Debug.Log("필요 데이터:" + data);
                 var needs = data.Split(',');
                 for (int i = 0; i < needs.Length / 2; i++)
@@ -278,7 +290,8 @@ public class SkillManager : MonoBehaviour
             //원숭이 공격속도
             monkeyAttackSpeed = (float.Parse(SceneVarScript.Instance.GetOptionByIndex(skill_Index, "perAttackSpeed", SceneVarScript.Instance.skillOption)) / 100);
             //바나나 공격 성공시 추가 골드
-            bananaBonusGold = int.Parse(SceneVarScript.Instance.GetOptionByIndex(skill_Index, "perMoney", SceneVarScript.Instance.skillOption));
+            var moneys= SceneVarScript.Instance.GetOptionByIndex(skill_Index, "perMoney", SceneVarScript.Instance.skillOption).Split('/');
+            bananaBonusGold = int.Parse(moneys[MainGameManager.mainGameManager.GetPlayerBuliding()]);
         }
         else
         {
@@ -353,7 +366,7 @@ public class SkillManager : MonoBehaviour
                 skill3_Stronger_Active(useSkillIndex.ToString());
                 break;
             case 4:
-
+                skill4_PoisonSpear_Active(useSkillIndex.ToString());
                 break;
         }
     }
@@ -399,12 +412,12 @@ public class SkillManager : MonoBehaviour
         {
             if (MainGameManager.mainGameManager.GetMoney() >= int.Parse(data))
             {
-                Debug.Log("Enough Money!");
+                //Debug.Log("Enough Money!");
                 return true;
             }
             else
             {
-                Debug.Log("Insufficient Money!");
+                //Debug.Log("Insufficient Money!");
                 return false;
             }
         }

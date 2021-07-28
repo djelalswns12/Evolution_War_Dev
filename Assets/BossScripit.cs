@@ -127,8 +127,9 @@ public class BossScripit : MonoBehaviourPunCallbacks,IPunObservable
                 {
                     hittedList.Add(hitArea[i].gameObject);
                     monsterScript target = hitArea[i].gameObject.GetComponent<monsterScript>();
-                    target.pv.RPC("CrowdControl", RpcTarget.All, transform.position, 5f, 4f);
-                    target.pv.RPC("GetDamage", RpcTarget.All, monster.damage, dieMoneyGet, NetworkMaster.Instance.dir);
+                    float crowdDir = (transform.position.x - target.transform.position.x);
+                    target.pv.RPC("CrowdControl", RpcTarget.All, (crowdDir > 0 ? -1 : 1), 5f, 4f);
+                    target.RpcCallGetDamage(monster.damage, dieMoneyGet, NetworkMaster.Instance.dir);
                 }
             }
         }

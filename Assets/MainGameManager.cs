@@ -34,6 +34,7 @@ public class MainGameManager : MonoBehaviour
     public Sprite[] bossIconList;//보스 아이콘
     public Sprite[] buildIconList;//건물 아이콘
     public Sprite[] trapIconList;//트랩 아이콘
+    public Sprite[] buffIconList;//버프 아이콘
     
     public Image bossIcon;
     public AudioSource[] myAudio;
@@ -66,7 +67,7 @@ public class MainGameManager : MonoBehaviour
         //골드 획득량 DB연동
         var nowPlayerName = NetworkMaster.player.GetComponent<monsterScript>().myName;
         SetPerMoney(int.Parse(SceneVarScript.Instance.GetOptionByName(nowPlayerName,"perMoney",SceneVarScript.Instance.playerOption)));
-        
+     
         //터치 데미지 공식으로 적용 되도록함
         SetTouchDamge(TouchDamageTheory());
 
@@ -188,11 +189,13 @@ public class MainGameManager : MonoBehaviour
         }
  
     }
+    public void CreatDamageEffect(Vector2 pos,int damage)
+    {
+
+    }
     public void CreatGoldEffect(Vector2 pos,int gotGold)
     {
-        GameObject GoldEffect=GameObject.Instantiate(hgold, new Vector3(pos.x, pos.y, 0), Quaternion.identity);
-        GoldEffect.GetComponent<MoneyPos>().gotGold = gotGold;
-        GoldEffect.GetComponent<MoneyPos>().txt.text = StringDot(gotGold)+"+";
+        GoldObjectPool.Instance.Pop(pos, gotGold);
     }
     public void SetPerMoney(int cost)
     {

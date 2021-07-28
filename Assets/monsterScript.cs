@@ -49,6 +49,8 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     public float bonusMoney; // 소환물 공격성공시 획득 골드
     public float bossBonusDamage; // 보스에게 추가 데미지
     public float bonusDamage; // 일반 보너스 데미지
+    public float thornsSpeed; // 가시덤불 디버프 스피드
+    public float oldHumanBuffSpeed; // 원시인 디버프 스피드
 
     public Vector2 attOffset, size;//중첩 확인
     public Vector2 attOffset2, size2;//자신앞에 유닛 존재여부 확인
@@ -61,6 +63,25 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     Color redColor = new Color(1, 0, 0);
 
     Coroutine lionBuff;
+    public bool hasLionBuffFlag;
+
+    public bool hasGoldBananaFlag;
+
+
+    Coroutine oldHumanBuff;
+    public bool hasOldHumanBuffFlag;//원시인 버프 보유 여부
+
+    Coroutine thornsBuff;
+    bool thornsFlag;//가시덤불 스크립트 보유 여부
+    public bool hasThornsBuffFlag;//가시덤불에 의한 슬로 여부
+
+
+    bool nuckBackFlag;//죽창 스크립트 보유 여부
+
+
+    public bool hasPoisionFlag;//중독상태
+    float poisionDamage;//원시인이 줄 수 있는 데미지
+    float poisionSpeed; // 원시인이 줄 수 있는 디버프 속도
     // Start is called before the first frame update
     void Awake()
     {
@@ -69,6 +90,8 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     }
     void Start()
     {
+        thornsSpeed = 1;
+        oldHumanBuffSpeed = 1;
         hitParticle = Resources.Load<ParticleSystem>("HitParticle");
         if (stateText != null)
         {
@@ -201,16 +224,14 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
             {
                 anim.SetFloat("AttackSpeed", attackSpeed);
                 PlayMonster();
-
             }
             else if (gameObject.tag == "Player")
             {
-
                 PlayPlayer();
             }
             else if (gameObject.tag == "Test")
             {
-                PlayBoss();
+                //PlayBoss();
             }
             else if (gameObject.tag == "boss")
             {
@@ -313,10 +334,18 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         {
             myOutline.enabled = false;
         }
-        if (!UnitThereExceptTrap())
+        Collider2D[] hit2 = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + (attOffset3.x * (dir == true ? -1 : 1)), transform.position.y + attOffset3.y), size3, 0, whatIsLayer2);
+        for (int i = 0; i < hit2.Length; i++)
+        {
+            if (hit2[i].tag == "boss")
+            {
+                hp-=1/mhp;
+            }
+        }
+            if (!UnitThereExceptTrap())
         {
             //앞에 무언가가 없다면
-            animReset();
+            //animReset();
             movestate = 0;
         }
         else
@@ -326,6 +355,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         }
         if (movestate == 1)
         {
+            /*
             Collider2D[] hit2 = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + (attOffset3.x * (dir == true ? -1 : 1)), transform.position.y + attOffset3.y), size3, 0, whatIsLayer2);
             for (int i = 0; i < hit2.Length; i++)
             {
@@ -352,6 +382,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                 }
                 animReset();
             }
+            */
         }
     }
     void PlayMonster()
@@ -377,7 +408,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
             {
                 if (moveMethod == 0)
                 {
-                    transform.position += Vector3.right * speed * (dir == true ? 1 : -1) * Time.deltaTime * NetworkMaster.Instance.editorSpeed;
+                    transform.position += Vector3.right * speed*(oldHumanBuffSpeed*thornsSpeed) * (dir == true ? 1 : -1) * Time.deltaTime * NetworkMaster.Instance.editorSpeed;
                 }
             }
 
@@ -486,20 +517,32 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     }
     public void SetSkillOpiton(string myName)
     {
+        //고유효과 부여하기 위해서는 이곳에 기입
         if (myName == "Monkey")
         {
             attackSpeed =(1+ SkillManager.Instance.monkeyAttackSpeed);
             bonusMoney = SkillManager.Instance.bananaBonusGold;
+            if (SkillManager.Instance.bananaBonusGold > 0)
+            {
+                FuncGoldBanana(true);
+            }
+            else
+            {
+                FuncGoldBanana(false);
+            }
             return;
         }
         if (myName == "Lion")
         {
-            bossBonusDamage = SkillManager.Instance.lionBossBonusDamage;
-            bonusDamage = SkillManager.Instance.lionBonusDamage;
+            bossBonusDamage = SkillManager.Instance.lionBossBonusDamage; //고유 효과
             attackSpeed = (1+SkillManager.Instance.lionAttackSpeed)*(1+bonusAttackSpeed);
             return;
         }
         attackSpeed = 1;
+    }
+    public void FuncGoldBanana(bool st)
+    {
+        hasGoldBananaFlag = st;
     }
     public void FuncLionAttackSpeedBuff(float time, float value)
     {
@@ -511,9 +554,29 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     }
     IEnumerator LionAttackSpeedBuff(float time,float value)
     {
+        hasLionBuffFlag = true;
         bonusAttackSpeed = value;
         yield return new WaitForSeconds(time);
+        hasLionBuffFlag = false;
         bonusAttackSpeed = 0;
+    }
+    public void FuncOldHumanBuff(float time, float damage,float speed)
+    {
+        if (oldHumanBuff != null)
+        {
+            StopCoroutine(oldHumanBuff);
+        }
+        oldHumanBuff = StartCoroutine(OldHumanBuff(time, damage,speed));
+    }
+    IEnumerator OldHumanBuff(float time, float damage, float speed)
+    {
+        hasOldHumanBuffFlag = true;
+        poisionDamage = damage;
+        poisionSpeed = speed;
+        yield return new WaitForSeconds(time);
+        hasOldHumanBuffFlag = false;
+        poisionDamage = 0;
+        poisionSpeed = 0;
     }
     public void Setdir()
     {
@@ -678,7 +741,19 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                         }
                         //pv.RPC("BossHit", RpcTarget.All, 2);
                         int calDamage =(int)(damage * (1 + bonusDamage) * (1 + bossBonusDamage));
-                        target.pv.RPC("GetDamage", RpcTarget.All, calDamage,dieMoneyGet, NetworkMaster.Instance.dir);
+                        if (hasOldHumanBuffFlag)
+                        {
+                            target.pv.RPC("GetPoision", RpcTarget.All,poisionDamage,poisionSpeed);
+                        }
+                        if (nuckBackFlag)
+                        {
+                            target.pv.RPC("CrowdControl", RpcTarget.All,0, float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "nuckBackX", SceneVarScript.Instance.trapOption)), float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "nuckBackY", SceneVarScript.Instance.trapOption)));
+                        }
+                        if (thornsFlag)
+                        {
+                            target.pv.RPC("GetThorns", RpcTarget.All, (100 - float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "slow", SceneVarScript.Instance.trapOption))) / 100, float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "slowTime", SceneVarScript.Instance.trapOption)));
+                        }
+                        target.RpcCallGetDamage(calDamage, dieMoneyGet, NetworkMaster.Instance.dir);
                         return;
                     }
                 }
@@ -729,10 +804,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         movestateChange = false;
         movestate = 0;
     }
-    public void RpcCallGetDamage(int damage,int dieMoneyGet,bool dir)
-    {
-       pv.RPC("GetDamage",RpcTarget.All, damage, dieMoneyGet, dir);
-    }
+
     public void SetFocusMonster()
     {
   
@@ -759,6 +831,13 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
             {
                     MainGameManager.mainGameManager.SetFocus(gameObject);
             }
+    }
+    public void SetNuckbackFlag(bool st) {
+        nuckBackFlag = st;
+    }
+    public void SetThornsFlag(bool st)
+    {
+        thornsFlag = st;
     }
     public void CreateHitPartiCle()
     {
@@ -797,6 +876,11 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
             stream.SendNext(bluePoint);
             stream.SendNext(myName);
             stream.SendNext(sp.flipX);
+            stream.SendNext(hasLionBuffFlag);
+            stream.SendNext(hasOldHumanBuffFlag);
+            stream.SendNext(hasPoisionFlag);
+            stream.SendNext(hasThornsBuffFlag);
+            stream.SendNext(hasGoldBananaFlag);
         }
         else
         {
@@ -811,12 +895,91 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
             bluePoint=(int)stream.ReceiveNext();
             myName= (string)stream.ReceiveNext();
             sp.flipX = (bool)stream.ReceiveNext();
+            hasLionBuffFlag= (bool)stream.ReceiveNext();
+            hasOldHumanBuffFlag= (bool)stream.ReceiveNext();
+            hasPoisionFlag= (bool)stream.ReceiveNext();
+            hasThornsBuffFlag= (bool)stream.ReceiveNext();
+            hasGoldBananaFlag= (bool)stream.ReceiveNext();
         }
     }
     [PunRPC]
     public void rpcTest()
     {
         Debug.Log("hi");
+    }
+    [PunRPC]
+    public void GetThorns(float deBuffSpeed, float perTime)
+    {
+        if (pv.IsMine)
+        {
+            if (gameObject.tag != "monster")
+            {
+                return;
+            }
+            thornsSpeed = deBuffSpeed;
+            if (thornsBuff != null)
+            {
+                StopCoroutine(thornsBuff);
+            }
+                thornsBuff = StartCoroutine(ThornsState(perTime));
+            
+        }
+    }
+    IEnumerator ThornsState(float perTime)
+    {
+        hasThornsBuffFlag = true;
+        yield return new WaitForSeconds(perTime);
+        hasThornsBuffFlag = false;
+        thornsSpeed = 1;
+        //float t = 0;
+        //while (true)
+        //{
+        //    t += Time.deltaTime;
+        //    if (t >= perTime)
+        //    {
+        //    thornsBuffFlag = false;
+        //    yield break;
+        //    }
+        //    yield return null;
+        //}
+    }
+    [PunRPC]
+    public void GetPoision(float damage,float deBuffSpeed)
+    {
+        if (pv.IsMine)
+        {
+            if (gameObject.tag != "monster" && gameObject.tag != "Test")
+            {
+                return;
+            }
+            var dam = mhp *damage;
+            oldHumanBuffSpeed= deBuffSpeed;
+            if (hasPoisionFlag == false)
+            {
+                hasPoisionFlag = true;
+                StartCoroutine(PoisionState(dam));
+            }
+        }
+    }
+    IEnumerator PoisionState(float damage)
+    {
+        float t=0;
+        var tick = damage / 5;
+        while (true)
+        {
+            //Debug.Log("0.2초마다 데미지를 받습니다");
+            RpcCallGetDamage((int)tick, 0, !NetworkMaster.Instance.dir,1);
+            while (true)
+            {
+                t += Time.deltaTime;
+                if (t >= 0.2)
+                {
+                    t = 0;
+                    break;
+                }
+                yield return null;
+            }
+        }
     }
     [PunRPC]
     public void PointCal(int damage,bool team)
@@ -841,28 +1004,73 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         }
     }
     [PunRPC]
-    public void CrowdControl(Vector3 setPos,float xForce,float yForce)
+    public void CrowdControl(int masterDir,float xForce,float yForce)
     {
-        rigid.AddForce(Vector2.up * yForce,ForceMode2D.Impulse);
-        if(setPos.x > transform.position.x)
+        if (pv.IsMine)
         {
-            rigid.AddForce(Vector2.left * xForce, ForceMode2D.Impulse);
+            if (gameObject.tag != "monster")
+            {
+                return; 
+            }
+            rigid.AddForce(Vector2.up * yForce, ForceMode2D.Impulse);
+            //0 : 맞는 대상의 방향의 넉백
+            if (masterDir == 0)
+            {
+                rigid.AddForce((dir==true?Vector2.left: Vector2.right) * xForce, ForceMode2D.Impulse);
+            }else if (masterDir == 2)
+            {
+                rigid.AddForce(Vector2.left * xForce, ForceMode2D.Impulse);
+                //2:공격자와 맞는자의 거리기반으로 넉백
+            }
+            else if (masterDir == 1)
+            {
+                rigid.AddForce(Vector2.right * xForce, ForceMode2D.Impulse);
+                //1:오른쪽으로 넉백
+            }
+            else if (masterDir == -1)
+            {
+                rigid.AddForce(Vector2.left * xForce, ForceMode2D.Impulse);
+                //-1:왼쪽으로 넉백
+            }
         }
-        else
-        {
-            rigid.AddForce(Vector2.right * xForce, ForceMode2D.Impulse);
-        }
-        
+    }
+    public void RpcCallGetDamage(int damage, int dieMoneyGet, bool dir,int type=0)
+    {
+        pv.RPC("GetDamage", RpcTarget.All, damage, dieMoneyGet, dir,type);
     }
     [PunRPC]
-    public void GetDamage(int damage,int moneyGet,bool requestDir)
+    public void GetDamage(int damage,int moneyGet,bool requestDir,int type)
     {
+        //type :0:기본타입 1>>독공격
+        //moneyGet=1 이면 중립공격 0 이면 상대방의 공격
+        //requestDir => true 왼쪽(red) false 오른쪽(blue)
         if (gameObject.tag == "monster")
         {
             StartCoroutine(colorCo());
         }
         if (pv.IsMine)
         {
+            if (gameObject.tag == "boss" || gameObject.tag == "Test")
+            {
+                if (type == 0)
+                {
+                    DamageObjectPool.Instacne.Pop(transform.position, damage, new Color(255, 255, 255));
+                }
+                else if (type == 1)
+                {
+                    DamageObjectPool.Instacne.TickPop(transform.position, damage, new Color(0, 1, 0));
+                }
+            }
+            else
+            {
+                if (type == 0)
+                {
+                    DamageObjectPool.Instacne.Pop(transform.position, damage, new Color(1, 0, 0));
+                }else if (type == 1)
+                {
+                    DamageObjectPool.Instacne.TickPop(transform.position, damage, new Color(0, 1, 0));
+                }
+            }
             pv.RPC("PointCal", RpcTarget.All, damage, requestDir);
            
             if ((bool)PhotonNetwork.CurrentRoom.CustomProperties["isTest"] || (NetworkMaster.otherPlayer && NetworkMaster.otherPlayer.GetComponent<monsterScript>().hp > 0))
@@ -873,13 +1081,13 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                     if (moneyGet == 1)
                     {
                         //죽기전 받은 공격의 소유자가 중립(보스 등)일 경우
-                        //killTarget은 false가 되고 돈을 받을 수 없다.
+                        //killTarget은 false가 되고 상대방은 돈을 받을 수 없다.
                         killTarget = false;
                     }
                     else
                     {
                         //죽기전 받은 공격의 소유자가 상대방일 경우
-                        //killTarget은 true가 되고 돈을 받을 수 있다.
+                        //killTarget은 true가 되고 상대방은 돈을 받을 수 있다.
                         killTarget = true;
                     }
                 }
@@ -888,6 +1096,17 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
             else
             {
                 Debug.Log("이미 당신이 이겼으므로 공격받지 않습니다.");
+            }
+        }
+        else
+        {
+            if (type == 0)
+            {
+                DamageObjectPool.Instacne.Pop(transform.position, damage, new Color(255, 255, 255));
+            }
+            else if (type == 1)
+            {
+                DamageObjectPool.Instacne.TickPop(transform.position, damage, new Color(0, 1, 0));
             }
         }
     }

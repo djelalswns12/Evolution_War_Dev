@@ -794,6 +794,8 @@ MonoBehaviour:
   bonusMoney: 0
   bossBonusDamage: 0
   bonusDamage: 0
+  thornsSpeed: 0
+  oldHumanBuffSpeed: 0
   attOffset: {x: 0, y: 0}
   size: {x: 0, y: 0}
   attOffset2: {x: 0, y: 0}

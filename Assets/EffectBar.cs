@@ -11,8 +11,9 @@ public class EffectBar : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
         //targetSp = transform.parent.GetComponent<SpriteRenderer>();
-        childerenSp = transform.GetComponentsInChildren<SpriteRenderer>();
+        childerenSp = transform.GetComponentsInChildren<SpriteRenderer>(true);
         mySp = GetComponent<SpriteRenderer>();
         if (gameObject.tag != "Player")
         {

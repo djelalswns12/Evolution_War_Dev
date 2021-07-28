@@ -55,7 +55,8 @@ public class GroundEffectScript : MonoBehaviourPunCallbacks
                     {
                         hittedMonster.Add(hitArea[i].gameObject);
                         monsterScript target = hitArea[i].gameObject.GetComponent<monsterScript>();
-                        target.pv.RPC("CrowdControl", RpcTarget.All,creator.transform.position,3f,2f);
+                        float crowdDir = (creator.transform.position.x- target.transform.position.x);
+                        target.pv.RPC("CrowdControl", RpcTarget.All,(crowdDir>0?-1:1), 3f,2f);
                         //target.pv.RPC("GetDamage", RpcTarget.All, damage,dieMoneyGet, NetworkMaster.Instance.dir);
                         target.RpcCallGetDamage(damage, dieMoneyGet, NetworkMaster.Instance.dir);
                     }

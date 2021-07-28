@@ -101,7 +101,9 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
                     {
                         MainGameManager.mainGameManager.CreatGoldEffect(transform.position,(int)bonusMoney);
                     }
-                    target.pv.RPC("GetDamage", RpcTarget.All, damage,dieMoneyGet, NetworkMaster.Instance.dir); //데미지 삽입
+                    if (target != null)
+                        target.RpcCallGetDamage(damage, dieMoneyGet, NetworkMaster.Instance.dir);
+
                   
                     return;
                 }
