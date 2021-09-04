@@ -32,7 +32,7 @@ public class TextExpress : MonoBehaviour
             int pos = 0;
             foreach(GameObject item in textList)
             {
-                if (item.GetComponent<TextMeshProUGUI>().alpha < 0)
+                if (item.GetComponent<Text>().color.a < 0)
                 {
                     Destroy(textList.Last.Value);
                     textList.RemoveLast();
@@ -55,7 +55,7 @@ public class TextExpress : MonoBehaviour
     {
         var newColor = mainText.color;
         var newColor2 = mainTextImg.color;
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(3.5f);
         while (true) {
             newColor.a -= 0.1f;
             mainText.color = newColor;
@@ -75,7 +75,7 @@ public class TextExpress : MonoBehaviour
     {
         GameObject newText=GameObject.Instantiate(textObj);
         newText.transform.SetParent(transform,false);
-        newText.GetComponent<TextMeshProUGUI>().text = s;
+        newText.GetComponent<Text>().text = s;
         Debug.Log(s);
         if (textList.Count > 3)
         {

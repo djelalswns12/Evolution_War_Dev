@@ -15,7 +15,10 @@ public class SetImage : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        var nowPlayerName = NetworkMaster.player.GetComponent<monsterScript>().myName;
-        myImage.sprite = MainGameManager.mainGameManager.buildIconList[int.Parse(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "icon")) - 3000];
+        if (NetworkMaster.player!=null)
+        {
+            var nowPlayerName = NetworkMaster.player.GetComponent<monsterScript>().myName;
+            myImage.sprite = MainGameManager.mainGameManager.buildIconList[int.Parse(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "icon")) - 3000];
+        }
     }
 }

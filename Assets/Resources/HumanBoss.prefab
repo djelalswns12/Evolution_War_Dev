@@ -754,6 +754,7 @@ MonoBehaviour:
   - {fileID: 7346986659133647347}
   - {fileID: 2058443249535804265}
   - {fileID: 7167547656560214841}
+  - {fileID: 0}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -835,9 +836,13 @@ MonoBehaviour:
   damage: 0
   dropMoney: 0
   attackSpeed: 0
+  bonusAttackSpeed: 0
   bonusMoney: 0
   bossBonusDamage: 0
   bonusDamage: 0
+  thornsSpeed: 0
+  oldHumanBuffSpeed: 0
+  monsterUI: {fileID: 0}
   attOffset: {x: 0, y: 0}
   size: {x: 0, y: 0}
   attOffset2: {x: 0, y: 0}
@@ -847,6 +852,12 @@ MonoBehaviour:
   throwPos: {x: 0, y: 0}
   spawnPos: {x: 0, y: 0}
   hitParticle: {fileID: 0}
+  hasLionBuffFlag: 0
+  hasGoldBananaFlag: 0
+  hasOldHumanBuffFlag: 0
+  hasThornsBuffFlag: 0
+  hasPoisionFlag: 0
+  effectScript: []
 --- !u!50 &5926975594951364490
 Rigidbody2D:
   serializedVersion: 4
@@ -1087,7 +1098,7 @@ MonoBehaviour:
     SynchronizeType: 2
     Name: attack
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: SingleAttack
   m_SynchronizeLayers:
   - SynchronizeType: 2

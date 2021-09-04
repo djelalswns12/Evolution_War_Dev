@@ -38,79 +38,88 @@ public class BossScripit : MonoBehaviourPunCallbacks,IPunObservable
     // Update is called once per frame
     void Update()
     {
-        bossDropGold =int.Parse(SceneVarScript.Instance.GetOptionByName(monster.myName, "touchDropGold", SceneVarScript.Instance.bossOption));
+        if (SceneVarScript.Instance.GetOptionByName(monster.myName, "touchDropGold", SceneVarScript.Instance.bossOption) != "null")
+        {
+            bossDropGold = int.Parse(SceneVarScript.Instance.GetOptionByName(monster.myName, "touchDropGold", SceneVarScript.Instance.bossOption));
+        }
+        else
+        {
+            bossDropGold = 0;
+        }
         MainGameManager.mainGameManager.SetNowBoss(gameObject);
+
         if (MainGameManager.mainGameManager.GetCanTouchAttack())
         {
             if (Input.GetMouseButtonDown(0))
             {
-                PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
-
-                eventDataCurrentPosition.position = Input.mousePosition;
-                List<RaycastResult> results = new List<RaycastResult>();
-                EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
-                if (results.Count >0)
+                if (TouchUI() == true)
                 {
-                    if (results.Count == 1)
-                    {
-                        if (results[0].gameObject != MainGameManager.mainGameManager.moveUI)
-                        {
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        return;
-                    }
-                }
-                
-
-
-                ray = new Ray2D(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-                foreach (RaycastHit2D hit in Physics2D.RaycastAll(ray.origin, ray.direction))
-                {
-                    if (hit.transform.gameObject == gameObject)
-                    {
-                        Instantiate(touchEffectObj, (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition), Quaternion.identity);
-                        MainGameManager.mainGameManager.CreatGoldEffect(Camera.main.ScreenToWorldPoint(Input.mousePosition), bossDropGold + MainGameManager.mainGameManager.GetTouchDropGold());
-                        monster.RpcCallGetDamage(MainGameManager.mainGameManager.GetTouchDamge(), dieMoneyGet, NetworkMaster.Instance.dir);
-                        StartCoroutine(colorCo());
-                        MainGameManager.mainGameManager.CoolTouchAttack();
-                        break;
-                    }
+                    TouchObj();
                 }
             }
         }
+
         if (pv.IsMine)
         {
             MonsterAttack();
         }
      }
+    private bool TouchObj()
+    {
+        var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        ray = new Ray2D(mousePos, Vector2.zero);
+        foreach (RaycastHit2D hit in Physics2D.RaycastAll(ray.origin, ray.direction))
+        {
+            if (hit.transform.gameObject == gameObject)
+            {
+                Instantiate(touchEffectObj, (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition), Quaternion.identity);
+                MainGameManager.mainGameManager.CreatGoldEffect(mousePos, bossDropGold + MainGameManager.mainGameManager.GetTouchDropGold());
+                monster.RpcCallGetDamage(MainGameManager.mainGameManager.GetTouchDamge(), dieMoneyGet, NetworkMaster.Instance.dir, 0, mousePos.x, mousePos.y);
+                StartCoroutine(colorCo());
+                MainGameManager.mainGameManager.CoolTouchAttack();
+                return true;
+            }
+        }
+        return false;
+    }
+    public bool TouchUI()
+    {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = Input.mousePosition;
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        if (results.Count > 0)
+        {
+            if (results.Count == 1)
+            {
+                if (results[0].gameObject != MainGameManager.mainGameManager.moveUI)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return true;
+    }
     public void SpawnGroundEffect()
     {
-        GroundEffectScript script;
-        GameObject LeftGroundEffect = GameObject.Instantiate(Effect1, transform.position + Vector3.left*1.5f, Quaternion.identity);
-        script = LeftGroundEffect.GetComponent<GroundEffectScript>();
-        script.dir = false;
-        script.whatIsLayer2 = monster.whatIsLayer2;
-        script.damage = monster.damage;
-        script.dieMoneyGet = 1;
-        script.creator=gameObject;
-        GameObject RightGroundEffect = GameObject.Instantiate(Effect1, transform.position + Vector3.right*1.5f, Quaternion.identity);
-        script = RightGroundEffect.GetComponent<GroundEffectScript>();
-        script.dir = true;
-        script.whatIsLayer2 = monster.whatIsLayer2;
-        script.damage = monster.damage;
-        script.dieMoneyGet = 1;
-        script.creator=gameObject;
+        SpawnAttack(true);
+        SpawnAttack(false);
     }
     public void SpawnSingleGroundEffect()
     {
-        Vector3 groundEffPos = transform.position + Vector3.right * 1.5f*(monster.GetTargetPlayer()==true?1f:-1f);
+        SpawnAttack(monster.GetTargetPlayer());
+    }
+    public void SpawnAttack(bool target)
+    {
+        Vector3 groundEffPos = transform.position + Vector3.right * 1.5f * (target == true ? -1f : 1f);
         GroundEffectScript script;
         GameObject GroundEffect = GameObject.Instantiate(Effect1, groundEffPos, Quaternion.identity);
         script = GroundEffect.GetComponent<GroundEffectScript>();
-        script.dir = monster.GetTargetPlayer();
+        script.dir = !target;
         script.whatIsLayer2 = monster.whatIsLayer2;
         script.damage = monster.damage;
         script.dieMoneyGet = 1;
@@ -134,12 +143,7 @@ public class BossScripit : MonoBehaviourPunCallbacks,IPunObservable
             }
         }
     }
-    [PunRPC]
-    void BossHit(int damage)
-    {
-        if (PhotonNetwork.IsMasterClient)
-            monster.hp -= damage;
-    }
+
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)

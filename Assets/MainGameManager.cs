@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Advertisements;
 using TMPro;
 public class MainGameManager : MonoBehaviour
 {
     public static MainGameManager mainGameManager;
     [SerializeField]
     public float money;
+    public float allMoney;
+    public float enemyAllMoney;
     private float getMoneyTime;
+    public float alamRenderingTime;
     public GameObject hgold; // 머니 이펙트 리소스
     public int perMoney; //getPerTime초당 들어오는 돈의 양
     public float getPerTime;//초의 기준
@@ -21,10 +25,12 @@ public class MainGameManager : MonoBehaviour
     public GameObject bossUI;
     public GameObject RightNav;
     public GameObject moveUI;
+    public GameObject leftAlam,rightAlam;
     RightNav RightNavScript;
     public bool canTouchAttack;
     public Image touchAttackBlind;
     public Image redBar, blueBar, bossHpBar;
+    public RectTransform UI_redBar, UI_blueBar, UI_bossHpBar;
     public TextMeshProUGUI bossHp,redPointPer,bluePointPer;
     public Text redGetMoney, blueGetMoney;
     public int playerBuliding,touchLevel;
@@ -45,40 +51,61 @@ public class MainGameManager : MonoBehaviour
     private monsterScript nowBossScript;
 
     SkillManager skillManager;
-    public List<string> useSkill;
+    public string[] useSkill;
+    public string[] enemyUseSkill;
+    public string enemyUserName;
+    public string getRewardMoney;
+
+    public GameObject TesterOption;
     // Start is called before the first frame update
     void Start()
     {
-        useSkill = new List<string>();
+        AdsManager.Instance.HideBanner();
         skillManager = GetComponent<SkillManager>();
         monsterList = new Dictionary<string, List<GameObject>>();
         popUpMaster = GetComponent<SetPopUP>();
         focus = null;
         mainGameManager = this;
         RightNavScript = RightNav.GetComponent<RightNav>();
+        BlindManager.Instance.CloseBlind();
+        LobbySoundManager.Instance.BGMSoundStop();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (SceneVarScript.Instance.GetUserOption("Master") == "1")
+        {
+            TesterOption.SetActive(true);
+        }
+        else
+        {
+            TesterOption.SetActive(false);
+        }
         //SkillSlot("1");
         //SkillSlot("2");
         //SkillSlot("3");
         //골드 획득량 DB연동
-        var nowPlayerName = NetworkMaster.player.GetComponent<monsterScript>().myName;
-        SetPerMoney(int.Parse(SceneVarScript.Instance.GetOptionByName(nowPlayerName,"perMoney",SceneVarScript.Instance.playerOption)));
-     
+        AlamRendering();
+        if (NetworkMaster.player != null)
+        {
+            var nowPlayerName = NetworkMaster.player.GetComponent<monsterScript>().myName;
+            SetPerMoney(int.Parse(SceneVarScript.Instance.GetOptionByName(nowPlayerName, "perMoney", SceneVarScript.Instance.playerOption)));
+        }
         //터치 데미지 공식으로 적용 되도록함
         SetTouchDamge(TouchDamageTheory());
 
         //시간별 골드 획득
-        getMoneyTime += Time.deltaTime;
-        if (getMoneyTime >= getPerTime)
+        if (NetworkMaster.Instance.endState == 0)
         {
-            getMoneyTime-=getPerTime;
-            Vector3 pos = NetworkMaster.player.transform.position;
-            pos.y += 2;
-            CreatGoldEffect(pos,(int)(perMoney));
+            getMoneyTime += Time.deltaTime;
+            if (getMoneyTime >= getPerTime)
+            {
+                getMoneyTime -= getPerTime;
+                Vector3 pos = NetworkMaster.player.transform.position;
+                pos.y += 2;
+                CreatGoldEffect(pos, (int)(perMoney));
+            }
         }
         goldText.text = StringDot(GetMoney().ToString())+" Gold";
 
@@ -94,25 +121,35 @@ public class MainGameManager : MonoBehaviour
             nowBossScript = nowBoss.GetComponent<monsterScript>();
             if (nowBossScript.redPoint + nowBossScript.bluePoint > 0)
             {
+                var maxWidth= UI_bossHpBar.sizeDelta.x*((nowBossScript.mhp - nowBossScript.hp) / nowBossScript.mhp);
+                UI_redBar.sizeDelta = new Vector2(maxWidth* (float)nowBossScript.redPoint / (nowBossScript.redPoint + nowBossScript.bluePoint), UI_bossHpBar.sizeDelta.y);
+                UI_blueBar.sizeDelta = new Vector2(maxWidth * (float)nowBossScript.bluePoint / (nowBossScript.redPoint + nowBossScript.bluePoint), UI_bossHpBar.sizeDelta.y);
+
                 redBar.fillAmount = (float)nowBossScript.redPoint / (nowBossScript.redPoint + nowBossScript.bluePoint);
                 redPointPer.text = (redBar.fillAmount * 100).ToString("N2")+"%";
                 blueBar.fillAmount = (float)nowBossScript.bluePoint / (nowBossScript.redPoint + nowBossScript.bluePoint);
                 bluePointPer.text = (blueBar.fillAmount * 100).ToString("N2") + "%";
-
-                redGetMoney.text = StringDot(Mathf.Floor(nowBossScript.dropMoney * redBar.fillAmount))+" Gold";
-                blueGetMoney.text = StringDot(Mathf.Floor(nowBossScript.dropMoney* blueBar.fillAmount))+ " Gold";
+                if (NetworkMaster.Instance.dir == true)
+                {
+                    redGetMoney.text = "보스처치시 획득 보상 : <color=yellow> " + StringDot(Mathf.Floor(nowBossScript.dropMoney * ((float)nowBossScript.redPoint / (nowBossScript.redPoint + nowBossScript.bluePoint) * (nowBossScript.mhp - nowBossScript.hp) / nowBossScript.mhp))) + " Gold</color>";
+                }
+                else
+                {
+                    redGetMoney.text = "보스처치시 획득 보상 : <color=yellow> " + StringDot(Mathf.Floor(nowBossScript.dropMoney * ((float)nowBossScript.bluePoint / (nowBossScript.redPoint + nowBossScript.bluePoint) * (nowBossScript.mhp - nowBossScript.hp) / nowBossScript.mhp))) + " Gold</color>";
+                }
+                blueGetMoney.text = "보스 처치시:" + StringDot(Mathf.Floor(nowBossScript.dropMoney * ((float)nowBossScript.bluePoint / (nowBossScript.redPoint + nowBossScript.bluePoint) * (nowBossScript.mhp - nowBossScript.hp) / nowBossScript.mhp))) + " Gold";
             }
             else
             {
                 redPointPer.text = "0%";
                 bluePointPer.text = "0%";
-                redGetMoney.text = "0 GOLD";
-                blueGetMoney.text = "0 GOLD";
+                redGetMoney.text = "";
+                blueGetMoney.text = "";
                 redBar.fillAmount = 0;
                 blueBar.fillAmount = 0;
             }
             bossHpBar.fillAmount = nowBossScript.hp / nowBossScript.mhp;
-            bossHp.text = Mathf.Floor(nowBossScript.hp / nowBossScript.mhp * 100)+"%";
+            bossHp.text = Mathf.Floor(nowBossScript.hp / nowBossScript.mhp * 100)+"%"+"[ "+ nowBossScript.hp+" / "+nowBossScript.mhp + " ]";
         }
         else
         {
@@ -216,7 +253,10 @@ public class MainGameManager : MonoBehaviour
     }
     public void CountMoney(float value)
     {
-
+        if (value >= 0 && NetworkMaster.Instance.endPoint==0)
+        {
+            allMoney += value;
+        }
         SetMoney(money + value);
     }
     public string StringDot<T>(T str)
@@ -255,12 +295,12 @@ public class MainGameManager : MonoBehaviour
         
         if (n == -1)
         {
-            return (int)Mathf.Ceil(touchLevel * touchLevel * 0.2f)+touchLevel + 10;
+            return (int)Mathf.Ceil(touchLevel * touchLevel * 0.2f)+touchLevel + 6;
             //return 20 + (touchLevel * 30);
         }
         else
         {
-            return (int)Mathf.Ceil(n * n * 0.2f) + touchLevel + 10;
+            return (int)Mathf.Ceil(n * n * 0.2f) + touchLevel + 6;
         }
     }
     public bool SpentGold(int num)
@@ -338,5 +378,47 @@ public class MainGameManager : MonoBehaviour
     public GameObject GetNowSkill()
     {
         return nowSkill;
+    }
+    public void AttackAlam()
+    {
+        alamRenderingTime = 5;
+        NetworkMaster.Instance.SendGameMsgFunc("<color=red>기지가 공격받고 있습니다!</color>", 0);
+    }
+    public void TestGetMoney()
+    {
+        CountMoney(10000);
+    }
+    public void TestGetSpeed()
+    {
+        SpawnManager.Instance.spawnSpeed += 7;
+    }
+    public void TestGetStage()
+    {
+        NetworkMaster.Instance.gameStage++;
+    }
+    public void TestDelStage()
+    {
+        NetworkMaster.Instance.gameStage--;
+    }
+    public void AlamRendering()
+    {
+        alamRenderingTime -= Time.deltaTime;
+        if (alamRenderingTime <= 0)
+        {
+            leftAlam.SetActive(false);
+            rightAlam.SetActive(false);
+            alamRenderingTime = 0;
+        }
+        else
+        {
+            if (NetworkMaster.Instance.dir == true)
+            {
+                leftAlam.SetActive(true);
+            }
+            else
+            {
+                rightAlam.SetActive(true);
+            }
+        }
     }
 }

@@ -7,19 +7,22 @@ using TMPro;
 public class textevent : MonoBehaviour
 {
     public int alphaState;
-    public TextMeshProUGUI text;
+    public Text text;
     float t;
+    Coroutine ColorChange;
     // Start is called before the first frame update
     void Start()
     {
-        text = GetComponent<TextMeshProUGUI>();
-        StartCoroutine("alphaChange1");
+        text = GetComponent<Text>();
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if (ColorChange == null)
+        {
+            StartCoroutine(alphaChange1());
+        }
     }
     IEnumerator alphaChange1()
     {

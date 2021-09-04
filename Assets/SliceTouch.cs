@@ -7,12 +7,17 @@ using UnityEngine.UI;
 
 public class SliceTouch : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    public static SliceTouch Instance;
     [SerializeField]
     bool moveBySpeed;
     public float CameraSpeed,cameraDeSpeed,toZeroSpeed;
     CameraScript camerascript;
     public Vector2 startPos,cameraStartPos,slicePos;
     // Start is called before the first frame update
+    private void Awake()
+    {
+        Instance = this;
+    }
     void Start()
     {
 
@@ -21,8 +26,14 @@ public class SliceTouch : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
     // Update is called once per frame
     void Update()
     {
-        if (NetworkMaster.player == null)
+        if (NetworkMaster.player == null || NetworkMaster.player.GetComponent<monsterScript>().hp <= 0)
+        {
             return;
+        }
+        if (NetworkMaster.Instance.endState != 0)
+        {
+            return;
+        }
 
         camerascript = CameraScript.Instance;
 
@@ -63,6 +74,14 @@ public class SliceTouch : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (NetworkMaster.Instance.endState != 0)
+        {
+            return;
+        }
+        if (CameraScript.Instance.moveStautu != 0)
+        {
+            return;
+        }
         moveBySpeed = false;
         CameraSpeed = 0;
         camerascript.moveStautu = 0;
@@ -73,6 +92,14 @@ public class SliceTouch : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (NetworkMaster.Instance.endState != 0)
+        {
+            return;
+        }
+        if (CameraScript.Instance.moveStautu != 0)
+        {
+            return;
+        }
         if (eventData.position.x - startPos.x < 0 )
         {
             if (camerascript.Rightfunc() == true)
@@ -101,7 +128,33 @@ public class SliceTouch : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
 
     public void OnEndDrag(PointerEventData eventData)
     {
-       //Debug.Log($"cameraSpeed:{CameraSpeed}");
+        if (NetworkMaster.Instance.endState != 0)
+        {
+            return;
+        }
+        if (CameraScript.Instance.moveStautu != 0)
+        {
+            return;
+        }
+        //Debug.Log($"cameraSpeed:{CameraSpeed}");
         moveBySpeed = true;
+    }
+    public void AddForceToPlayer(int num)
+    {
+
+        if (NetworkMaster.Instance.endState != 0)
+        {
+            return;
+        }
+
+        if (num == 0)
+        {
+            CameraSpeed = 200;
+            moveBySpeed = true;
+        }else if (num == 1)
+        {
+            CameraSpeed = -200;
+            moveBySpeed = true;
+        }
     }
 }

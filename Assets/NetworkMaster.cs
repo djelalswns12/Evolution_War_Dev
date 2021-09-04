@@ -43,11 +43,14 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
     public Vector2 upSetPos, downSetPos;
     public bool dir;
     public int endPoint; // 0 : 게임중  1: hp 계산완료 결과창 드랍 2:종료상태
+    public int endState; // 0:미정 1 : 승리 2:패배
+    public int setRatingState;//0:미완료 1:초기설정 완료
     public GameObject EndingMsgBox;
     public Text EndingMsg;
     public bool otherPlayerHasBeen; // 접속하여 생성되었는지 확인
     public TextExpress textExpress;
     public int gameStage;
+    public float playTime;
     public GameObject[] spawnList;
     public MapList[] groundSp;
 
@@ -69,13 +72,13 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
     /// </summary>
     void Start()
     {
+        EndingMsgBox.SetActive(false);
         endPoint = 0;
         Instance = this;
         // in case we started this demo with the wrong scene being active, simply load the menu scene
         if (!PhotonNetwork.IsConnected)
         {
-
-
+            PhotonNetwork.LoadLevel("LoginScean");
         }
 
         if (playerPrefab == null)
@@ -123,6 +126,8 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
     }
     void Update()
     {
+        playTime += Time.deltaTime;
+        //시대별 소환 유닛 항목 표기
         for (int k = 0; k < spawnList.Length; k++)
         {
             if (k <= gameStage)
@@ -134,6 +139,8 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
                 spawnList[k].SetActive(false);
             }
         }
+
+        //시대별 배경 변환
         for (int i = 0; i < groundSp.Length; i++)
         {
             if (gameStage == i)
@@ -154,8 +161,9 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         //Debug.Log(MainGameManager.mainGameManager.GetMoney());
         if (PhotonNetwork.IsConnected == false)
         {
-            SceneManager.LoadScene("LobbyScean");
-            //SceneManager.LoadScene("LoginScean");
+            
+            //SceneManager.LoadScene("LobbyScean");
+            SceneManager.LoadScene("LoginScean");
         }
         float playerpos = background.GetComponent<SpriteRenderer>().bounds.size.x / 2 * 0.85f;
         Vector2 focusPos = GradiantPos.Instance.par.position;
@@ -171,19 +179,20 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
                     if (player.GetComponent<monsterScript>().hp <= 0)
                     {
                         endPoint = 1;
-                        pv.RPC("Win", RpcTarget.All, !dir);
+                        pv.RPC("Win", RpcTarget.All, !dir,playTime);
                     }
                     if ((otherPlayer && otherPlayer.GetComponent<monsterScript>().hp <= 0))
                     {
                         //상대방 유저 체력이 0이하라면
                         endPoint = 1;
-                        pv.RPC("Win", RpcTarget.All, dir);
+                        pv.RPC("Win", RpcTarget.All, dir, playTime);
                     }
-                    if (otherPlayer == null && otherPlayerHasBeen)
+                    if ((otherPlayer == null||otherPlayer.GetComponent<monsterScript>().pv.IsMine==true )&& otherPlayerHasBeen)
                     {
+                        otherPlayer.GetComponent<monsterScript>().hp = 0;
                         //상대방이 들어온적이 있는데 튕겨서 나가진거라면
                         endPoint = 1;
-                        pv.RPC("Win", RpcTarget.All, dir);
+                        pv.RPC("Win", RpcTarget.All, dir, playTime);
                     }
                 }
             }
@@ -209,7 +218,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
     /// <param name="other">Other.</param>
     public override void OnPlayerLeftRoom(Player other)
     {
-
+        Debug.Log("Player is Left");
     }
 
 
@@ -253,6 +262,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
     }
     public void UpgradeTrap()
     {
+        
         //돈 맞는지 확인
         //nextIndex 존재여부 확인
         //
@@ -468,8 +478,16 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
             GameObject monster = PhotonNetwork.Instantiate(name, pos, Quaternion.identity, 0);
             monster.layer = LayerMask.NameToLayer("upunit");
             SetCreatureInfo(monster, name);
+            pv.RPC("SetStartRating", RpcTarget.All);
+            Debug.Log("게임 정상적으로 시작되어서 점수가 깍입니다.");
+            pv.RPC("CameraMove", RpcTarget.All, monster.transform.position);
+            
         }
-
+    }
+    [PunRPC]
+    public void CameraMove(Vector3 pos)
+    {
+        CameraScript.Instance.CameraMoveToPos(pos);
     }
     public void SetNextStage(string name)
     {
@@ -577,18 +595,59 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
     {
         Application.Quit();
     }
-    public void EndAction(string result)
+    IEnumerator EndAction(string result,float playTime)
     {
         endPoint = 2;
+
+        if (playTime >= SceneVarScript.REWARD_TIME)
+        {
+            playTime = SceneVarScript.REWARD_TIME;
+        }
+        if (setRatingState == 0)
+        {
+            //초기 감소값 복구
+            SceneVarScript.Instance.SetRating(SceneVarScript.START_RATING_DISCOUNT);
+            SceneVarScript.Instance.SetWinLose(-1, "lose");
+            EndingMsgBox.SetActive(true);
+            EndingMsg.text = "네트워크 오류로 인해 비겼습니다.";
+            yield break;
+        }
         if (result == "Win")
         {
+            endState = 1;
+            SceneVarScript.Instance.SetRating(SceneVarScript.START_RATING_DISCOUNT +SceneVarScript.Instance.GetWinPoint());
+            SceneVarScript.Instance.SetWinLose(-1, "lose");
+            SceneVarScript.Instance.SetWinLose(1, "win");
+            int getMoney = (int)MainGameManager.mainGameManager.allMoney;
+            if (getMoney * 0.07 >= SceneVarScript.MAX_REWARD)
+            {
+                getMoney = SceneVarScript.MAX_REWARD +(int)(SceneVarScript.WIN_REWARD*(playTime/SceneVarScript.REWARD_TIME));
+            }
+            else
+            {
+                getMoney =(int)(getMoney*0.07) + (int)(SceneVarScript.WIN_REWARD * (playTime / SceneVarScript.REWARD_TIME));
+            }
+            SceneVarScript.Instance.AddGold(getMoney);
+            yield return new WaitForSeconds(3);
             EndingMsgBox.SetActive(true);
-            EndingMsg.text = "승리";
+            EndingMsg.text = "승리하셨습니다!";
         }
         else if (result == "Lose")
         {
+            endState = 2;
+            int getMoney = (int)MainGameManager.mainGameManager.allMoney;
+            if (getMoney * 0.03 >= SceneVarScript.MAX_REWARD)
+            {
+                getMoney = SceneVarScript.MAX_REWARD + (int)(SceneVarScript.LOSE_REWARD * (playTime / SceneVarScript.REWARD_TIME));
+            }
+            else
+            {
+                getMoney = (int)(getMoney * 0.03) + (int)(SceneVarScript.LOSE_REWARD * (playTime / SceneVarScript.REWARD_TIME));
+            }
+            SceneVarScript.Instance.AddGold(getMoney);
+            yield return new WaitForSeconds(3);
             EndingMsgBox.SetActive(true);
-            EndingMsg.text = "패배";
+            EndingMsg.text = "패배하셨습니다.";
         }
     }
     #endregion
@@ -603,15 +662,25 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         textExpress.setMainText(s);
     }
     [PunRPC]
-    public void Win(bool Winner)
+    public void SetStartRating()
     {
+        SceneVarScript.Instance.SetWinLose(1, "lose");
+        SceneVarScript.Instance.SetRating(-SceneVarScript.START_RATING_DISCOUNT);
+        setRatingState = 1;
+    }
+    [PunRPC]
+    public void Win(bool Winner,float playTime)
+    {
+     
         if (Winner == dir)
         {
-            EndAction("Win");
+            pv.RPC("CameraMove", RpcTarget.All,otherPlayer.transform.position );
+            StartCoroutine(EndAction("Win",playTime));
         }
         else
         {
-            EndAction("Lose");
+            pv.RPC("CameraMove", RpcTarget.All, player.transform.position);
+            StartCoroutine(EndAction("Lose", playTime));
         }
     }
     [PunRPC]

@@ -3,29 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class overlapScript : MonoBehaviour
+public class OverlapScript : MonoBehaviour
 {
+    public static OverlapScript Instance;
     // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-      
+        Instance = this;
     }
-
-    // Update is called once per frame
-    void Update()
+    public void ReleaseMonster(Collider2D[] OverlapUnits)
     {
-       
-    }
-    public void release(Collider2D[] gb)
-    {
+        #region
         int pointIndex = -1;
-        int monsterIndex = -1;
         float selPoint;
-        int check = NetworkMaster.Instance.creatnumber + 1;
+        #endregion
+        int monsterIndex = -1;
+        int createNumber = NetworkMaster.Instance.creatnumber + 1;
+        //생성이 가장 빨리되었던 몬스터를 찾기위한 인덱스 변수 이다. 
+        //몬스터 생성번호의 (최대값+1)의 값으로 설정한다.
         monsterScript selectMonster;
-        // Debug.Log(gb.Length);
-        if (gb.Length > 0)
+        if (OverlapUnits.Length > 0)
         {
+            #region
             if (NetworkMaster.player.GetComponent<PlayerScript>().dir == true)
             {
                 selPoint = -10000;
@@ -34,17 +33,18 @@ public class overlapScript : MonoBehaviour
             {
                 selPoint = 10000;
             }
-
-            for (int i = 0; i < gb.Length; i++)
+            #endregion
+            for (int i = 0; i < OverlapUnits.Length; i++)
             {
-                selectMonster = gb[i].GetComponent<monsterScript>();
+                selectMonster = OverlapUnits[i].GetComponent<monsterScript>();
 
-                if (check > selectMonster.creatnumber && selectMonster.attackPlayer==false)
+                if (createNumber > selectMonster.creatnumber && selectMonster.attackPlayer==false)
                 {
-                    //가장먼저 태어난 몬스터를 고름 > monsterIndex
-                    check = selectMonster.creatnumber;
+                    //for문을 돌며 몬스터 생성이 가장 빨리된 몬스터의 인덱스를 구한다.
+                    createNumber = selectMonster.creatnumber;
                     monsterIndex = i;
                 }
+                #region 
                 if (NetworkMaster.player.GetComponent<PlayerScript>().dir == true)
                 {
                     //먼저 앞서가 있는 몬스터를 고름 > pointIndex
@@ -67,25 +67,26 @@ public class overlapScript : MonoBehaviour
             if (NetworkMaster.player.GetComponent<PlayerScript>().dir == true)
             {
                 //가장 먼저 태어난 몬스터의 x좌표+보정값 보다 앞서있는 몬스터의 x좌표 값이 더 크다면 생성순서를 뒤바꿔준다.
-                if (gb[monsterIndex].GetComponent<monsterScript>().transform.position.x + 0.3f < gb[pointIndex].GetComponent<monsterScript>().transform.position.x)
+                if (OverlapUnits[monsterIndex].GetComponent<monsterScript>().transform.position.x + 0.3f < OverlapUnits[pointIndex].GetComponent<monsterScript>().transform.position.x)
                 {
-                    int temp = gb[monsterIndex].GetComponent<monsterScript>().creatnumber;
-                    gb[monsterIndex].GetComponent<monsterScript>().creatnumber = gb[pointIndex].GetComponent<monsterScript>().creatnumber;
-                    gb[pointIndex].GetComponent<monsterScript>().creatnumber = temp;
+                    int temp = OverlapUnits[monsterIndex].GetComponent<monsterScript>().creatnumber;
+                    OverlapUnits[monsterIndex].GetComponent<monsterScript>().creatnumber = OverlapUnits[pointIndex].GetComponent<monsterScript>().creatnumber;
+                    OverlapUnits[pointIndex].GetComponent<monsterScript>().creatnumber = temp;
                 }
             }
             else
             {
-                if (gb[monsterIndex].GetComponent<monsterScript>().transform.position.x - 0.3f > gb[pointIndex].GetComponent<monsterScript>().transform.position.x)
+                if (OverlapUnits[monsterIndex].GetComponent<monsterScript>().transform.position.x - 0.3f > OverlapUnits[pointIndex].GetComponent<monsterScript>().transform.position.x)
                 {
-                    int temp = gb[monsterIndex].GetComponent<monsterScript>().creatnumber;
-                    gb[monsterIndex].GetComponent<monsterScript>().creatnumber = gb[pointIndex].GetComponent<monsterScript>().creatnumber;
-                    gb[pointIndex].GetComponent<monsterScript>().creatnumber = temp;
+                    int temp = OverlapUnits[monsterIndex].GetComponent<monsterScript>().creatnumber;
+                    OverlapUnits[monsterIndex].GetComponent<monsterScript>().creatnumber = OverlapUnits[pointIndex].GetComponent<monsterScript>().creatnumber;
+                    OverlapUnits[pointIndex].GetComponent<monsterScript>().creatnumber = temp;
                 }
             }
-            //Debug.Log(gb[monsterIndex].gameObject.GetComponent<monsterScript>().creatnumber+"탈출성공");
-            //이 작업을 거친 몬스터를 중첩해제 시킨뒤 앞으로 이동시킨다.
-            gb[monsterIndex].gameObject.GetComponent<monsterScript>().resetSpeed();
+            #endregion
+            Debug.Log(monsterIndex);
+            OverlapUnits[monsterIndex].gameObject.GetComponent<monsterScript>().ResetSpeed();
+            //이 작업을 통해 결정된 몬스터는 멈춰있던 스피드 초기화 하여 전진할 수 있도록 한다.
         }
     }
 }

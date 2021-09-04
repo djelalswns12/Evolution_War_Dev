@@ -9,7 +9,7 @@ public class BambooSpearScript : TrapScript
         if (setCool <= nowCool)
         {
             Attack();
-            nowCool = 0;
+            monster.RpcCallTrapCoolReset();
         }
     }
     public void Attack()

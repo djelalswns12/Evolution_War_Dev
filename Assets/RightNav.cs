@@ -22,15 +22,17 @@ public class RightNav : MonoBehaviour
     public Text uiTouchNowGold, uiTouchNowLevel, uiTouchNextDamage,uiTouchNextGold,uiTouchCost;
 
     [Header("Type2:건물진화 팝업 내용")]
+    public GameObject uiBuildUpgradeBtn,uiBuildNextBuildDescBar;
     public Image uiBuildImg,uiBuildNextImg;
     public Text uiBuildName,uiBuildPerMoney;
     public Text uiBuildHp, uiBuildNextName, uiBuildNextHp, uiBuildNextPerMoney,uiBuildCost;
 
-    [Header("Type4:트랩세부옵션 팝업 내용")]
+    [Header("Type3:트랩세부옵션 팝업 내용")]
+    public GameObject uiTrapUpgradeBtn;
     public Text uiTrapName, uiTrapCost;
     public Image uiTrapImg,uiTrapBar;
     public Text uiTrapAllHp, uiTrapDesc;
-    [Header("Type5:스킬세부옵션 팝업 내용")]
+    [Header("Type4:스킬세부옵션 팝업 내용")]
     public Text uiSkillName, uiSkillNeed, uiSkillDesc;
     public Image uiSkillImg, uiSkillMask;
     public RectTransform skillDescRayout;
@@ -100,7 +102,17 @@ public class RightNav : MonoBehaviour
                 uiBuildNextName.text = NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "nickname")!="null"? NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "nickname"):"-";
                 uiBuildNextHp.text = "Hp : " + (SceneVarScript.Instance.GetOptionByName(nextPlayerName, "mhp",SceneVarScript.Instance.monsterOption) != "null" ? SceneVarScript.Instance.GetOptionByName(nextPlayerName, "mhp", SceneVarScript.Instance.monsterOption) : "-");
                 uiBuildNextPerMoney.text= "Gold/s : " + (SceneVarScript.Instance.GetOptionByName(nextPlayerName, "perMoney", SceneVarScript.Instance.playerOption) != "null" ? SceneVarScript.Instance.GetOptionByName(nextPlayerName, "perMoney", SceneVarScript.Instance.playerOption): "-");
-                uiBuildCost.text =MainGameManager.mainGameManager.StringDot(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "cost")) + " G";
+                if (NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "cost") == "null" || NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "cost") == "0")
+                {
+                    uiBuildNextBuildDescBar.SetActive(false);
+                    uiBuildUpgradeBtn.SetActive(false);
+                }
+                else
+                {
+                    uiBuildNextBuildDescBar.SetActive(true);
+                    uiBuildUpgradeBtn.SetActive(true);
+                    uiBuildCost.text = MainGameManager.mainGameManager.StringDot(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "cost")) + " G";
+                }
                 uiBuildNextImg.sprite = NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "icon")!="null"? MainGameManager.mainGameManager.buildIconList[int.Parse(NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "icon")) - 3000]:uiBuildImg.sprite;
             }
             else if (openedType == 3)
@@ -119,7 +131,15 @@ public class RightNav : MonoBehaviour
                     uiTrapBar.fillAmount = monster.hp / monster.mhp;
                     uiTrapAllHp.text = monster.hp + "/" + monster.mhp;
                     uiTrapDesc.text = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByName(monster.myName, "desc", SceneVarScript.Instance.trapOption));
-                    uiTrapCost.text = SceneVarScript.Instance.GetOptionByName(monster.myName, "upgradeCost", SceneVarScript.Instance.trapOption) =="null"?"-": SceneVarScript.Instance.GetOptionByName(monster.myName, "upgradeCost", SceneVarScript.Instance.trapOption);
+                    if (SceneVarScript.Instance.GetOptionByName(monster.myName, "upgradeCost", SceneVarScript.Instance.trapOption) == "null")
+                    {
+                        uiTrapUpgradeBtn.SetActive(false);
+                    }
+                    else
+                    {
+                        uiTrapUpgradeBtn.SetActive(true);
+                        uiTrapCost.text = SceneVarScript.Instance.GetOptionByName(monster.myName, "upgradeCost", SceneVarScript.Instance.trapOption);
+                    }
                 }
                 else
                 {

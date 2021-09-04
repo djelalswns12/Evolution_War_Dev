@@ -4,11 +4,11 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Bullet
   - monster
   - boss
   - Test
   - trap
+  - Bullet
   layers:
   - Default
   - TransparentFX

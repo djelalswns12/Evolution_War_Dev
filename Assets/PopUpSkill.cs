@@ -35,6 +35,7 @@ public class PopUpSkill : MonoBehaviour
                 if (item.gameObject == gameObject)
                 {
                     //Debug.Log("마우스클릭 잘함");
+                    LobbySoundManager.Instance.BtnClickSoundPlay();
                     active = true;
                     break;
                 }

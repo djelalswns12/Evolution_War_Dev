@@ -4,17 +4,18 @@ using Firebase.Auth;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using UnityEngine.SocialPlatforms;
 using System.Threading.Tasks;
-using TMPro;
 using System.Net;
 using System.IO;
 public class AuthScript : MonoBehaviour
 {
+    public static AuthScript Instance;
     public bool IsFirebaseReady;
     public bool IsSignInOnProgess;
 
@@ -32,6 +33,9 @@ public class AuthScript : MonoBehaviour
     public static FirebaseUser user;
     public static int wwww=2;
     public string authCode;
+
+    public float dealayStart=0;
+    public bool isLoading;
     public string Mycraw(string url)
     {
         // Create a request for the URL.
@@ -62,6 +66,7 @@ public class AuthScript : MonoBehaviour
     }
     private void Awake()
     {
+        Instance = this;
         Screen.SetResolution(1920, 1080, true);
         Application.runInBackground = true;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
@@ -85,7 +90,7 @@ public class AuthScript : MonoBehaviour
 
         PlayGamesPlatform.InitializeInstance(config);
 
-        PlayGamesPlatform.DebugLogEnabled = true;
+        PlayGamesPlatform.DebugLogEnabled = false;
         PlayGamesPlatform.Activate();
 
 
@@ -105,41 +110,72 @@ public class AuthScript : MonoBehaviour
                 firebaseAuth = FirebaseAuth.DefaultInstance;
             }
         });
-        googleLogin();
+   
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (user != null && SceneVarScript.Instance.isDataConnect==true)
-        {
-            logo3.text = "실행2";
-            SceneManager.LoadScene("LobbyScean");
-        }
-        else
-        {
-            logo3.text = "DB연결:"+SceneVarScript.Instance.isDataConnect.ToString();
-        }
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (authCode != null)
-            {
-                logo3.text = "실행1";
-                GoogleToFireBase();
-            }else if (Application.isEditor)
-            {
-                Debug.Log("구글플레이 인증에 실패해서 파이어베이스에 접근할수 없었지만 디버그 모드라서 구글플레이 인증을 완료했다 친후 파이어베이스 접근 코드를 test로 임의부여후 실행하였습니다.");
-                SceneManager.LoadScene("LobbyScean");
-
-            }
-        }
+        googleLogin();
+        EnterGame();
         if (authCode != null)
         {
-            tabToPlay.SetActive(true);
+            //tabToPlay.SetActive(true);
             Debug.Log("구글플레이 회원id를 받아왔습니다. 이값을 이제 파이어베이스로 넘기세요!");
         }
     }
-
+    public void EnterGame()
+    {
+        dealayStart += Time.deltaTime;
+        if (Input.GetMouseButtonDown(0) && dealayStart > 2.5f)
+        {
+            /*
+            로그인 완료이후에 클릭시
+            */
+            if (SceneVarScript.Instance.isVersionCheck == false)
+            {
+                tabToPlay.SetActive(true);
+                if (dealayStart > 5f)
+                    tabToPlay.GetComponent<Text>().text = "Please Update App";
+                Debug.Log("구글로그인 또는 파이어베이스 로그인에 실패하였습니다.");
+                return;
+            }
+            if (user == null && !Application.isEditor)
+            {
+                tabToPlay.SetActive(true);
+                if (dealayStart > 5f)
+                {
+                    tabToPlay.GetComponent<Text>().text = "Login Error01, Please restart or Check your Network";
+                }
+                Debug.Log("구글로그인 또는 파이어베이스 로그인에 실패하였습니다.");
+                return;
+            }
+            if (SceneVarScript.Instance.isDataConnect == false)
+            {
+                tabToPlay.SetActive(true);
+                if (dealayStart > 5f)
+                    tabToPlay.GetComponent<Text>().text = "Login Error02, Please restart or Check your Network";
+                Debug.Log("데이터 로드 오류.");
+                return;
+            }
+            if (SceneVarScript.Instance.hasUser == false)
+            {
+                if (StartManager.Instance.UINaming.activeSelf == false)
+                {
+                    tabToPlay.SetActive(true);
+                    tabToPlay.GetComponent<Text>().text = "Login Error03, Please restart or Check your Network";
+                }
+                else
+                {
+                    tabToPlay.SetActive(false);
+                }
+                Debug.Log("게임 계정생성 오류.");
+                return;
+            }
+            BlindManager.Instance.CloseBlind();
+            SceneManager.LoadScene("LobbyScean");
+        }
+    }
     public void SignIn()
     {
         if(IsFirebaseReady==false || IsSignInOnProgess==true || user != null)
@@ -196,12 +232,18 @@ public class AuthScript : MonoBehaviour
 
     public void googleLogin()
     {
+        if (isLoading == true)
+        {
+            return;
+        }
+        isLoading = true;
         Social.localUser.Authenticate((bool success) =>
         {
             if (success)
             {
                 logo.text = "구글플레이게임 로그인 및 활성 성공!";
                 authCode = PlayGamesPlatform.Instance.GetServerAuthCode();
+                GoogleToFireBase();
                 //signinbtn.interactable = IsFirebaseReady;
             }
             else
@@ -209,13 +251,21 @@ public class AuthScript : MonoBehaviour
                 if (Application.isEditor)
                 {
                     SceneVarScript.Instance.SetAuthCode("test");
+                    SceneVarScript.Instance.LoginCourseFun(SceneVarScript.Instance.GetAuthCode());
                     tabToPlay.SetActive(true);
+                    tabToPlay.GetComponent<Text>().text = "Tab to Play";
+                }
+                else
+                {
+               
+                    isLoading = false;
                 }
                 logo.text = "구글플레이게임 로그인 및 활성 실패!";
             }
 
         });
     }
+
     public void googleLogOut()
     {
         if(tabToPlay.activeSelf)
@@ -230,6 +280,7 @@ public class AuthScript : MonoBehaviour
     }
     public void GoogleToFireBase()
             {
+        LobbySoundManager.Instance.BGMSoundPlay();
         logo3.text = "실행4";
         signinbtn.interactable = false;
             firebaseAuth = Firebase.Auth.FirebaseAuth.DefaultInstance;
@@ -258,7 +309,10 @@ public class AuthScript : MonoBehaviour
                     user = newUser;
                     SceneVarScript.Instance.SetFirebaseUser(user);
                     SceneVarScript.Instance.SetAuthCode(user.UserId);
-                 
+                    SceneVarScript.Instance.LoginCourseFun(SceneVarScript.Instance.GetAuthCode());
+                    tabToPlay.SetActive(true);
+                    tabToPlay.GetComponent<Text>().text = "Tab to Play";
+     
                 });
         }
         }

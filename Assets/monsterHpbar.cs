@@ -17,7 +17,7 @@ public class monsterHpbar : MonoBehaviour
         targetsp = transform.parent.parent.GetComponent<SpriteRenderer>();
         parentsp = transform.parent.GetComponent<SpriteRenderer>();
         mySp = GetComponent<SpriteRenderer>();
-        if (gameObject.tag != "Player")
+        if (Instance.gameObject.tag != "Player")
         {
             mySp.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
             transform.parent.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleInsideMask;

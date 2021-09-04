@@ -17,7 +17,7 @@ public class AttackEffectScript : MonoBehaviour
         mySp.sortingLayerName = targetsp.sortingLayerName;
         mySp.flipX = targetsp.flipX;
         pos = transform.localPosition;
-        pos.x = mySp.flipX == true ? -SetX : SetX;
+        pos.x = (mySp.flipX == true ? -SetX : SetX);
         transform.localPosition = pos;
         if (gameObject.tag != "Player")
         {
@@ -33,5 +33,10 @@ public class AttackEffectScript : MonoBehaviour
         pos = transform.localPosition;
         pos.x = mySp.flipX == true ? -SetX : SetX;
         transform.localPosition = pos;
+    }
+    public void EffectOn()
+    {
+        var anim = GetComponent<Animator>();
+        anim.SetTrigger("Effect");
     }
 }

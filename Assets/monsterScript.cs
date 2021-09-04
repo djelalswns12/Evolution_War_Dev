@@ -16,7 +16,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     private SpriteOutline myOutline;
     private bool outlineCheck;
     public bool dir;//True:왼쪽>오른쪽 False:오른쪽>왼쪽
-    public int movestate; // 움직임 상태번호
+    public int movestate; // 움직임 상태번호 0:이동 가능 1:이동 불가
     public bool movestateChange;
     public int creatnumber;
     public bool someThingBlock; // 앞에 무엇인가 막혔는지 정하는 변수
@@ -25,6 +25,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     public SpriteRenderer sp;
 
     public LayerMask whatIsLayer;//길막 유닛 체크 마스크
+    public LayerMask FrontUnitLayer;//길막 유닛 체크 마스크
     public LayerMask whatIsLayer2; //공격대상 체크 마스크
     public bool attackPlayer; // 공격중인지 확인 하는 변수
 
@@ -51,7 +52,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     public float bonusDamage; // 일반 보너스 데미지
     public float thornsSpeed; // 가시덤불 디버프 스피드
     public float oldHumanBuffSpeed; // 원시인 디버프 스피드
-
+    public Canvas monsterUI;
     public Vector2 attOffset, size;//중첩 확인
     public Vector2 attOffset2, size2;//자신앞에 유닛 존재여부 확인
     public Vector2 attOffset3, size3;//공격범위에 적있는지 확인
@@ -82,21 +83,21 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     public bool hasPoisionFlag;//중독상태
     float poisionDamage;//원시인이 줄 수 있는 데미지
     float poisionSpeed; // 원시인이 줄 수 있는 디버프 속도
+
+    
+    public AttackEffectScript[] effectScript;
     // Start is called before the first frame update
     void Awake()
     {
         if(transform.tag!="Test")
         gameObject.layer = LayerMask.NameToLayer("Nothing");
+        sp = GetComponent<SpriteRenderer>();
     }
     void Start()
     {
         thornsSpeed = 1;
         oldHumanBuffSpeed = 1;
         hitParticle = Resources.Load<ParticleSystem>("HitParticle");
-        if (stateText != null)
-        {
-            stateText.text = "";
-        }
         if (transform.tag == "Player")
         {
             Myplayer = GetComponent<PlayerScript>();
@@ -104,7 +105,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         myOutline = GetComponent<SpriteOutline>();
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        sp = GetComponent<SpriteRenderer>();
+       
         orginColor = sp.color;
         SetMask(sp); // 마스크에 가려질 오브젝트인지 확인한다 player일 경우 무시한다
         pv = GetComponent<PhotonView>();
@@ -138,14 +139,18 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                 outlineCheck = true;
             }
         myOutline.enabled = outlineCheck;
-
+        if (stateText != null)
+        {
+            monsterUI.sortingLayerName = sp.sortingLayerName;
+            stateText.text = hp + " / " + mhp;
+        }
     }
 
     // Update is called once per frame
 
     void Update()
     {
-
+     
         #region 다른 PC에서도 실행하는 영역
         //레이어 미설정되었을 경우 rigidbody 적용을 막는 역할
         if (LayerMask.LayerToName(gameObject.layer) == "Nothing")
@@ -172,6 +177,35 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
             bluetxt.text = bluePoint.ToString();
             SetFocusMonster();
         }
+        if (stateText != null)
+        {
+            monsterUI.sortingLayerName = sp.sortingLayerName;
+            monsterUI.sortingOrder = 5;
+
+            if (NetworkMaster.Instance.dir == true)
+            {
+                if (gameObject.transform.position.x < GradiantPos.Instance.transform.position.x)
+                {
+                    stateText.text = hp + " / " + mhp;
+                }
+                else
+                {
+                    stateText.text = "";
+                }
+            }
+            else
+            {
+                if (gameObject.transform.position.x > GradiantPos.Instance.transform.position.x)
+                {
+                    stateText.text = hp + " / " + mhp;
+                }
+                else
+                {
+                    stateText.text = "";
+                }
+            }
+
+        }
         #endregion
 
         #region 상대방 캐릭터 행위 기술
@@ -193,6 +227,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         #region 본인 캐릭터 행위 기술
         else
         {
+            FrontUnitLayer = whatIsLayer;
             Setdir();
 
             if (hp <= 0)
@@ -200,7 +235,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                 hp = 0;
                 if (gameObject.tag == "Player")
                 {
-
+                    PlayPlayer();
                 }
                 else
                 {
@@ -355,34 +390,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         }
         if (movestate == 1)
         {
-            /*
-            Collider2D[] hit2 = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + (attOffset3.x * (dir == true ? -1 : 1)), transform.position.y + attOffset3.y), size3, 0, whatIsLayer2);
-            for (int i = 0; i < hit2.Length; i++)
-            {
-                if (hit2[i].gameObject == gameObject)
-                {
-                    continue;
-                }
-                if (hit2[i].tag == "monster" && hit2[i].GetComponent<PhotonView>().IsMine == true)
-                {
-                    anim.SetBool("attack", true);
-                    break;
-                }
-                if (hit2[i].tag == "boss")
-                {
-
-                }
-                if (hit2[i].tag == "Test")
-                {
-
-                }
-                if (hit2[i].tag == "Player" && hit2[i].GetComponent<PhotonView>().IsMine == false)
-                {
-
-                }
-                animReset();
-            }
-            */
+ 
         }
     }
     void PlayMonster()
@@ -466,7 +474,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         {
             bossAttackSignal = 1;
             float attackTimer = Random.Range(float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "attackMinTimer",SceneVarScript.Instance.bossOption)), float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "attackMaxTimer", SceneVarScript.Instance.bossOption)));
-            StartCoroutine(bossHit(attackTimer));
+            StartCoroutine(BossAttack(attackTimer));
         }
         //Debug.Log(anim.GetCurrentAnimatorStateInfo(0).IsName("attack")+ "//도착지점:"+ anim.GetCurrentAnimatorStateInfo(0).normalizedTime);
         if (anim.GetCurrentAnimatorStateInfo(0).IsName("attack") && anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.97f)
@@ -477,21 +485,21 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         {
             animReset();
         }
-        sp.flipX = GetTargetPlayer();
+        sp.flipX = !GetTargetPlayer();
 
     }
     public bool GetTargetPlayer()
     {
         if (redPoint > bluePoint)
         {
-            return false;
+            return true;
         }
         else
         {
-            return true;
+            return false;
         }
     }
-    IEnumerator bossHit(float attackTimer)
+    IEnumerator BossAttack(float attackTimer)
     {
         float attackType = Random.Range(0,100);
         if (attackType < int.Parse(SceneVarScript.Instance.GetOptionByName(myName, "attackType", SceneVarScript.Instance.bossOption)))
@@ -637,7 +645,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                 if (hit2[i].gameObject == NetworkMaster.player)
                 {
                     //Debug.Log("본인 player 콜라이더가 걸렸으므로 무시해야함");
-                    return false;
+                    continue;
                 }
                 if (hit2[i].tag == "boss"  || hit2[i].tag== "Test" /*|| hit2[i].tag == "Player"*/)
                 {
@@ -663,22 +671,23 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     bool FrontUnitThere()
     {
         //자신앞에 유닛 존재여부 확인
-        Collider2D[] hit2 = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + (attOffset2.x * (dir == true ? -1 : 1)), transform.position.y + attOffset2.y), size2, 0, whatIsLayer);
+        monsterScript monster;
+        Collider2D[] hit2 = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + (attOffset2.x * (dir == true ? -1 : 1)), transform.position.y + attOffset2.y), size2, 0, FrontUnitLayer);
         for (int i = 0; i < hit2.Length; i++)
         {
-            //if ((dir == false && hit2[i].transform.position.x < transform.position.x) || (dir == true && hit2[i].transform.position.x > transform.position.x))
-            if((hit2[i].GetComponent<monsterScript>().creatnumber < creatnumber && hit2[i].GetComponent<monsterScript>().attackPlayer == false) || hit2[i].GetComponent<monsterScript>().dir!=dir)
+           monster = hit2[i].GetComponent<monsterScript>();
+          if ((monster.creatnumber < creatnumber && monster.attackPlayer == false) || monster.dir!=dir)
             {
-                if (hit2[i].gameObject == gameObject)
+                if (monster.gameObject == gameObject)
                 {
                     continue;
                 }
-                if (hit2[i].gameObject == NetworkMaster.player)
+                if (monster.gameObject == NetworkMaster.player)
                 {
-                   // Debug.Log("본인 player 콜라이더가 걸렸으므로 무시해야함");
-                    return false;
+                    // Debug.Log("본인 player 콜라이더가 걸렸으므로 무시해야함");
+                    continue;
                 }
-                if (hit2[i].tag == "boss"  || hit2[i].tag == "Test")
+                if (monster.tag == "boss" )
                 {
                     attackPlayer = true;
                 }
@@ -687,7 +696,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                     attackPlayer = false;
                 }
                 //가로막는 유닛이 플레이어나 보스를 공격중이 아니라면 가로막혀서 전진불가
-                if (hit2[i].GetComponent<monsterScript>().attackPlayer == false)
+                if (monster.attackPlayer == false)
                 {
                     someThingBlock = true;
                     return true;
@@ -698,27 +707,25 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         return false;
     }
     public void OverlapUnit()
-    {
-        
-        Collider2D[] hit = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + (attOffset.x * (dir == true ? -1 : 1)), transform.position.y + attOffset.y), size, 0, whatIsLayer);
+    {    
+        Collider2D[] hit = Physics2D.OverlapBoxAll(
+            new Vector2(transform.position.x + (attOffset.x * (dir == true ? -1 : 1)), transform.position.y + attOffset.y),
+            size,
+            0,
+            whatIsLayer
+            );
 
-        if (hit.Length == 1) 
+        if (hit.Length == 1 && hit[0].gameObject==gameObject) 
         {
-            movestate = 0;
-            movestateChange = false;
+            //유닛간의 중첩이 없고 자기 자신만 있을 경우
+            //멈춰있던 스피드 초기화 하여 전진할 수 있도록 한다.
+            ResetSpeed();
         }
         else
         {
-            //movestate가 true이면 이동불가 상태로 갈 수 있다는 뜻이다.
-            //movestateChange를 이용하여 release함수에 의해 선택된 아이만 movestate가 변할 수 있게 한다.
-            movestateChange = true; 
-            NetworkMaster.Instance.GetComponent<overlapScript>().release(hit);
-            //네트워크 마스터에서 중첩된 유닛중 우선순위가 가장높은 객체를 골라 movestatChange를 false 시키고 movestate를 0으로 만들어서 이동시킨다.
-            if (movestateChange == true)
-            {
-                movestate = 1;
-            }
-      
+            movestateChange = true;
+            //싱글톤으로 정의된 OverlapScript의 ReleaseMonster 함수를 호출한다
+            OverlapScript.Instance.ReleaseMonster(hit);
         }
     }
 
@@ -760,6 +767,48 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
             }
         }
     }
+    public void MonsterAttack()
+    {
+        if (pv.IsMine == true)
+        {
+            Collider2D[] hitArea = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + (attOffset3.x * (dir == true ? -1 : 1)), transform.position.y + attOffset3.y), size3, 0, whatIsLayer2);
+            if (hitArea.Length > 0)
+            {
+                for (int i = 0; i < hitArea.Length; i++)
+                {
+                    monsterScript target = hitArea[i].gameObject.GetComponent<monsterScript>();
+                    if ((target.dir != this.dir && (target.tag == "monster" || target.tag == "Player")) || target.tag == "boss" || target.tag == "Test")
+                    {
+                        if (hitArea.Length > 2 && hitArea[i].tag == "Player")
+                        {
+                            continue;
+                            //플레이어 공격중에 캐릭터 생성된다면 공격타겟을 바꿔줘야하기 때문
+                        }
+                        //pv.RPC("BossHit", RpcTarget.All, 2);
+                        int calDamage = (int)(damage * (1 + bonusDamage) * (1 + bossBonusDamage));
+                        if (hasOldHumanBuffFlag)
+                        {
+                            target.pv.RPC("GetPoision", RpcTarget.All, poisionDamage, poisionSpeed);
+                        }
+                        if (nuckBackFlag)
+                        {
+                            target.pv.RPC("CrowdControl", RpcTarget.All, 0, float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "nuckBackX", SceneVarScript.Instance.trapOption)), float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "nuckBackY", SceneVarScript.Instance.trapOption)));
+                        }
+                        if (thornsFlag)
+                        {
+                            target.pv.RPC("GetThorns", RpcTarget.All, (100 - float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "slow", SceneVarScript.Instance.trapOption))) / 100, float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "slowTime", SceneVarScript.Instance.trapOption)));
+                        }
+                        target.RpcCallGetDamage(calDamage, dieMoneyGet, NetworkMaster.Instance.dir);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    public void AttackEffectPlay(int index)
+    {
+        effectScript[index].EffectOn();
+    }
         //애니메이션에서 실행됨
     public void MonseterThrow(string name)
     {
@@ -799,7 +848,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
             // Debug.Log(setLayerString + "유닛입니다, 업 유닛");
         }
     }
-    public void resetSpeed()
+    public void ResetSpeed()
     {
         movestateChange = false;
         movestate = 0;
@@ -843,6 +892,11 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     {
         var par = Instantiate(hitParticle, transform.position, Quaternion.identity);
     }
+
+    public void RpcCallTrapCoolReset()
+    {
+        pv.RPC("TrapCoolReset", RpcTarget.All);
+    }
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
@@ -875,12 +929,12 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
             stream.SendNext(redPoint);
             stream.SendNext(bluePoint);
             stream.SendNext(myName);
-            stream.SendNext(sp.flipX);
             stream.SendNext(hasLionBuffFlag);
             stream.SendNext(hasOldHumanBuffFlag);
             stream.SendNext(hasPoisionFlag);
             stream.SendNext(hasThornsBuffFlag);
             stream.SendNext(hasGoldBananaFlag);
+            stream.SendNext(sp.flipX);
         }
         else
         {
@@ -894,14 +948,21 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
             redPoint=(int)stream.ReceiveNext();
             bluePoint=(int)stream.ReceiveNext();
             myName= (string)stream.ReceiveNext();
-            sp.flipX = (bool)stream.ReceiveNext();
             hasLionBuffFlag= (bool)stream.ReceiveNext();
             hasOldHumanBuffFlag= (bool)stream.ReceiveNext();
             hasPoisionFlag= (bool)stream.ReceiveNext();
             hasThornsBuffFlag= (bool)stream.ReceiveNext();
             hasGoldBananaFlag= (bool)stream.ReceiveNext();
+            sp.flipX = (bool)stream.ReceiveNext();
         }
     }
+    [PunRPC]
+    public void TrapCoolReset()
+    {
+        var trapScript= GetComponent<TrapScript>();
+        trapScript.nowCool = 0;
+    }
+
     [PunRPC]
     public void rpcTest()
     {
@@ -964,7 +1025,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     IEnumerator PoisionState(float damage)
     {
         float t=0;
-        var tick = damage / 5;
+        var tick = Mathf.Ceil(damage / 5);
         while (true)
         {
             //Debug.Log("0.2초마다 데미지를 받습니다");
@@ -1034,12 +1095,17 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
             }
         }
     }
+
     public void RpcCallGetDamage(int damage, int dieMoneyGet, bool dir,int type=0)
     {
-        pv.RPC("GetDamage", RpcTarget.All, damage, dieMoneyGet, dir,type);
+        pv.RPC("GetDamage", RpcTarget.All, damage, dieMoneyGet, dir,type,0f,0f);
+    }
+    public void RpcCallGetDamage(int damage, int dieMoneyGet, bool dir, int type,float x,float y)
+    {
+        pv.RPC("GetDamage", RpcTarget.All, damage, dieMoneyGet, dir, type, x,y);
     }
     [PunRPC]
-    public void GetDamage(int damage,int moneyGet,bool requestDir,int type)
+    public void GetDamage(int damage,int moneyGet,bool requestDir,int type,float x,float y)
     {
         //type :0:기본타입 1>>독공격
         //moneyGet=1 이면 중립공격 0 이면 상대방의 공격
@@ -1048,31 +1114,39 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         {
             StartCoroutine(colorCo());
         }
+        Vector2 attackPos = new Vector2(x, y);
+        if (attackPos == Vector2.zero)
+        {
+            attackPos = transform.position;
+        }
         if (pv.IsMine)
         {
             if (gameObject.tag == "boss" || gameObject.tag == "Test")
             {
                 if (type == 0)
                 {
-                    DamageObjectPool.Instacne.Pop(transform.position, damage, new Color(255, 255, 255));
+                    DamageObjectPool.Instacne.Pop(attackPos, damage, new Color(255, 255, 255));
                 }
                 else if (type == 1)
                 {
-                    DamageObjectPool.Instacne.TickPop(transform.position, damage, new Color(0, 1, 0));
+                    DamageObjectPool.Instacne.TickPop(attackPos, damage, new Color(0, 1, 0));
                 }
             }
             else
             {
                 if (type == 0)
                 {
-                    DamageObjectPool.Instacne.Pop(transform.position, damage, new Color(1, 0, 0));
+                    DamageObjectPool.Instacne.Pop(attackPos, damage, new Color(1, 0, 0));
                 }else if (type == 1)
                 {
-                    DamageObjectPool.Instacne.TickPop(transform.position, damage, new Color(0, 1, 0));
+                    DamageObjectPool.Instacne.TickPop(attackPos , damage, new Color(0, 1, 0));
                 }
             }
             pv.RPC("PointCal", RpcTarget.All, damage, requestDir);
-           
+            if (gameObject.tag == "Player")
+            {
+                MainGameManager.mainGameManager.AttackAlam();
+            }
             if ((bool)PhotonNetwork.CurrentRoom.CustomProperties["isTest"] || (NetworkMaster.otherPlayer && NetworkMaster.otherPlayer.GetComponent<monsterScript>().hp > 0))
             {
                 //상대방이 살아있고
@@ -1102,11 +1176,11 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         {
             if (type == 0)
             {
-                DamageObjectPool.Instacne.Pop(transform.position, damage, new Color(255, 255, 255));
+                DamageObjectPool.Instacne.Pop(attackPos, damage, new Color(255, 255, 255));
             }
             else if (type == 1)
             {
-                DamageObjectPool.Instacne.TickPop(transform.position, damage, new Color(0, 1, 0));
+                DamageObjectPool.Instacne.TickPop(attackPos, damage, new Color(0, 1, 0));
             }
         }
     }
@@ -1131,11 +1205,11 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                 {
                     if (redPoint > bluePoint)
                     {
-                        NetworkMaster.Instance.SendMainMsgFunc($"<color=red>RED</color>팀이 보스에게 더많은 피해를 입혔습니다.", 1);
+                        NetworkMaster.Instance.SendMainMsgFunc($"<color=red>RED</color>팀이 보스에게 더많은 피해를 입혔습니다.\n보스 처치 보상:<color=yellow>{GetMoney}Gold</color> 획득", 1);
                     }
                     else
                     {
-                        NetworkMaster.Instance.SendMainMsgFunc($"<color=blue>BLUE</color>팀이 보스에게 더많은 피해를 입혔습니다.", 1);
+                        NetworkMaster.Instance.SendMainMsgFunc($"<color=blue>BLUE</color>팀이 보스에게 더많은 피해를 입혔습니다.\n보스 처치 보상:<color=yellow>{GetMoney}Gold</color> 획득", 1);
                     }
                     //NetworkMaster.Instance.SendGameMsgFunc($"<color=blue>BLUE:</color> {GetMoney}<color=yellow>G</color>  <color=red>RED:</color> {dropMoney - GetMoney}<color=yellow>G</color>", 1);
                     Debug.Log($"{myName} 다음 보스를 소환합니다.");

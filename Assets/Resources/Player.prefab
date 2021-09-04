@@ -123,8 +123,8 @@ Transform:
   m_LocalPosition: {x: 2.1359, y: 6.5594, z: 0}
   m_LocalScale: {x: -3.5511672, y: 5.176415, z: 0.69351}
   m_Children:
-  - {fileID: 3244983981444866720}
   - {fileID: 3428306515525191956}
+  - {fileID: 3244983981444866720}
   m_Father: {fileID: 4922454488373627007}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -191,6 +191,7 @@ GameObject:
   - component: {fileID: 4125645505993542563}
   - component: {fileID: 7819965775754642264}
   - component: {fileID: 4426680208515185482}
+  - component: {fileID: 7767663430905836464}
   m_Layer: 0
   m_Name: "\uCE90\uC2AC\uC644\uC131"
   m_TagString: Player
@@ -231,7 +232,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 5e83a6c79cd04034da72cb9857661d47, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -278,6 +279,20 @@ MonoBehaviour:
   targetsp: {fileID: 0}
   SetX: 0
   flip: 0
+--- !u!114 &7767663430905836464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1358802075637202815}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a8cf4587dcb42a4588d3f1a46001c6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 1, g: 0, b: 0, a: 1}
+  outlineSize: 6
 --- !u!1 &2339838916251987311
 GameObject:
   m_ObjectHideFlags: 0
@@ -308,7 +323,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1.05, z: 1}
   m_Children: []
   m_Father: {fileID: 820083382001893745}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4733031325820680549
 SpriteRenderer:
@@ -535,6 +550,9 @@ MonoBehaviour:
   - {fileID: 7191426109393982396}
   - {fileID: 6998428600566690812}
   - {fileID: 1358802075637202815}
+  allMoney: 0
+  userName: 
+  UseSKill: []
 --- !u!50 &7749779203394634200
 Rigidbody2D:
   serializedVersion: 4
@@ -579,6 +597,9 @@ MonoBehaviour:
   whatIsLayer:
     serializedVersion: 2
     m_Bits: 0
+  FrontUnitLayer:
+    serializedVersion: 2
+    m_Bits: 0
   whatIsLayer2:
     serializedVersion: 2
     m_Bits: 0
@@ -605,6 +626,7 @@ MonoBehaviour:
   bonusDamage: 0
   thornsSpeed: 0
   oldHumanBuffSpeed: 0
+  monsterUI: {fileID: 0}
   attOffset: {x: 0, y: 0}
   size: {x: 0, y: 0}
   attOffset2: {x: 0, y: 0}
@@ -619,6 +641,7 @@ MonoBehaviour:
   hasOldHumanBuffFlag: 0
   hasThornsBuffFlag: 0
   hasPoisionFlag: 0
+  effectScript: []
 --- !u!61 &8873828932401422363
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -767,13 +790,14 @@ GameObject:
   - component: {fileID: 4205159965413836421}
   - component: {fileID: 683116355499472451}
   - component: {fileID: 2528874793910256441}
+  - component: {fileID: 3317184080250255316}
   m_Layer: 0
   m_Name: "\uB3D9\uAD743"
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4205159965413836421
 Transform:
   m_ObjectHideFlags: 0
@@ -807,7 +831,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 5e83a6c79cd04034da72cb9857661d47, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -854,6 +878,20 @@ MonoBehaviour:
   targetsp: {fileID: 0}
   SetX: 0
   flip: 0
+--- !u!114 &3317184080250255316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4452880956976326037}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a8cf4587dcb42a4588d3f1a46001c6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 1, g: 0, b: 0, a: 1}
+  outlineSize: 13
 --- !u!1 &6998428600566690812
 GameObject:
   m_ObjectHideFlags: 0
@@ -865,6 +903,7 @@ GameObject:
   - component: {fileID: 5230652230140832934}
   - component: {fileID: 7200904548600522458}
   - component: {fileID: 9102134275152361}
+  - component: {fileID: 5018753374053819508}
   m_Layer: 0
   m_Name: "\uC6C0\uC9D1"
   m_TagString: Player
@@ -905,7 +944,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 5e83a6c79cd04034da72cb9857661d47, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -952,6 +991,20 @@ MonoBehaviour:
   targetsp: {fileID: 0}
   SetX: 0
   flip: 0
+--- !u!114 &5018753374053819508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6998428600566690812}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a8cf4587dcb42a4588d3f1a46001c6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 1, g: 0, b: 0, a: 1}
+  outlineSize: 10
 --- !u!1 &7191426109393982396
 GameObject:
   m_ObjectHideFlags: 0
@@ -963,6 +1016,7 @@ GameObject:
   - component: {fileID: 7338075893085106101}
   - component: {fileID: 6154218479116905531}
   - component: {fileID: 7376249699335189326}
+  - component: {fileID: 1284408105656602842}
   m_Layer: 0
   m_Name: "\uB098\uBB34\uC9D11"
   m_TagString: Player
@@ -1003,7 +1057,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 5e83a6c79cd04034da72cb9857661d47, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1050,6 +1104,20 @@ MonoBehaviour:
   targetsp: {fileID: 0}
   SetX: 0
   flip: 0
+--- !u!114 &1284408105656602842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7191426109393982396}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a8cf4587dcb42a4588d3f1a46001c6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 1, g: 0, b: 0, a: 1}
+  outlineSize: 10
 --- !u!1 &7403859238103313786
 GameObject:
   m_ObjectHideFlags: 0
@@ -1082,7 +1150,7 @@ RectTransform:
   m_Children:
   - {fileID: 5341982202452435507}
   m_Father: {fileID: 820083382001893745}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}

@@ -9,9 +9,10 @@ public class CornTrapScript : TrapScript
         if (setCool <= nowCool)
         {
             GetGold();
-            nowCool = 0;
+            monster.RpcCallTrapCoolReset();
         }
     }
+
     public void GetGold()
     {
         var point = int.Parse(SceneVarScript.Instance.GetOptionByName(myName, "perMoney", SceneVarScript.Instance.trapOption));

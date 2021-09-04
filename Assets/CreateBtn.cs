@@ -36,7 +36,7 @@ public class CreateBtn : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         cost = int.Parse(NetworkMaster.Instance.GetMonsterOption(myname, "cost"));
         //mytxt.text = NetworkMaster.Instance.GetMonsterOption(Index, 6) + "\n"+ NetworkMaster.Instance.GetMonsterOption(Index, 1)+"원";
         mytxt.text =cost.ToString()+"G";
-        if (cost >= MainGameManager.mainGameManager.GetMoney())
+        if (cost > MainGameManager.mainGameManager.GetMoney())
         {
             blind.SetActive(true);
         }

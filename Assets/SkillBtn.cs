@@ -58,13 +58,13 @@ public class SkillBtn : MonoBehaviour
     }
     public void BeginDragEvent()
     {
+        LobbySoundManager.Instance.BtnClickSoundPlay();
         lobbymanager.Instance.skillTarget.GetComponent<Image>().sprite = myImg.sprite;
         lobbymanager.Instance.skillTarget.transform.position = Input.mousePosition;
         lobbymanager.Instance.skillTarget.SetActive(true);
     }
     public void DragEvent()
     {
-        ClickEvent();
         lobbymanager.Instance.skillTarget.transform.position = Input.mousePosition;
 
     }
@@ -93,6 +93,18 @@ public class SkillBtn : MonoBehaviour
     }
     public void ClickEvent()
     {
-        lobbymanager.Instance.selectedSkill = myName;
+        LobbySoundManager.Instance.BtnClickSoundPlay();
+        if (lobbymanager.Instance.selectedSkill != myName)
+        {
+            lobbymanager.Instance.selectedSkill = myName;
+        }
+        else
+        {
+            lobbymanager.Instance.selectedSkill = "";
+        }
+    }
+    public string GetMyName()
+    {
+        return myName;
     }
 }

@@ -23,6 +23,7 @@ public class GoldObjectPool : MonoBehaviour
     {
         
     }
+
     private void InitQueue(int cnt)
     {
         for (int i = 0; i < cnt; i++)

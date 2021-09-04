@@ -770,6 +770,9 @@ MonoBehaviour:
   whatIsLayer:
     serializedVersion: 2
     m_Bits: 0
+  FrontUnitLayer:
+    serializedVersion: 2
+    m_Bits: 0
   whatIsLayer2:
     serializedVersion: 2
     m_Bits: 0
@@ -796,6 +799,7 @@ MonoBehaviour:
   bonusDamage: 0
   thornsSpeed: 0
   oldHumanBuffSpeed: 0
+  monsterUI: {fileID: 0}
   attOffset: {x: 0, y: 0}
   size: {x: 0, y: 0}
   attOffset2: {x: 0, y: 0}
@@ -805,6 +809,12 @@ MonoBehaviour:
   throwPos: {x: 0, y: 0}
   spawnPos: {x: 0, y: 0}
   hitParticle: {fileID: 0}
+  hasLionBuffFlag: 0
+  hasGoldBananaFlag: 0
+  hasOldHumanBuffFlag: 0
+  hasThornsBuffFlag: 0
+  hasPoisionFlag: 0
+  effectScript: []
 --- !u!50 &7974547359439363077
 Rigidbody2D:
   serializedVersion: 4
@@ -1022,7 +1032,7 @@ MonoBehaviour:
     SynchronizeType: 2
     Name: attack
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: SingleAttack
   m_SynchronizeLayers:
   - SynchronizeType: 2

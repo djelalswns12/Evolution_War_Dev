@@ -75,7 +75,7 @@ public class BuffControl : MonoBehaviour
         /////////////////////////////////////////
         if (monster.hasThornsBuffFlag)
         {
-            buffInsert("ThornsBuff","3"); //바나나임시로
+            buffInsert("ThornsBuff","4"); //
         }
         else
         {

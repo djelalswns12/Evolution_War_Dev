@@ -1,28 +1,10 @@
 fileFormatVersion: 2
-guid: 8e29534ce442f8a4783f34b267bd71c5
+guid: 24adc541b5720c2488cb8d0df66e78bd
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6383899843306800720
-    second: uiLobby_0
-  - first:
-      213: 4160389036465590474
-    second: uiLobby_1
-  - first:
-      213: -3969884743232992470
-    second: uiLobby_2
-  - first:
-      213: -7409421318873092943
-    second: uiLobby_3
-  - first:
-      213: 2986936390032182140
-    second: uiLobby_4
-  - first:
-      213: 7506637932285793876
-    second: uiLobby_5
-  - first:
-      213: -517918657593976914
-    second: uiLobby_6
+      213: -1414930529092288882
+    second: "\uAC8C\uC784\uC544\uC774\uCF58_0"
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -160,13 +142,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: uiLobby_0
+      name: "\uAC8C\uC784\uC544\uC774\uCF58_0"
       rect:
         serializedVersion: 2
-        x: 318
-        y: 437
-        width: 144
-        height: 167
+        x: 176
+        y: 112
+        width: 884
+        height: 943
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -174,134 +156,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0b9b6067ae4d767a0800000000000000
-      internalID: -6383899843306800720
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: uiLobby_1
-      rect:
-        serializedVersion: 2
-        x: 544
-        y: 441
-        width: 143
-        height: 167
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ac016f539cbacb930800000000000000
-      internalID: 4160389036465590474
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: uiLobby_2
-      rect:
-        serializedVersion: 2
-        x: 784
-        y: 459
-        width: 101
-        height: 108
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a2bca500cd228e8c0800000000000000
-      internalID: -3969884743232992470
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: uiLobby_3
-      rect:
-        serializedVersion: 2
-        x: 985
-        y: 456
-        width: 104
-        height: 130
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1bcec5931927c2990800000000000000
-      internalID: -7409421318873092943
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: uiLobby_4
-      rect:
-        serializedVersion: 2
-        x: 348
-        y: 212
-        width: 98
-        height: 117
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c7b4e8e32dab37920800000000000000
-      internalID: 2986936390032182140
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: uiLobby_5
-      rect:
-        serializedVersion: 2
-        x: 512
-        y: 204
-        width: 124
-        height: 116
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4561e537d6fec2860800000000000000
-      internalID: 7506637932285793876
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: uiLobby_6
-      rect:
-        serializedVersion: 2
-        x: 711
-        y: 199
-        width: 143
-        height: 165
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ea7509799bbffc8f0800000000000000
-      internalID: -517918657593976914
+      spriteID: e8e399f2e282d5ce0800000000000000
+      internalID: -1414930529092288882
       vertices: []
       indices: 
       edges: []

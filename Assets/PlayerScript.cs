@@ -16,8 +16,12 @@ public class PlayerScript : MonoBehaviourPunCallbacks,IPunObservable
     public Rigidbody2D rigid;
 
     public GameObject[] buliding;
+    public float allMoney;
+    public string userName;
+    public string[] UseSKill;
     void Start()
     {
+        UseSKill = new string[SceneVarScript.MAX_SKILL_COUNT];
         myplayer = pv.IsMine;
 
         //if (myplayer)
@@ -29,30 +33,40 @@ public class PlayerScript : MonoBehaviourPunCallbacks,IPunObservable
     // Update is called once per frame
     void Update()
     {
-        for(int i = 0; i < buliding.Length; i++)
+        for (int i = 0; i < buliding.Length; i++)
         {
             if (playerSp == i)
             {
                 buliding[i].SetActive(true);
+                if (myplayer == false)
+                {
+                    buliding[i].GetComponent<SpriteOutline>().enabled=true;
+                }
             }
             else
             {
                 buliding[i].SetActive(false);
             }
         }
-
-        
         sp.flipX = dir;
         if (myplayer == false)
         {
             NetworkMaster.otherPlayer = gameObject;
             NetworkMaster.Instance.otherPlayerHasBeen = true;
+            MainGameManager.mainGameManager.enemyUseSkill = UseSKill;
+            MainGameManager.mainGameManager.enemyAllMoney = allMoney;
+            MainGameManager.mainGameManager.enemyUserName = userName;
             return;
         }
         //아래부터 IsMine 이라면
+        userName = SceneVarScript.Instance.GetUserOption("username");
+        allMoney = MainGameManager.mainGameManager.allMoney;
         playerSp = MainGameManager.mainGameManager.GetPlayerBuliding();
-
-
+        for (int i = 0; i < SceneVarScript.MAX_SKILL_COUNT; i++)
+        {
+            UseSKill[i] = SceneVarScript.Instance.GetOptionByIndex(SceneVarScript.Instance.GetUserOption("skill" + (i + 1)), "name", SceneVarScript.Instance.skillOption);
+        }
+        MainGameManager.mainGameManager.useSkill = UseSKill;
     }
     public void SetPlayerSp()
     {
@@ -65,11 +79,18 @@ public class PlayerScript : MonoBehaviourPunCallbacks,IPunObservable
         {
             stream.SendNext(dir);
             stream.SendNext(playerSp);
+            stream.SendNext(UseSKill);
+            stream.SendNext(allMoney);
+            stream.SendNext(userName);
         }
         else
         {
             dir = (bool)stream.ReceiveNext();
             playerSp = (int)stream.ReceiveNext();
+            UseSKill = (string[])stream.ReceiveNext();
+            allMoney = (float)stream.ReceiveNext();
+            userName = (string)stream.ReceiveNext();
+
             //float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
             //Debug.Log(lag);
         }

@@ -70,7 +70,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 176526479
-  m_SortingLayer: 7
+  m_SortingLayer: 8
   m_SortingOrder: 0
   m_Sprite: {fileID: 5270397129360678384, guid: dfc99fb6b9c8acf43ae90820aa8c25b4,
     type: 3}
@@ -186,3 +186,4 @@ MonoBehaviour:
     m_Bits: 0
   lostTarget: 0
   dieMoneyGet: 0
+  bonusMoney: 0

@@ -9,7 +9,7 @@ public class ThornsTrapScript : TrapScript
         if (setCool <= nowCool)
         {
             Attack();
-            nowCool = 0;
+            monster.RpcCallTrapCoolReset();
         }
     }
     public void Attack()

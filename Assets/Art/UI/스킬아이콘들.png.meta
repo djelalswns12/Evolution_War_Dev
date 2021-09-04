@@ -4,19 +4,19 @@ TextureImporter:
   internalIDToNameTable:
   - first:
       213: 6773118235982958952
-    second: "\uC2A4\uD0AC\uC544\uC774\uCF58\uB4E4_0"
+    second: "\uBC14\uB098\uB098_0"
   - first:
       213: -3953690400076805791
-    second: "\uC2A4\uD0AC\uC544\uC774\uCF58\uB4E4_1"
+    second: "\uC288\uD37C\uAC70\uBD81\uC774_1"
   - first:
       213: 9189358215307616868
-    second: "\uC2A4\uD0AC\uC544\uC774\uCF58\uB4E4_2"
+    second: "\uACE0\uC0DD\uB300\uC9D1\uACB0_2"
   - first:
       213: -5836485331821424452
-    second: "\uC2A4\uD0AC\uC544\uC774\uCF58\uB4E4_3"
+    second: "\uC57D\uC721\uAC15\uC2DD_3"
   - first:
       213: 7726564024472560038
-    second: "\uC2A4\uD0AC\uC544\uC774\uCF58\uB4E4_4"
+    second: "\uB3C5\uCC3D\uC804\uC220_4"
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -154,7 +154,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\uC2A4\uD0AC\uC544\uC774\uCF58\uB4E4_0"
+      name: "\uBC14\uB098\uB098_0"
       rect:
         serializedVersion: 2
         x: 49
@@ -162,7 +162,7 @@ TextureImporter:
         width: 190
         height: 183
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -175,7 +175,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uC2A4\uD0AC\uC544\uC774\uCF58\uB4E4_1"
+      name: "\uC288\uD37C\uAC70\uBD81\uC774_1"
       rect:
         serializedVersion: 2
         x: 351
@@ -183,7 +183,7 @@ TextureImporter:
         width: 190
         height: 183
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -196,15 +196,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uC2A4\uD0AC\uC544\uC774\uCF58\uB4E4_2"
+      name: "\uACE0\uC0DD\uB300\uC9D1\uACB0_2"
       rect:
         serializedVersion: 2
-        x: 696
+        x: 698
         y: 503
         width: 191
         height: 183
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -217,7 +217,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uC2A4\uD0AC\uC544\uC774\uCF58\uB4E4_3"
+      name: "\uC57D\uC721\uAC15\uC2DD_3"
       rect:
         serializedVersion: 2
         x: 57
@@ -225,7 +225,7 @@ TextureImporter:
         width: 191
         height: 183
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -238,7 +238,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uC2A4\uD0AC\uC544\uC774\uCF58\uB4E4_4"
+      name: "\uB3C5\uCC3D\uC804\uC220_4"
       rect:
         serializedVersion: 2
         x: 469
@@ -246,7 +246,7 @@ TextureImporter:
         width: 191
         height: 183
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
