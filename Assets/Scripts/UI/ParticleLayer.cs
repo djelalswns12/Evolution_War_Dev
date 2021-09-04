@@ -16,6 +16,9 @@ public class ParticleLayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.Log("----------------------------------------" + gameObject.name);
+        Debug.Log("----------------------------------------" + gameObject.name);
+        Debug.Log("----------------------------------------" + gameObject.name);
         SetRender();
     }
     public void SetRender()

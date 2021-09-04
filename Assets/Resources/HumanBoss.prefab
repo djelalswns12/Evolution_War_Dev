@@ -648,13 +648,13 @@ GameObject:
   - component: {fileID: 7346986659133647350}
   - component: {fileID: 7346986659133647345}
   - component: {fileID: 7346986659133647344}
-  - component: {fileID: 7346986659133647347}
   - component: {fileID: 2058443249535804265}
   - component: {fileID: 5926975594951364490}
   - component: {fileID: 3838575136473368774}
   - component: {fileID: 5673917392986243735}
   - component: {fileID: 5100122571613651392}
   - component: {fileID: 7167547656560214841}
+  - component: {fileID: -3950300776178644537}
   m_Layer: 0
   m_Name: HumanBoss
   m_TagString: boss
@@ -751,10 +751,9 @@ MonoBehaviour:
   OwnershipTransfer: 0
   ObservedComponents:
   - {fileID: 7346986659133647344}
-  - {fileID: 7346986659133647347}
   - {fileID: 2058443249535804265}
   - {fileID: 7167547656560214841}
-  - {fileID: 0}
+  - {fileID: -3950300776178644537}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -774,25 +773,6 @@ MonoBehaviour:
   m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
   m_UseLocal: 1
---- !u!114 &7346986659133647347
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7346986659133647341}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 360efb08409d4ff40b476dde19142e7b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  touchEffectObj: {fileID: 5338528605005824268, guid: 4914d58ae79cc8d4bba2e9d757fafaa2,
-    type: 3}
-  Effect1: {fileID: 877455057852851377, guid: 23d32d5fedcd1d24c8102bf399827b3b, type: 3}
-  pv: {fileID: 7346986659133647345}
-  bossDropGold: 15
-  dieMoneyGet: 0
-  hittedList: []
 --- !u!114 &2058443249535804265
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -814,6 +794,9 @@ MonoBehaviour:
   pv: {fileID: 0}
   sp: {fileID: 0}
   whatIsLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  FrontUnitLayer:
     serializedVersion: 2
     m_Bits: 0
   whatIsLayer2:
@@ -1103,6 +1086,25 @@ MonoBehaviour:
   m_SynchronizeLayers:
   - SynchronizeType: 2
     LayerIndex: 0
+--- !u!114 &-3950300776178644537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7346986659133647341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49c3364e888d62b478e0d6a19142f54f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  touchEffectObj: {fileID: 5338528605005824268, guid: 4914d58ae79cc8d4bba2e9d757fafaa2,
+    type: 3}
+  Effect1: {fileID: 877455057852851377, guid: 23d32d5fedcd1d24c8102bf399827b3b, type: 3}
+  pv: {fileID: 7346986659133647345}
+  bossDropGold: 0
+  dieMoneyGet: 0
+  hittedList: []
 --- !u!1 &7760430169983893494
 GameObject:
   m_ObjectHideFlags: 0

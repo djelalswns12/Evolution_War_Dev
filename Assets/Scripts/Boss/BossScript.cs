@@ -1,16 +1,16 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class BossScripit : MonoBehaviourPunCallbacks,IPunObservable
+public class BossScript : MonoBehaviourPunCallbacks, IPunObservable
 {
     public GameObject touchEffectObj;
     public GameObject Effect1;
     public PhotonView pv;
-    public int bossDropGold; 
+    public int bossDropGold;
     public int dieMoneyGet;
     Color orginColor = new Color(1, 1, 1);
     Color redColor = new Color(1, 0, 0);
@@ -63,7 +63,7 @@ public class BossScripit : MonoBehaviourPunCallbacks,IPunObservable
         {
             MonsterAttack();
         }
-     }
+    }
     private bool TouchObj()
     {
         var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);

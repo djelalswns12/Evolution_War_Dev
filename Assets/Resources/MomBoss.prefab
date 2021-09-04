@@ -601,13 +601,13 @@ GameObject:
   - component: {fileID: 6421619618068314745}
   - component: {fileID: 6421619618068314750}
   - component: {fileID: 6421619618068314751}
-  - component: {fileID: 6421619618068314748}
   - component: {fileID: 2340358116085084390}
   - component: {fileID: 7974547359439363077}
   - component: {fileID: 1298485222046994793}
   - component: {fileID: 8561093941514685114}
   - component: {fileID: 6760124137478531045}
   - component: {fileID: -7200387771446600010}
+  - component: {fileID: 4940987933287869720}
   m_Layer: 0
   m_Name: MomBoss
   m_TagString: boss
@@ -706,9 +706,9 @@ MonoBehaviour:
   OwnershipTransfer: 0
   ObservedComponents:
   - {fileID: 6421619618068314751}
-  - {fileID: 6421619618068314748}
   - {fileID: 2340358116085084390}
   - {fileID: -7200387771446600010}
+  - {fileID: 4940987933287869720}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -728,25 +728,6 @@ MonoBehaviour:
   m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
   m_UseLocal: 1
---- !u!114 &6421619618068314748
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6421619618068314722}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 360efb08409d4ff40b476dde19142e7b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  touchEffectObj: {fileID: 5338528605005824268, guid: 4914d58ae79cc8d4bba2e9d757fafaa2,
-    type: 3}
-  Effect1: {fileID: 877455057852851377, guid: 23d32d5fedcd1d24c8102bf399827b3b, type: 3}
-  pv: {fileID: 6421619618068314750}
-  bossDropGold: 10
-  dieMoneyGet: 0
-  hittedList: []
 --- !u!114 &2340358116085084390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1037,6 +1018,25 @@ MonoBehaviour:
   m_SynchronizeLayers:
   - SynchronizeType: 2
     LayerIndex: 0
+--- !u!114 &4940987933287869720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6421619618068314722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49c3364e888d62b478e0d6a19142f54f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  touchEffectObj: {fileID: 5338528605005824268, guid: 4914d58ae79cc8d4bba2e9d757fafaa2,
+    type: 3}
+  Effect1: {fileID: 877455057852851377, guid: 23d32d5fedcd1d24c8102bf399827b3b, type: 3}
+  pv: {fileID: 6421619618068314750}
+  bossDropGold: 0
+  dieMoneyGet: 0
+  hittedList: []
 --- !u!1 &8450463584968683165
 GameObject:
   m_ObjectHideFlags: 0

@@ -685,13 +685,13 @@ GameObject:
   - component: {fileID: 6043057234834887922}
   - component: {fileID: 6043057234834887925}
   - component: {fileID: 6043057234834887924}
-  - component: {fileID: 6043057234834887927}
   - component: {fileID: 3078758743549156973}
   - component: {fileID: 7235073620437742222}
   - component: {fileID: 2395977875196682085}
   - component: {fileID: 7588813359234223110}
   - component: {fileID: 7627129893866248831}
   - component: {fileID: 2980100237501796597}
+  - component: {fileID: -2878586469034884266}
   m_Layer: 0
   m_Name: DragonBoss
   m_TagString: boss
@@ -788,9 +788,9 @@ MonoBehaviour:
   OwnershipTransfer: 0
   ObservedComponents:
   - {fileID: 6043057234834887924}
-  - {fileID: 6043057234834887927}
   - {fileID: 3078758743549156973}
   - {fileID: 7627129893866248831}
+  - {fileID: -2878586469034884266}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -810,25 +810,6 @@ MonoBehaviour:
   m_SynchronizeRotation: 0
   m_SynchronizeScale: 0
   m_UseLocal: 1
---- !u!114 &6043057234834887927
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6043057234834887913}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 360efb08409d4ff40b476dde19142e7b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  touchEffectObj: {fileID: 5338528605005824268, guid: 4914d58ae79cc8d4bba2e9d757fafaa2,
-    type: 3}
-  Effect1: {fileID: 877455057852851377, guid: 23d32d5fedcd1d24c8102bf399827b3b, type: 3}
-  pv: {fileID: 6043057234834887925}
-  bossDropGold: 8
-  dieMoneyGet: 0
-  hittedList: []
 --- !u!114 &3078758743549156973
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -991,6 +972,25 @@ CapsuleCollider2D:
   m_Offset: {x: 0.02, y: 1.68}
   m_Size: {x: 5.03, y: 3.8}
   m_Direction: 1
+--- !u!114 &-2878586469034884266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6043057234834887913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49c3364e888d62b478e0d6a19142f54f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  touchEffectObj: {fileID: 5338528605005824268, guid: 4914d58ae79cc8d4bba2e9d757fafaa2,
+    type: 3}
+  Effect1: {fileID: 877455057852851377, guid: 23d32d5fedcd1d24c8102bf399827b3b, type: 3}
+  pv: {fileID: 6043057234834887925}
+  bossDropGold: 0
+  dieMoneyGet: 0
+  hittedList: []
 --- !u!1 &6771252442145271636
 GameObject:
   m_ObjectHideFlags: 0
