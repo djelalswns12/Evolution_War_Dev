@@ -39,21 +39,14 @@ public class TrapScript : MonoBehaviour
     {
 
     }
-    public void CoolManage()
+    private void CoolManage()
     {
         setCool = int.Parse(SceneVarScript.Instance.GetOptionByName(myName, "perTime", SceneVarScript.Instance.trapOption));
+        //트랩 DB로 부터 해당 트랩의 이름을 Key값으로 해서 효과 발동에 소모되는 쿨타임값을 가져온다.
         nowCool += Time.deltaTime;
         isLoad = true;
     }
-    protected virtual void UseSkill()
-    {
-        if (setCool <= nowCool)
-        {
-            //사용될 스킬 GetGold();
-            nowCool = 0;
-        }
-    }
-    public void BarRendering()
+    private void BarRendering()
     {
         if (nowCool > setCool)
         {
@@ -66,6 +59,13 @@ public class TrapScript : MonoBehaviour
         else
         {
             bar.transform.localScale = new Vector3(Mathf.Lerp(bar.transform.localScale.x, nowCool / setCool, 0.5f), 1, 1);
+        }
+    }
+    protected virtual void UseSkill()
+    {
+        if (setCool <= nowCool)
+        {
+            //사용될 효과 자식 클래스에서 서술
         }
     }
 }

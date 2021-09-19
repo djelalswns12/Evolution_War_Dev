@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,7 +30,7 @@ public class SkillManager : MonoBehaviour
         startSkillBtnPosX = skillBtn[0].transform.position.x;
         skillActiveList = new bool[SceneVarScript.Instance.skillOption.Length];
         skillCool = new float[SceneVarScript.Instance.skillOption.Length];
-        // Áø¿µ¿¡ µû¶ó UIÀ§Ä¡ ÁöÁ¤
+        // ì§„ì˜ì— ë”°ë¼ UIìœ„ì¹˜ ì§€ì •
         if (!NetworkMaster.Instance.dir)
         {
             startSkillBtnPosX *= -1;
@@ -46,9 +46,9 @@ public class SkillManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        SKillUniqueEffect();
+        SKillUniqueEffect(); //ìŠ¤í‚¬ ê³ ìœ íš¨ê³¼ ì ìš©
         SetSkillBtn();
-        SkillCoolManager();
+        SkillCoolManager(); //
         for (int i = 0; i < SceneVarScript.Instance.skillOption.Length; i++)
         {
             UseSkill(i.ToString());
@@ -58,6 +58,12 @@ public class SkillManager : MonoBehaviour
     {
         switch (index)
         {
+            /*
+             bool skillActiveList[];
+            -----------------------------------------------
+             í•´ë‹¹ ì¸ë±ìŠ¤ ìŠ¤í‚¬ì´ ë°œë™í•  íš¨ê³¼(ê¸°ë³¸ ì§€ì† íš¨ê³¼ , ì‚¬ìš©ì‹œ íš¨ê³¼)ë¥¼ ì„¤ì •
+             íš¨ê³¼ë¥¼ ë°œìƒì‹œí‚¤ëŠ” í•¨ìˆ˜ê°€ trueë¥¼ ë°˜í™˜í•˜ë©´ í•´ë‹¹ ìŠ¤í‚¬ì˜ ì‚¬ìš© ì¡°ê±´ì´ ë§Œì¡±ë˜ì—ˆìŒì„ ì˜ë¯¸í•œë‹¤.
+             */
             case "0":
                 skillActiveList[int.Parse(index)] = skill0_Assemble(index);
                 break;
@@ -74,10 +80,8 @@ public class SkillManager : MonoBehaviour
                 skillActiveList[int.Parse(index)] = skill4_PoisonSpear(index);
                 break;
             default:
-                Debug.Log("Á¸ÀçÇÏÁö ¾Ê´Â ½ºÅ³À» ¿äÃ»ÇÏ¿´½À´Ï´Ù.");
                 break;
         }
-
     }
     public bool skill0_Assemble(string index)
     {
@@ -92,10 +96,10 @@ public class SkillManager : MonoBehaviour
             skillOnParticle[slotNum].gameObject.SetActive(false);
             return false;
         }
-        //»ç¿ë ¿©ºÎ ON/OFF
+        //ì‚¬ìš© ì—¬ë¶€ ON/OFF
         skillOnParticle[slotNum].gameObject.SetActive(true);
 
-        //±âº»  Áö¼Ó È¿°ú
+        //ê¸°ë³¸  ì§€ì† íš¨ê³¼
         skill0_Assemble_passive(true, index);
 
         return true;
@@ -128,10 +132,10 @@ public class SkillManager : MonoBehaviour
             skillOnParticle[slotNum].gameObject.SetActive(false);
             return false;
         }
-        //»ç¿ë ¿©ºÎ ON/OFF
+        //ì‚¬ìš© ì—¬ë¶€ ON/OFF
         skillOnParticle[slotNum].gameObject.SetActive(true);
 
-        //±âº»  Áö¼Ó È¿°ú
+        //ê¸°ë³¸  ì§€ì† íš¨ê³¼
         skill2_GoldBanana_passive(true, index);
 
         return true;
@@ -149,10 +153,10 @@ public class SkillManager : MonoBehaviour
             skillOnParticle[slotNum].gameObject.SetActive(false);
             return false;
         }
-        //»ç¿ë ¿©ºÎ ON/OFF
+        //ì‚¬ìš© ì—¬ë¶€ ON/OFF
         skillOnParticle[slotNum].gameObject.SetActive(true);
 
-        //±âº»  Áö¼Ó È¿°ú
+        //ê¸°ë³¸  ì§€ì† íš¨ê³¼
 
         return true;
     }
@@ -168,27 +172,27 @@ public class SkillManager : MonoBehaviour
             skillOnParticle[slotNum].gameObject.SetActive(false);
             return false;
         }
-        //»ç¿ë ¿©ºÎ ON/OFF
+        //ì‚¬ìš© ì—¬ë¶€ ON/OFF
         skillOnParticle[slotNum].gameObject.SetActive(true);
 
-        //±âº»  Áö¼Ó È¿°ú
+        //ê¸°ë³¸  ì§€ì† íš¨ê³¼
         return true;
     }
-    #region ¿¢Æ¼ºê È¿°ú
-    //////////////////////////    ¿¢Æ¼ºê È¿°ú      ////////////////////////////
+    #region ì—‘í‹°ë¸Œ íš¨ê³¼
+    //////////////////////////    ì—‘í‹°ë¸Œ íš¨ê³¼      ////////////////////////////
     public void skill1_SuperTutle_Active(string index)
     {
         skillCool[int.Parse(index)]= float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "cool", SceneVarScript.Instance.skillOption));
-        //Â÷ÃâµÉ ¸ó½ºÅÍ ÀÌ¸§ ¼³Á¤
+        //ì°¨ì¶œë  ëª¬ìŠ¤í„° ì´ë¦„ ì„¤ì •
         var settingName = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByIndex(index, "needMonster", SceneVarScript.Instance.skillOption)).Split(',')[0];
         Debug.Log(settingName);
-        //Â÷Ãâ¸ó½ºÅÍ ÇÊ¿ä °¹¼ö ¼³Á¤
+        //ì°¨ì¶œëª¬ìŠ¤í„° í•„ìš” ê°¯ìˆ˜ ì„¤ì •
         var settingNeed = int.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "need0", SceneVarScript.Instance.skillOption));
 
-        //¼ÒÈ¯µÉ ¸ó½ºÅÍ ÀÌ¸§ ¼³Á¤
+        //ì†Œí™˜ë  ëª¬ìŠ¤í„° ì´ë¦„ ì„¤ì •
         var spawnMonster = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByIndex(index, "spawnMonster", SceneVarScript.Instance.skillOption));
 
-        //ÇÃ·¹ÀÌ¾î·ÎºÎÅÍ °¡Àå ¸Ö¸®ÀÖ´Â °ÅºÏÀÌ 10¸¶¸® Â÷Ãâ
+        //í”Œë ˆì´ì–´ë¡œë¶€í„° ê°€ì¥ ë©€ë¦¬ìˆëŠ” ê±°ë¶ì´ 10ë§ˆë¦¬ ì°¨ì¶œ
 
         int spawnLayer = -1;
         for (int i = 0; i < list[settingName].Count; i++)
@@ -206,17 +210,17 @@ public class SkillManager : MonoBehaviour
                 }
             }
         }
-        Debug.Log("ÇÃ·¹ÀÌ¾î¿Í °ÅºÏÀÌ °Å¸®¸¦ ±âÁØÀ¸·Î ³»¸²Â÷¼ø Á¤·Ä ¿Ï·á");
-        //Â÷ÃâµÈ °ÅºÏÀÌ¸¦ »ç¸Á½ÃÅ°¸é¼­ ¸¶Áö¸·¿¡ ÇÃ·¹ÀÌ¾î·Î ºÎÅÍ °¡Àå °¡±î¿î °ÅºÏÀÌÀÇ ·¹ÀÌ¾î¸¦ ±¸ÇØ¿À±â
+        Debug.Log("í”Œë ˆì´ì–´ì™€ ê±°ë¶ì´ ê±°ë¦¬ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ë‚´ë¦¼ì°¨ìˆœ ì •ë ¬ ì™„ë£Œ");
+        //ì°¨ì¶œëœ ê±°ë¶ì´ë¥¼ ì‚¬ë§ì‹œí‚¤ë©´ì„œ ë§ˆì§€ë§‰ì— í”Œë ˆì´ì–´ë¡œ ë¶€í„° ê°€ì¥ ê°€ê¹Œìš´ ê±°ë¶ì´ì˜ ë ˆì´ì–´ë¥¼ êµ¬í•´ì˜¤ê¸°
         for (int i = 0; i < settingNeed; i++)
         {
-            //10¸¶¸® ¸ğµÎ »ç¸Á½ÃÅ°±â
+            //10ë§ˆë¦¬ ëª¨ë‘ ì‚¬ë§ì‹œí‚¤ê¸°
             list[settingName][i].GetComponent<monsterScript>().hp = 0;
         }
         list[settingName][list[settingName].Count-1].GetComponent<monsterScript>().GetLayerNum();
-        //ÀúÀåµÈ ·¹ÀÌ¾î¿¡ °ÅºÏÀÌ ¼ÒÈ¯½ÃÅ°±â
+        //ì €ì¥ëœ ë ˆì´ì–´ì— ê±°ë¶ì´ ì†Œí™˜ì‹œí‚¤ê¸°
         NetworkMaster.Instance.CreatMonster(spawnMonster, 1, NetworkMaster.Instance.CreatPosXOffset(), spawnLayer);
-        NetworkMaster.Instance.SendGameMsgFunc("½´ÆÛ °ÅºÏÀÌ°¡ ÀüÀå¿¡ ÃâÇöÇß½À´Ï´Ù!",1);
+        NetworkMaster.Instance.SendGameMsgFunc("ìŠˆí¼ ê±°ë¶ì´ê°€ ì „ì¥ì— ì¶œí˜„í–ˆìŠµë‹ˆë‹¤!",1);
     }
 
 
@@ -236,27 +240,27 @@ public class SkillManager : MonoBehaviour
         //        ele.GetComponent<monsterScript>().FuncLionAttackSpeedBuff(perTime, perAttackSpeed);
         //    }
         //}
-        NetworkMaster.Instance.SendGameMsgFunc("¾àÀ°°­½ÄÀÌ ¹ßµ¿µÇ¾ú½À´Ï´Ù!");
+        NetworkMaster.Instance.SendGameMsgFunc("ì•½ìœ¡ê°•ì‹ì´ ë°œë™ë˜ì—ˆìŠµë‹ˆë‹¤!");
     }
     public void skill4_PoisonSpear_Active(string index)
     {
         skillCool[int.Parse(index)] = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "cool", SceneVarScript.Instance.skillOption));
-        var perTime = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "perTime", SceneVarScript.Instance.skillOption)); // Áö¼Ó½Ã°£
-        var addSpeed = (100-float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "addSpeed", SceneVarScript.Instance.skillOption))) / 100; //ÀÌ¼Ó °¨¼Ò·®
-        var addDamage = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "addDamage", SceneVarScript.Instance.skillOption)) / 100; // µµÆ® µ¥¹ÌÁö·®
+        var perTime = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "perTime", SceneVarScript.Instance.skillOption)); // ì§€ì†ì‹œê°„
+        var addSpeed = (100-float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "addSpeed", SceneVarScript.Instance.skillOption))) / 100; //ì´ì† ê°ì†ŒëŸ‰
+        var addDamage = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "addDamage", SceneVarScript.Instance.skillOption)) / 100; // ë„íŠ¸ ë°ë¯¸ì§€ëŸ‰
         if (list.ContainsKey("OldHuman")) { 
         foreach (var item in list["OldHuman"])
         {
             item.GetComponent<monsterScript>().FuncOldHumanBuff(perTime, addDamage,addSpeed);
         }
         }
-        NetworkMaster.Instance.SendGameMsgFunc("µ¶Ã¢ Àü¼úÀÌ ¹ßµ¿µÇ¾ú½À´Ï´Ù!");
+        NetworkMaster.Instance.SendGameMsgFunc("ë…ì°½ ì „ìˆ ì´ ë°œë™ë˜ì—ˆìŠµë‹ˆë‹¤!");
     }
     #endregion
 
 
-    #region ÆĞ½Ãºê ½ºÅ³
-    //////////////////////////ÆĞ½Ãºê ½ºÅ³ ¼³¸í ( ±âº» Áö¼Ó È¿°ú )////////////////////////////
+    #region íŒ¨ì‹œë¸Œ ìŠ¤í‚¬
+    //////////////////////////íŒ¨ì‹œë¸Œ ìŠ¤í‚¬ ì„¤ëª… ( ê¸°ë³¸ ì§€ì† íš¨ê³¼ )////////////////////////////
     public void skill0_Assemble_passive(bool isActive, string skill_Index)
     {
         if (isActive)
@@ -269,7 +273,7 @@ public class SkillManager : MonoBehaviour
                 string data = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByIndex(skill_Index, "needMonster", SceneVarScript.Instance.skillOption));
                 string[] moneys= SceneVarScript.Instance.GetOptionByIndex(skill_Index, "perMoney", SceneVarScript.Instance.skillOption).Split('/');
                 int perMoney = int.Parse(moneys[MainGameManager.mainGameManager.GetPlayerBuliding()]);
-                //Debug.Log("ÇÊ¿ä µ¥ÀÌÅÍ:" + data);
+                //Debug.Log("í•„ìš” ë°ì´í„°:" + data);
                 var needs = data.Split(',');
                 for (int i = 0; i < needs.Length / 2; i++)
                 {
@@ -289,9 +293,9 @@ public class SkillManager : MonoBehaviour
     {
         if (isActive)
         {
-            //¿ø¼şÀÌ °ø°İ¼Óµµ
+            //ì›ìˆ­ì´ ê³µê²©ì†ë„
             monkeyAttackSpeed = (float.Parse(SceneVarScript.Instance.GetOptionByIndex(skill_Index, "perAttackSpeed", SceneVarScript.Instance.skillOption)) / 100);
-            //¹Ù³ª³ª °ø°İ ¼º°ø½Ã Ãß°¡ °ñµå
+            //ë°”ë‚˜ë‚˜ ê³µê²© ì„±ê³µì‹œ ì¶”ê°€ ê³¨ë“œ
             var moneys= SceneVarScript.Instance.GetOptionByIndex(skill_Index, "perMoney", SceneVarScript.Instance.skillOption).Split('/');
             bananaBonusGold = int.Parse(moneys[MainGameManager.mainGameManager.GetPlayerBuliding()]);
         }
@@ -302,16 +306,16 @@ public class SkillManager : MonoBehaviour
         }
     }
 
-    //////////////////////////ÆĞ½Ãºê ½ºÅ³ ¼³¸í ( ±âº» Áö¼Ó È¿°ú )////////////////////////////
+    //////////////////////////íŒ¨ì‹œë¸Œ ìŠ¤í‚¬ ì„¤ëª… ( ê¸°ë³¸ ì§€ì† íš¨ê³¼ )////////////////////////////
     #endregion
 
-    #region °íÀ¯È¿°ú
-    ////////////////////////// ½ºÅ³ ¼³¸í (°íÀ¯ È¿°ú )////////////////////////////
+    #region ê³ ìœ íš¨ê³¼
+    ////////////////////////// ìŠ¤í‚¬ ì„¤ëª… (ê³ ìœ  íš¨ê³¼ )////////////////////////////
     public void skill3_Stronger_Unique(bool isActive, string skill_Index)
     {
         if (isActive)
         {
-            //»çÀÚ º¸½º »Ç°ø
+            //ì‚¬ì ë³´ìŠ¤ ë½€ê³µ
             lionBossBonusDamage = (float.Parse(SceneVarScript.Instance.GetOptionByIndex(skill_Index, "addDamage", SceneVarScript.Instance.skillOption)) / 100);
         }
         else
@@ -322,22 +326,34 @@ public class SkillManager : MonoBehaviour
     }
 
     #endregion
-
     public void SKillUniqueEffect()
     {
         bool[] OnSKillList = new bool[SceneVarScript.Instance.skillOption.Length];
+        //ì „ì²´ ìŠ¤í‚¬DBë¥¼ ì½ì–´ì™€ì„œ ì°©ìš©ì¤‘ì¸ ìŠ¤í‚¬ì¸ì§€ ì²´í¬í•˜ëŠ” ë³€ìˆ˜ì´ë‹¤.
+
         foreach (var item in skillBtn)
         {
-            var findIndex = SceneVarScript.Instance.GetOptionByName(item.GetComponent<SkillBtn>().myName, "index", SceneVarScript.Instance.skillOption);
+            //ì¥ì°©ì¤‘ì¸ ìŠ¤í‚¬ì˜ ì¸ë±ìŠ¤ ë²ˆí˜¸ë¥¼ êµ¬í•œë‹¤.
+            var findIndex = SceneVarScript.Instance.GetOptionByName(
+                item.GetComponent<SkillBtn>().myName,
+                "index", SceneVarScript.Instance.skillOption
+                );
             if (findIndex != "null")
             {
-                OnSKillList[int.Parse(SceneVarScript.Instance.GetOptionByName(item.GetComponent<SkillBtn>().myName, "index", SceneVarScript.Instance.skillOption))] = true;
+                //í•´ë‹¹ ì¸ë±ìŠ¤ë¥¼ ê°€ì§€ëŠ” ìŠ¤í´ì´ ì°©ìš©ì¤‘ì¸ ìŠ¤í‚¬ì„ì„ ëª…ì‹œí•œë‹¤
+                OnSKillList[int.Parse(SceneVarScript.Instance.GetOptionByName(
+                    item.GetComponent<SkillBtn>().myName,
+                    "index", SceneVarScript.Instance.skillOption)
+                    )] = true;
             }
         }
         for (int i = 0; i < OnSKillList.Length; i++)
         {
             switch (i)
             {
+                /*
+                 í•´ë‹¹ ì¸ë±ìŠ¤ë¥¼ ê°€ì§€ëŠ” ìŠ¤í‚¬ì´ ë°œë™í•  íš¨ê³¼(ê³ ìœ  íš¨ê³¼)ë¥¼ ì„¤ì •
+                 */
                 case 3:
                     skill3_Stronger_Unique(OnSKillList[i], i.ToString());
                     break;
@@ -351,12 +367,12 @@ public class SkillManager : MonoBehaviour
         var useSkillIndex = int.Parse(SceneVarScript.Instance.GetOptionByName(skillName.myName, "index", SceneVarScript.Instance.skillOption));
         if (skillCool[useSkillIndex] > 0)
         {
-            NetworkMaster.Instance.SendGameMsgFunc("Àç»ç¿ë ´ë±â½Ã°£ÀÌ ³²¾Ò½À´Ï´Ù.");
+            NetworkMaster.Instance.SendGameMsgFunc("ì¬ì‚¬ìš© ëŒ€ê¸°ì‹œê°„ì´ ë‚¨ì•˜ìŠµë‹ˆë‹¤.");
             return;
         }
         if (skillActiveList[useSkillIndex] == false)
         {
-            NetworkMaster.Instance.SendGameMsgFunc("½ºÅ³ »ç¿ë Á¶°ÇÀÌ ºÎÁ·ÇÕ´Ï´Ù.");
+            NetworkMaster.Instance.SendGameMsgFunc("ìŠ¤í‚¬ ì‚¬ìš© ì¡°ê±´ì´ ë¶€ì¡±í•©ë‹ˆë‹¤.");
             return;
         }
         switch (useSkillIndex)
@@ -431,22 +447,22 @@ public class SkillManager : MonoBehaviour
         if (SceneVarScript.Instance.GetOptionByIndex(index, "needMonster", SceneVarScript.Instance.skillOption) != "null")
         {
             string data = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByIndex(index, "needMonster", SceneVarScript.Instance.skillOption));
-            //Debug.Log("ÇÊ¿ä µ¥ÀÌÅÍ:" + data);
+            //Debug.Log("í•„ìš” ë°ì´í„°:" + data);
             var needs = data.Split(',');
             for (int i = 0; i < needs.Length / 2; i++)
             {
                 if (!list.ContainsKey(needs[i * 2]))
                 {
-                    // Debug.Log(needs[i * 2]+"´Â ¼ÒÈ¯¸ñ·Ï¿¡ ¾ø½À´Ï´Ù.");
+                    // Debug.Log(needs[i * 2]+"ëŠ” ì†Œí™˜ëª©ë¡ì— ì—†ìŠµë‹ˆë‹¤.");
                     return false;
                 }
                 if (list[needs[i * 2]].Count >= int.Parse(needs[(i * 2) + 1]))
                 {
-                    // Debug.Log(needs[i * 2] + "´Â °¹¼ö ¸¸Á·ÇÕ´Ï´Ù.");
+                    // Debug.Log(needs[i * 2] + "ëŠ” ê°¯ìˆ˜ ë§Œì¡±í•©ë‹ˆë‹¤.");
                 }
                 else
                 {
-                    // Debug.Log(needs[i * 2] + "ÀÇ °¹¼ö°¡ ºÎÁ·ÇÕ´Ï´Ù.");
+                    // Debug.Log(needs[i * 2] + "ì˜ ê°¯ìˆ˜ê°€ ë¶€ì¡±í•©ë‹ˆë‹¤.");
                     return false;
                 }
             }
@@ -457,7 +473,7 @@ public class SkillManager : MonoBehaviour
     }
     public void SetSkillBtn()
     {
-        //ÀÎ°ÔÀÓ ½ºÅ³ ¾ÆÀÌÄÜÀÇ °ªÀ» ¼³Á¤ÇÑ´Ù.
+        //ì¸ê²Œì„ ìŠ¤í‚¬ ì•„ì´ì½˜ì˜ ê°’ì„ ì„¤ì •í•œë‹¤.
 
         for (int i = 0; i < skillBtn.Length; i++)
         {
@@ -471,8 +487,8 @@ public class SkillManager : MonoBehaviour
 }
 
 
-//½ºÅ³ ¸Å´ÏÁ®¿¡¼­ ÇöÀç °¡Áö°í ÀÖ´Â ½ºÅ³ÀÇ µ¥ÀÌÅÍ¸¦ È®ÀÎÇÑ´Ù.
+//ìŠ¤í‚¬ ë§¤ë‹ˆì ¸ì—ì„œ í˜„ì¬ ê°€ì§€ê³  ìˆëŠ” ìŠ¤í‚¬ì˜ ë°ì´í„°ë¥¼ í™•ì¸í•œë‹¤.
 
-//°ÔÀÓ ¸Å´ÏÁ®¿¡¼­´Â ½ºÅ³¸Å´ÏÁ®ÀÇ °ªÀ» °¡Á®¿Â´Ù
+//ê²Œì„ ë§¤ë‹ˆì ¸ì—ì„œëŠ” ìŠ¤í‚¬ë§¤ë‹ˆì ¸ì˜ ê°’ì„ ê°€ì ¸ì˜¨ë‹¤
 
-//½ºÅ³ ¸Å´ÏÁ®¿¡¼­ °ÔÀÓ¸Ş´ÏÁ®ÀÇ °ªÀ» ÀĞ¾î¼­ È°¼ºÈ­ ¿©ºÎ¸¦ °áÁ¤ÇÑ´Ù.
+//ìŠ¤í‚¬ ë§¤ë‹ˆì ¸ì—ì„œ ê²Œì„ë©”ë‹ˆì ¸ì˜ ê°’ì„ ì½ì–´ì„œ í™œì„±í™” ì—¬ë¶€ë¥¼ ê²°ì •í•œë‹¤.

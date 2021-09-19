@@ -137,7 +137,6 @@ public class AuthScript : MonoBehaviour
                 tabToPlay.SetActive(true);
                 if (dealayStart > 5f)
                     tabToPlay.GetComponent<Text>().text = "Please Update App";
-                Debug.Log("구글로그인 또는 파이어베이스 로그인에 실패하였습니다.");
                 return;
             }
             if (user == null && !Application.isEditor)

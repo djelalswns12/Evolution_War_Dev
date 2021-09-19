@@ -643,6 +643,8 @@ public class SceneVarScript : MonoBehaviour
     public void RequestGameVersion()
     {
         isVersionCheck = false;
+
+        //파이어베이스의 Version 데이터를 읽어온다
         DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
         FirebaseDatabase.DefaultInstance
         .GetReference("Version")
@@ -653,25 +655,24 @@ public class SceneVarScript : MonoBehaviour
                 DataSnapshot data = task.Result;
                 foreach(var item in data.Children)
                 {
-                    Debug.Log(item.Key);
+                    //읽어온 버전 데이터에서 해당 클라이언트의 버전이 
+                    //이용가능한 버전인지 확인한다.
                     if (item.Key.ToString() == gameVersion)
                     {
                         if ((bool)item.Value == true)
                         {
+                            //이용가능한 버전
                             isVersionCheck = true;
                             return;
                         }
                         else
                         {
+                            //이용불가능한 버전
                             isVersionCheck = false;
                             return;
                         }
                     }
                 }
-            }
-            if (task.IsFaulted)
-            {
-
             }
         });
         }

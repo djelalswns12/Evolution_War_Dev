@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class ParticleLayer : MonoBehaviour
 {
+    //트랩에(옥수수,와드) 표시될 파티클
     public SpriteRenderer parSp;
     public ParticleSystemRenderer[] rend;
     // Start is called before the first frame update

@@ -84,7 +84,6 @@ public class OverlapScript : MonoBehaviour
                 }
             }
             #endregion
-            //Debug.Log(monsterIndex);
             OverlapUnits[monsterIndex].gameObject.GetComponent<monsterScript>().ResetSpeed();
             //이 작업을 통해 결정된 몬스터는 멈춰있던 스피드 초기화 하여 전진할 수 있도록 한다.
         }
