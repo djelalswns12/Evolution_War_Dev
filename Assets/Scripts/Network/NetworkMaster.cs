@@ -27,18 +27,18 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
 
 
     private GameObject instance;
-    // 0이름, 1비용 , 2드랍골드,3공중여부,4데미지 ,5최대체력 , 6이름,7스피드 
 
     [Tooltip("The prefab to use for representing the player")]
     [SerializeField]
     private GameObject playerPrefab;
+    public int gameMode;
     public static GameObject player = null, otherPlayer;
     public PhotonView pv;
     public GameObject background;
     public int creatnumber; //유닛 생성 번호 위치에 따라 추후 변경되기도 함
     public float editorSpeed; // 빠른 디버깅을 위하여 에디터에서만 캐릭터 이동속도 증가하는곳에 쓰임 
     public int setLayer; // 유닛 생성시 레이어 설정
-    public int playTest; // 1 : 왼쪽플레이어 생성 , -1:오른쪽 플레이어 생성
+    public bool StartPlayerPos; // true : 왼쪽플레이어 생성 , false:른쪽 플레이어 생성
     public float CreatposY;
     public Vector2 upSetPos, downSetPos;
     public bool dir;
@@ -88,39 +88,12 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         }
         else
         {
-
-
-            if (player == null)
-            {
-                int playerX = PhotonNetwork.IsMasterClient ? 1 : 0;//1마스터 : 0일반유저;
-                dir = playerX == 1 ? true : false;
-                if (playTest == -1)
-                {
-                    dir = false;
-                }
-                //int playerX = PhotonNetwork.CurrentRoom.PlayerCount % 2;
-                Debug.LogFormat("해당 씬에 플레이어 생성합니다. {0}", SceneManagerHelper.ActiveSceneName);
-
-                // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
-                float playerpos = background.GetComponent<SpriteRenderer>().bounds.size.x / 2 * 0.85f;
-                Vector3 setCameraPosition = new Vector3(playerX == (1 * playTest) ? -playerpos : playerpos, 0f, Camera.main.transform.position.z);
-                Camera.main.GetComponent<CameraScript>().SetCameraMove(setCameraPosition);
-
-                player = PhotonNetwork.Instantiate("Player", new Vector3(playerX == (1 * playTest) ? -playerpos : playerpos, downSetPos.y, 0f), Quaternion.identity, 0);
-                player.GetComponent<PlayerScript>().dir = dir;
-                SetCreatureInfo(player, "Player1");
-                player.layer = LayerMask.NameToLayer("centerunit");
-                if (photonView.IsMine)
+            MakePlayer(PhotonNetwork.IsMasterClient==true? StartPlayerPos:!StartPlayerPos);
+            MakePlayer(PhotonNetwork.IsMasterClient == false ? StartPlayerPos : !StartPlayerPos);
+            if (photonView.IsMine)
                 {
                     StartCoroutine(SetBoss("DragonBoss"));
                 }
-            }
-            else
-            {
-                Debug.LogFormat("해당씬에 플레이어생성이 무시됨 : {0}", SceneManagerHelper.ActiveSceneName);
-            }
-
-
         }
 
     }
@@ -189,10 +162,13 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
                     }
                     if ((otherPlayer == null||otherPlayer.GetComponent<monsterScript>().pv.IsMine==true )&& otherPlayerHasBeen)
                     {
-                        otherPlayer.GetComponent<monsterScript>().hp = 0;
                         //상대방이 들어온적이 있는데 튕겨서 나가진거라면
-                        endPoint = 1;
-                        pv.RPC("Win", RpcTarget.All, dir, playTime);
+                        if (gameMode == 0)
+                        {
+                            otherPlayer.GetComponent<monsterScript>().hp = 0;
+                            endPoint = 1;
+                            pv.RPC("Win", RpcTarget.All, dir, playTime);
+                        }
                     }
                 }
             }
@@ -234,68 +210,107 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
     #region Public Methods
     public void UpgradeBuild()
     {
+        UpgradeBuildByPlayer(player);
+    }
+    public bool UpgradeBuildByPlayer(GameObject player)
+    {
         var playerScript = player.GetComponent<monsterScript>();
         var nowPlayerName = playerScript.myName;
         var nowBuild = int.Parse(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "icon")) - 3000 + 1;
         var buildCost = int.Parse(GetMonsterOption(nowPlayerName, "cost"));
         if (nowBuild - 1 < gameStage)
         {
-            if (MainGameManager.mainGameManager.SpentGold(buildCost))
+            if (player == NetworkMaster.player)
             {
+                if (!MainGameManager.mainGameManager.SpentGold(buildCost))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (!AIManager.Instance.SpentGold(buildCost))
+                {
+                    return false;
+                }
+            }
                 if (nowBuild + 1 < buildMaxCnt)
                 {
                     var nextPlayerName = "Player" + (int.Parse(NetworkMaster.Instance.GetMonsterOption(NetworkMaster.player.GetComponent<monsterScript>().myName, "icon")) - 3000 + 2);
                     playerScript.hp += int.Parse(NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "mhp")) * 0.5f;
-                    SetCreatureInfo(player, "Player" + (nowBuild + 1));
-                    MainGameManager.mainGameManager.SetPlayerBuliding(nowBuild);
+                    SetCreatureInfo(player, "Player" + (nowBuild + 1),player);
+                    if (player == NetworkMaster.player)
+                    {
+                        MainGameManager.mainGameManager.SetPlayerBuliding(nowBuild);
+                    }
+                    else if (player == NetworkMaster.otherPlayer)
+                    {
+                        AIManager.Instance.SetPlayerBuliding(nowBuild);
+                    }
+                return true;
                 }
                 else
                 {
-                    Debug.Log("플레이어 건물 종류를 넘어서서 업그레이드 하려합니다.");
+                if (player == NetworkMaster.player) SendGameMsgFunc("알맞지 않은 시대라 업그레이드 할 수 없습니다.",0);
+                else  Debug.Log("알맞지 않은 시대라 업그레이드 할 수 없습니다.");
+                return false;
                 }
-            }
+            
         }
         else
         {
-            SendGameMsgFunc("알맞지 않은 시대라 업그레이드 할 수 없습니다.", 0);
+            if (player == NetworkMaster.player) SendGameMsgFunc("플레이어 건물 종류를 넘어서서 업그레이드 하려합니다.", 0);
+            else Debug.Log("플레이어 건물 종류를 넘어서서 업그레이드 하려합니다.");
+            return false;
         }
     }
     public void UpgradeTrap()
     {
-        
-        //돈 맞는지 확인
-        //nextIndex 존재여부 확인
-        //
+        UpgradeTrapByPlayer(player, MainGameManager.mainGameManager.GetNowMonster());
+    }
+    public void UpgradeTrapByPlayer(GameObject player,GameObject nowMonster)
+    {
         var playerScript = player.GetComponent<monsterScript>();
         var nowPlayerName = playerScript.myName;
         var nowBuild = int.Parse(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "icon")) - 3000;
-        var nowMonster = MainGameManager.mainGameManager.GetNowMonster();
         if (nowMonster == null)
         {
-            SendGameMsgFunc("업그레이드할 트랩이 존재하지 않습니다.", 0);
+            Debug.Log("업그레이드할 트랩이 존재하지 않습니다.");
+            //SendGameMsgFunc("업그레이드할 트랩이 존재하지 않습니다.", 0);
             return;
         }
         var nowMonsterScript = nowMonster.GetComponent<monsterScript>();
         if (SceneVarScript.Instance.GetOptionByName(nowMonsterScript.myName, "canBuild", SceneVarScript.Instance.trapOption) == "null")
         {
-            SendGameMsgFunc("더이상 업그레이드 할 수 없습니다.", 0);
+            Debug.Log("더이상 업그레이드 못함");
             return;
         }
         if (nowBuild < int.Parse(SceneVarScript.Instance.GetOptionByName(nowMonsterScript.myName, "canBuild", SceneVarScript.Instance.trapOption)))
         {
-            SendGameMsgFunc("건물 업그레이드가 부족합니다.", 0);
+            Debug.Log("건물 업그레이드 부족");
             return;
         }
-        if (MainGameManager.mainGameManager.SpentGold(int.Parse(SceneVarScript.Instance.GetOptionByName(nowMonsterScript.myName, "upgradeCost", SceneVarScript.Instance.trapOption))))
+        if (player == NetworkMaster.player)
         {
-            var nextIndex = SceneVarScript.Instance.GetOptionByName(nowMonsterScript.myName, "nextIndex",SceneVarScript.Instance.trapOption);
-            var nextName = SceneVarScript.Instance.GetOptionByIndex(nextIndex, "name",SceneVarScript.Instance.trapOption);
-            nowMonsterScript.hp = 0;
-            CreatMonster(nextName, 1, nowMonster.transform.position.x,nowMonsterScript.GetLayerNum());
-            MainGameManager.mainGameManager.RightNav.GetComponent<RightNav>().CloseNav();
+            if (!MainGameManager.mainGameManager.SpentGold(int.Parse(SceneVarScript.Instance.GetOptionByName(nowMonsterScript.myName, "upgradeCost", SceneVarScript.Instance.trapOption))))
+            {
+                return;
+            }
+             MainGameManager.mainGameManager.RightNav.GetComponent<RightNav>().CloseNav();
         }
+        else
+        {
+            if (!AIManager.Instance.SpentGold(int.Parse(SceneVarScript.Instance.GetOptionByName(nowMonsterScript.myName, "upgradeCost", SceneVarScript.Instance.trapOption))))
+            {
+                return;
+            }
+        }
+            var nextIndex = SceneVarScript.Instance.GetOptionByName(nowMonsterScript.myName, "nextIndex", SceneVarScript.Instance.trapOption);
+            var nextName = SceneVarScript.Instance.GetOptionByIndex(nextIndex, "name", SceneVarScript.Instance.trapOption);
+            nowMonsterScript.hp = 0;
+            CreatMonster(nextName, 1, nowMonster.transform.position.x, nowMonsterScript.GetLayerNum(),player);
+           
     }
-
     public string GetMonsterOption(string index0, string index1)
     {
         var monsterDB = SceneVarScript.Instance.monsterOption;
@@ -323,7 +338,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         script.whatIsLayer2 = creatmonster.whatIsLayer2;
         script.bonusMoney = bonusMoney;
     }
-    public void CreatMonster(string name, int createType = 0/*0이 아닌경우는 특정위치에서 소환되어야 할때 */, float posX = 0,int setLayer=-1)
+    public void CreatMonster(string name, int createType /*0이 아닌경우는 특정위치에서 소환되어야 할때 */, float posX ,int setLayer,GameObject player)
     {
         //UpLayer:1
         //DownLayer:0
@@ -343,7 +358,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         creatpos.y = (setLayer == 0 ? downSetPos.y : upSetPos.y) + Mathf.Abs(script.spawnPos.y);
         if (createType == 0)
         {
-            creatpos.x = CreatPosXOffset();
+            creatpos.x = CreatPosXOffset(player);
         }
         else if (createType == 1)
         {
@@ -374,10 +389,9 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
                 monster.layer = setLayer == 0 ? LayerMask.NameToLayer("downTrap") : LayerMask.NameToLayer("upTrap");
             }
         }
-        SetCreatureInfo(monster, name);
-
+        SetCreatureInfo(monster, name,player);
     }
-    public float CreatPosXOffset()
+    public float CreatPosXOffset(GameObject player)
     {
         Vector3 creatpos = player.transform.position;
         if (player.GetComponent<PlayerScript>().dir == true)
@@ -392,9 +406,10 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         }
         return creatpos.x;
     }
-    void SetCreatureInfo(GameObject monster, string name)
+    void SetCreatureInfo(GameObject monster, string name,GameObject player)
     {
         monsterScript instanceMonster = monster.GetComponent<monsterScript>();
+        instanceMonster.myPlayer = player.GetComponent<PlayerScript>();
         instanceMonster.creatnumber = creatnumber++;
         instanceMonster.myName = GetMonsterOption(name, "name").ToString();
         instanceMonster.dropMoney = int.Parse(GetMonsterOption(name, "dropcost"));
@@ -477,7 +492,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
             Vector3 pos = new Vector3(background.transform.position.x, upSetPos.y, background.transform.position.z);
             GameObject monster = PhotonNetwork.Instantiate(name, pos, Quaternion.identity, 0);
             monster.layer = LayerMask.NameToLayer("upunit");
-            SetCreatureInfo(monster, name);
+            SetCreatureInfo(monster, name,player);
             pv.RPC("SetStartRating", RpcTarget.All);
             Debug.Log("게임 정상적으로 시작되어서 점수가 깍입니다.");
             pv.RPC("CameraMove", RpcTarget.All, monster.transform.position);
@@ -543,6 +558,109 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
             yield return null;
         }
 
+    }
+    public bool CreateTrap(string myname, GameObject player, Vector2 mousePos, int layer)
+    {
+        Vector2 bossPos;
+        if (MainGameManager.mainGameManager.nowBoss != null)
+        {
+            bossPos = MainGameManager.mainGameManager.nowBoss.transform.position;
+            if (Mathf.Abs(mousePos.x - bossPos.x) < 3 && layer == 1)
+            {
+                if (player == NetworkMaster.player) SendGameMsgFunc("보스 근처에는 생성할 수 없습니다.", 0);
+                else
+                    Debug.Log("근처 보스");
+                return false;
+            }
+        }
+        if (Mathf.Abs(mousePos.x - NetworkMaster.player.transform.position.x) < 3 || (otherPlayer != null && Mathf.Abs(mousePos.x - otherPlayer.transform.position.x) < 3))
+        {
+            if (player == NetworkMaster.player) SendGameMsgFunc("플레이어 근처에는 생성할 수 없습니다.", 0);
+            else
+                Debug.Log("플레이어 근처 생성");
+
+            return false;
+        }
+        LayerMask mask = layer == 1 ? LayerMask.GetMask("upTrap") : LayerMask.GetMask("downTrap");
+        Collider2D[] otherTraps = Physics2D.OverlapBoxAll(mousePos, new Vector2(2, 2), 0, mask);
+        if (otherTraps.Length > 0)
+        {
+            if (player == NetworkMaster.player) SendGameMsgFunc("근처에 이미 다른 트랩이 존재합니다.", 0);
+            else
+                Debug.Log("근처 트랩");
+
+            return false;
+        }
+        if (SceneVarScript.Instance.GetOptionByName(myname, "outsideFocus", SceneVarScript.Instance.trapOption) == "0")
+        {
+            if (player == NetworkMaster.player)
+            {
+                if (player.GetComponent<PlayerScript>().dir == true)
+                {
+                    if (GradiantPos.Instance.transform.position.x < mousePos.x)
+                    {
+                        if (player == NetworkMaster.player) NetworkMaster.Instance.SendGameMsgFunc("시야가 없습니다.", 0);
+                        else
+                            Debug.Log("시야 없음");
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (GradiantPos.Instance.transform.position.x > mousePos.x)
+                    {
+                        if (player == NetworkMaster.player) NetworkMaster.Instance.SendGameMsgFunc("시야가 없습니다.", 0);
+                        else
+                            Debug.Log("시야 없음");
+                        return false;
+                    }
+                }
+            }
+        }
+        if (player == NetworkMaster.player)
+        {
+            if (!MainGameManager.mainGameManager.SpentGold(int.Parse(SceneVarScript.Instance.GetOptionByName(myname, "cost", SceneVarScript.Instance.monsterOption))))
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (!AIManager.Instance.SpentGold(int.Parse(SceneVarScript.Instance.GetOptionByName(myname, "cost", SceneVarScript.Instance.monsterOption))))
+            {
+                return false;
+            }
+        }
+        CreatMonster(myname, 1, mousePos.x, layer, player);
+        return true;
+    }
+    public void MakePlayer(bool dir)
+    {
+            Debug.LogFormat("해당 씬에 플레이어 생성합니다. {0}", SceneManagerHelper.ActiveSceneName);
+
+            // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
+            float playerpos = background.GetComponent<SpriteRenderer>().bounds.size.x / 2 * 0.85f;
+            Vector3 setCameraPosition = new Vector3(dir ? -playerpos : playerpos, 0f, Camera.main.transform.position.z);
+
+        if (player == null)
+        {
+            Camera.main.GetComponent<CameraScript>().SetCameraMove(setCameraPosition);
+            player = PhotonNetwork.Instantiate("Player", new Vector3(dir ? -playerpos : playerpos, downSetPos.y, 0f), Quaternion.identity, 0);
+            player.GetComponent<PlayerScript>().dir = dir;
+            SetCreatureInfo(player, "Player1",player);
+            player.layer = LayerMask.NameToLayer("centerunit");
+            player.GetComponent<PlayerScript>().myplayer = true;
+            this.dir = dir;
+        }
+        else
+        {
+            otherPlayer = PhotonNetwork.Instantiate("Player", new Vector3(dir ? -playerpos : playerpos, downSetPos.y, 0f), Quaternion.identity, 0);
+            otherPlayer.GetComponent<PlayerScript>().dir = dir;
+            SetCreatureInfo(otherPlayer, "Player1",otherPlayer);
+            otherPlayer.layer = LayerMask.NameToLayer("centerunit");
+            otherPlayer.GetComponent<PlayerScript>().myplayer = false;
+            gameMode = 1;
+        }
     }
     public void SendGameMsgFunc(string s, int type=0)
     {

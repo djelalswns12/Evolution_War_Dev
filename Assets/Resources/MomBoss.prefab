@@ -796,6 +796,7 @@ MonoBehaviour:
   hasThornsBuffFlag: 0
   hasPoisionFlag: 0
   effectScript: []
+  myPlayer: {fileID: 0}
 --- !u!50 &7974547359439363077
 Rigidbody2D:
   serializedVersion: 4

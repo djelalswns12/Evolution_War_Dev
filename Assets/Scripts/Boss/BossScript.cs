@@ -88,21 +88,14 @@ public class BossScript : MonoBehaviourPunCallbacks, IPunObservable
         eventDataCurrentPosition.position = Input.mousePosition;
         List<RaycastResult> results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
-        if (results.Count > 0)
+        if (results.Count == 1)
         {
-            if (results.Count == 1)
+            if (results[0].gameObject == MainGameManager.mainGameManager.moveUI)
             {
-                if (results[0].gameObject != MainGameManager.mainGameManager.moveUI)
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
     public void SpawnGroundEffect()
     {

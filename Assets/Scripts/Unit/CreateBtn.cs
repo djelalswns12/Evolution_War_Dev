@@ -47,57 +47,7 @@ public class CreateBtn : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     }
     public void Create()
     {
-        NetworkMaster.Instance.CreatMonster(myname);
-    }
-    public void TrapCreate()
-    {
-        var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 bossPos;
-        if (MainGameManager.mainGameManager.nowBoss!=null)
-        {
-            bossPos = MainGameManager.mainGameManager.nowBoss.transform.position;
-            if (Mathf.Abs(mousePos.x - bossPos.x) < 3&& NetworkMaster.Instance.GetLayer()==1)
-            {
-                NetworkMaster.Instance.SendGameMsgFunc("보스 근처에는 생성할 수 없습니다.", 0);
-                return;
-            }
-        }
-        if (Mathf.Abs(mousePos.x - NetworkMaster.player.transform.position.x)<3 || (NetworkMaster.otherPlayer!=null&& Mathf.Abs(mousePos.x - NetworkMaster.otherPlayer.transform.position.x) < 3))
-        {
-            NetworkMaster.Instance.SendGameMsgFunc("플레이어 근처에는 생성할 수 없습니다.", 0);
-            return;
-        }
-        LayerMask mask = NetworkMaster.Instance.GetLayer() == 1? LayerMask.GetMask("upTrap"): LayerMask.GetMask("downTrap");
-        Collider2D[] otherTraps = Physics2D.OverlapBoxAll(mousePos,new Vector2(2,2),0,mask);
-        if (otherTraps.Length > 0)
-        {
-            NetworkMaster.Instance.SendGameMsgFunc("근처에 이미 다른 트랩이 존재합니다.", 0);
-            return;
-        }
-        if (SceneVarScript.Instance.GetOptionByName(myname, "outsideFocus", SceneVarScript.Instance.trapOption) == "0")
-        {
-           if (NetworkMaster.Instance.dir == true)
-            {
-                if (GradiantPos.Instance.transform.position.x < mousePos.x)
-                {
-                    NetworkMaster.Instance.SendGameMsgFunc("시야가 없습니다.", 0);
-                    return;
-                }
-            }
-            else
-            {
-                if (GradiantPos.Instance.transform.position.x > mousePos.x )
-                {
-                    NetworkMaster.Instance.SendGameMsgFunc("시야가 없습니다.", 0);
-                    return;
-                }
-            }
-        }
-        if (!MainGameManager.mainGameManager.SpentGold(int.Parse(SceneVarScript.Instance.GetOptionByName(myname, "cost", SceneVarScript.Instance.monsterOption))))
-        {
-            return;
-        }
-         NetworkMaster.Instance.CreatMonster(myname, 1, mousePos.x);
+        NetworkMaster.Instance.CreatMonster(myname,0,0,-1,NetworkMaster.player);
     }
     public void SetMyName(string s)
     {
@@ -161,7 +111,7 @@ public class CreateBtn : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
             }
             else if(createType==1)
             {
-                TrapCreate();
+                NetworkMaster.Instance.CreateTrap(myname,NetworkMaster.player,Camera.main.ScreenToWorldPoint(Input.mousePosition),NetworkMaster.Instance.GetLayer());
             }
         }
         

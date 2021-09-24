@@ -102,7 +102,7 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
                         MainGameManager.mainGameManager.CreatGoldEffect(transform.position,(int)bonusMoney);
                     }
                     if (target != null)
-                        target.RpcCallGetDamage(damage, dieMoneyGet, NetworkMaster.Instance.dir);
+                        target.RpcCallGetDamage(damage, dieMoneyGet,dir);
 
                   
                     return;

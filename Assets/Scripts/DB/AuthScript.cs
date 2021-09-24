@@ -29,7 +29,6 @@ public class AuthScript : MonoBehaviour
 
     public static FirebaseApp firebaseApp;
     public static FirebaseAuth firebaseAuth;
-
     public static FirebaseUser user;
     public static int wwww=2;
     public string authCode;

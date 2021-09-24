@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 public class lobbymanager : MonoBehaviourPunCallbacks
 {
     public static lobbymanager Instance;
+    public int gameMode;
     public GameObject matchingObj;
     public Text nametext;
     public Text infotext;
@@ -149,6 +150,7 @@ public class lobbymanager : MonoBehaviourPunCallbacks
                 StopBtn.interactable = true;
                 FindTime += Time.deltaTime;
                 timeStamp.text = $"( {(Mathf.Floor(FindTime / 60) < 10 ? "0" + Mathf.Floor(FindTime / 60).ToString("N0") : Mathf.Floor(FindTime / 60).ToString("N0"))} : {(Mathf.Floor(FindTime % 60) < 10 ? "0" + Mathf.Floor(FindTime % 60).ToString("N0") : Mathf.Floor(FindTime % 60).ToString("N0"))} )"; ;
+
             }
         }
         if (RoomWait == 1)

@@ -56,7 +56,7 @@ public class LayerSpawner : MonoBehaviour
     }
     public void SpawnByNum(int num)
     {
-        NetworkMaster.Instance.CreatMonster(myList[num][0], 0, 0, int.Parse(myList[num][2]));
+        NetworkMaster.Instance.CreatMonster(myList[num][0], 0, 0, int.Parse(myList[num][2]),NetworkMaster.player);
         DeleteCreature(creatures[num], false);
     }
     public void DeleteCreature(GameObject obj)

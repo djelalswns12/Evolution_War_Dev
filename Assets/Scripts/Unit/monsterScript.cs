@@ -10,7 +10,6 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     public int flystate; // 공중 여부 체크
     private int moveMethod; // 캥거루 걸음 걸이 체크
     private float setSpeed;
-    private PlayerScript Myplayer;
     private Animator anim;
     private Rigidbody2D rigid;
     private SpriteOutline myOutline;
@@ -86,6 +85,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
 
     
     public AttackEffectScript[] effectScript;
+    public PlayerScript myPlayer;
     // Start is called before the first frame update
     void Awake()
     {
@@ -98,10 +98,6 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         thornsSpeed = 1;
         oldHumanBuffSpeed = 1;
         hitParticle = Resources.Load<ParticleSystem>("HitParticle");
-        if (transform.tag == "Player")
-        {
-            Myplayer = GetComponent<PlayerScript>();
-        }
         myOutline = GetComponent<SpriteOutline>();
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
@@ -111,13 +107,14 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         pv = GetComponent<PhotonView>();
         setSpeed = speed;
         if (transform.tag != "Test")
-            dir = NetworkMaster.player.GetComponent<PlayerScript>().dir; //테스트 몹이 아니라면 플레이어 dir을 받아온다
-
-        dir = pv.IsMine ? dir : !dir; // 나의 몬스터라면 플레이어의 dir을 아니라면 반대를 적용한다.
+        {
+            dir = myPlayer.dir; //테스트 몹이 아니라면 플레이어 dir을 받아온다
+        }
+        dir = myPlayer.dir;
         sp.flipX = dir;
 
 
-        if (pv.IsMine)
+        if (myPlayer.dir == NetworkMaster.Instance.dir)
         {
             MainGameManager.SetMonsterList(myName, gameObject,true); //게임메니져의 몬스터 리스트에 추가
         }
@@ -125,7 +122,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         //외곽선 표시기능
         if (transform.tag == "monster" || transform.tag == "Player" || transform.tag == "trap")
             {
-                if (pv.IsMine)
+                if (myPlayer.dir == NetworkMaster.Instance.dir)
                 {
                     outlineCheck = false;
                 }
@@ -225,20 +222,18 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         }
         #endregion 상대방 캐릭터 행위 기술
         #region 본인 캐릭터 행위 기술
-        else
+        else if (pv.IsMine)
         {
+            //&& myPlayer.dir == NetworkMaster.Instance.dir
             FrontUnitLayer = whatIsLayer;
             Setdir();
-
+            if (hp > mhp)
+            {
+                hp = mhp;
+            }
             if (hp <= 0)
             {
                 hp = 0;
-                if (gameObject.tag == "Player")
-                {
-                    PlayPlayer();
-                }
-                else
-                {
                     if (gameObject.tag == "monster")
                     {
                         MainGameManager.SetMonsterList(myName, gameObject,false); //게임메니져의 몬스터 리스트에서 제거
@@ -247,14 +242,11 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                     pv.RPC("MonsterDie", RpcTarget.All,killTarget);
                     //Destroy(gameObject);
                     return;
-                }
             }
-            if(hp > mhp)
+            if (myPlayer.dir == NetworkMaster.Instance.dir)
             {
-                hp = mhp;
+                SetFocusMonster();
             }
-
-            SetFocusMonster();
             if (gameObject.tag == "monster")
             {
                 anim.SetFloat("AttackSpeed", attackSpeed);
@@ -431,7 +423,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                 {
                     continue;
                 }
-                if (hit2[i].tag == "monster" && hit2[i].GetComponent<PhotonView>().IsMine == false)
+                if (hit2[i].tag == "monster" && hit2[i].GetComponent<monsterScript>().myPlayer != myPlayer)
                 {
                     anim.SetBool("attack", true);
                     break;
@@ -446,7 +438,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                     anim.SetBool("attack", true);
                     break;
                 }
-                if (hit2[i].tag == "Player" && hit2[i].GetComponent<PhotonView>().IsMine == false)
+                if (hit2[i].tag == "Player" && hit2[i].GetComponent<monsterScript>().myPlayer!=myPlayer)
                 {
                     anim.SetBool("attack", true);
                     break;
@@ -594,7 +586,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         }
         else if (gameObject.tag == "Player")
         {
-            sp.flipX = Myplayer.dir;
+            sp.flipX = myPlayer.dir;
         }
     }
     public void animReset()
@@ -642,7 +634,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                 {
                     continue;
                 }
-                if (hit2[i].gameObject == NetworkMaster.player)
+                if (hit2[i].gameObject == myPlayer.gameObject)
                 {
                     //Debug.Log("본인 player 콜라이더가 걸렸으므로 무시해야함");
                     continue;
@@ -682,7 +674,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                 {
                     continue;
                 }
-                if (monster.gameObject == NetworkMaster.player)
+                if (monster.gameObject == myPlayer.gameObject)
                 {
                     // Debug.Log("본인 player 콜라이더가 걸렸으므로 무시해야함");
                     continue;
@@ -725,7 +717,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         {
             movestateChange = true;
             //싱글톤으로 정의된 OverlapScript의 ReleaseMonster 함수를 호출한다
-            OverlapScript.Instance.ReleaseMonster(hit);
+            OverlapScript.Instance.ReleaseMonster(hit,myPlayer);
         }
     }
 
@@ -741,7 +733,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                     monsterScript target=hitArea[i].gameObject.GetComponent<monsterScript>();
                     if ((target.dir!=this.dir && (target.tag=="monster" || target.tag == "Player")) || target.tag== "boss" || target.tag == "Test")
                     {
-                        if (hitArea.Length > 2 && hitArea[i].tag == "Player")
+                        if (hitArea.Length > 1 && hitArea[i].tag == "Player")
                         {
                             continue;
                             //플레이어 공격중에 캐릭터 생성된다면 공격타겟을 바꿔줘야하기 때문
@@ -760,8 +752,15 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                         {
                             target.pv.RPC("GetThorns", RpcTarget.All, (100 - float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "slow", SceneVarScript.Instance.trapOption))) / 100, float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "slowTime", SceneVarScript.Instance.trapOption)));
                         }
-                        target.RpcCallGetDamage(calDamage, dieMoneyGet, NetworkMaster.Instance.dir);
-                        return;
+                        target.RpcCallGetDamage(calDamage, dieMoneyGet, myPlayer.dir);
+                        if (thornsFlag || nuckBackFlag)
+                        {
+
+                        }
+                        else
+                        {
+                            return;
+                        }
                     }
                 }
             }
@@ -779,7 +778,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                     monsterScript target = hitArea[i].gameObject.GetComponent<monsterScript>();
                     if ((target.dir != this.dir && (target.tag == "monster" || target.tag == "Player")) || target.tag == "boss" || target.tag == "Test")
                     {
-                        if (hitArea.Length > 2 && hitArea[i].tag == "Player")
+                        if (hitArea.Length > 1 && hitArea[i].tag == "Player")
                         {
                             continue;
                             //플레이어 공격중에 캐릭터 생성된다면 공격타겟을 바꿔줘야하기 때문
@@ -798,7 +797,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                         {
                             target.pv.RPC("GetThorns", RpcTarget.All, (100 - float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "slow", SceneVarScript.Instance.trapOption))) / 100, float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "slowTime", SceneVarScript.Instance.trapOption)));
                         }
-                        target.RpcCallGetDamage(calDamage, dieMoneyGet, NetworkMaster.Instance.dir);
+                        target.RpcCallGetDamage(calDamage, dieMoneyGet, myPlayer.dir);
                         return;
                     }
                 }
@@ -1029,7 +1028,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
         while (true)
         {
             //Debug.Log("0.2초마다 데미지를 받습니다");
-            RpcCallGetDamage((int)tick, 0, !NetworkMaster.Instance.dir,1);
+            RpcCallGetDamage((int)tick, 0, !myPlayer.dir,1);
             while (true)
             {
                 t += Time.deltaTime;
@@ -1143,8 +1142,9 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
                 }
             }
             pv.RPC("PointCal", RpcTarget.All, damage, requestDir);
-            if (gameObject.tag == "Player")
+            if (gameObject==myPlayer.gameObject)
             {
+
                 MainGameManager.mainGameManager.AttackAlam();
             }
             if ((bool)PhotonNetwork.CurrentRoom.CustomProperties["isTest"] || (NetworkMaster.otherPlayer && NetworkMaster.otherPlayer.GetComponent<monsterScript>().hp > 0))
@@ -1188,7 +1188,7 @@ public class monsterScript :  MonoBehaviourPunCallbacks,IPunObservable
     [PunRPC]
     public void MonsterDie(bool isKillByEnemy=false)
     {
-        if (pv.IsMine == false&& gameObject.tag=="monster")
+        if (myPlayer.dir != NetworkMaster.Instance.dir&& gameObject.tag=="monster")
         {
             if (isKillByEnemy == true)
             {

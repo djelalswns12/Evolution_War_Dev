@@ -7311,6 +7311,7 @@ MonoBehaviour:
   signinbtn: {fileID: 1614594944}
   authCode: 
   dealayStart: 0
+  isLoading: 0
 --- !u!4 &1877004453
 Transform:
   m_ObjectHideFlags: 0

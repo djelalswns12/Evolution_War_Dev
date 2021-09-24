@@ -226,10 +226,6 @@ public class MainGameManager : MonoBehaviour
         }
  
     }
-    public void CreatDamageEffect(Vector2 pos,int damage)
-    {
-
-    }
     public void CreatGoldEffect(Vector2 pos,int gotGold)
     {
         GoldObjectPool.Instance.Pop(pos, gotGold);

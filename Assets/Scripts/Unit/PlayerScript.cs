@@ -9,7 +9,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks,IPunObservable
     public int playerSp;
 
     public PhotonView pv;
-    public bool myplayer = false;
+    public bool myplayer;
     public SpriteRenderer sp;
     public bool dir;
 
@@ -22,8 +22,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks,IPunObservable
     void Start()
     {
         UseSKill = new string[SceneVarScript.MAX_SKILL_COUNT];
-        myplayer = pv.IsMine;
-
         //if (myplayer)
         //    sp.color = new Color(0, 1, 0);
         //else
@@ -51,11 +49,18 @@ public class PlayerScript : MonoBehaviourPunCallbacks,IPunObservable
         sp.flipX = dir;
         if (myplayer == false)
         {
+            if (NetworkMaster.Instance.gameMode == 1)
+            {
+                userName = AIManager.Instance.userName;
+                allMoney = AIManager.Instance.allMoney;
+                playerSp = AIManager.Instance.GetPlayerBuliding();
+            }
             NetworkMaster.otherPlayer = gameObject;
             NetworkMaster.Instance.otherPlayerHasBeen = true;
             MainGameManager.mainGameManager.enemyUseSkill = UseSKill;
             MainGameManager.mainGameManager.enemyAllMoney = allMoney;
             MainGameManager.mainGameManager.enemyUserName = userName;
+        
             return;
         }
         //아래부터 IsMine 이라면

@@ -219,7 +219,7 @@ public class SkillManager : MonoBehaviour
         }
         list[settingName][list[settingName].Count-1].GetComponent<monsterScript>().GetLayerNum();
         //저장된 레이어에 거북이 소환시키기
-        NetworkMaster.Instance.CreatMonster(spawnMonster, 1, NetworkMaster.Instance.CreatPosXOffset(), spawnLayer);
+        NetworkMaster.Instance.CreatMonster(spawnMonster, 1, NetworkMaster.Instance.CreatPosXOffset(NetworkMaster.player), spawnLayer,NetworkMaster.player);
         NetworkMaster.Instance.SendGameMsgFunc("슈퍼 거북이가 전장에 출현했습니다!",1);
     }
 

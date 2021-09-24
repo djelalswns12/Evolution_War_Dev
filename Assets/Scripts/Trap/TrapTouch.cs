@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class TrapTouch : MonoBehaviour
@@ -32,9 +33,24 @@ public class TrapTouch : MonoBehaviour
         yield return new WaitForSeconds(0.04f);
         sp.color = orginColor;
     }
+    public bool TouchUI()
+    {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = Input.mousePosition;
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        if (results.Count == 1)
+        {
+            if (results[0].gameObject == MainGameManager.mainGameManager.moveUI)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     public void AttackTrap()
     {
-        if (!monsterScript.pv.IsMine)
+        if (!monsterScript.myPlayer.dir==NetworkMaster.Instance.dir)
         {
             //if (Input.touchCount > 0)
             //{
@@ -92,6 +108,10 @@ public class TrapTouch : MonoBehaviour
         }
         else
         {
+            if (TouchUI() == false)
+            {
+                return;
+            }
             if (Input.GetMouseButtonDown(0))
             {
                 var ray = new Ray2D(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);

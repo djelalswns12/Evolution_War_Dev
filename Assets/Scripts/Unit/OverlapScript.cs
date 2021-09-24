@@ -11,7 +11,7 @@ public class OverlapScript : MonoBehaviour
     {
         Instance = this;
     }
-    public void ReleaseMonster(Collider2D[] OverlapUnits)
+    public void ReleaseMonster(Collider2D[] OverlapUnits,PlayerScript player)
     {
         #region
         int pointIndex = -1;
@@ -25,7 +25,7 @@ public class OverlapScript : MonoBehaviour
         if (OverlapUnits.Length > 0)
         {
             #region
-            if (NetworkMaster.player.GetComponent<PlayerScript>().dir == true)
+            if (player.dir == true)
             {
                 selPoint = -10000;
             }
@@ -45,7 +45,7 @@ public class OverlapScript : MonoBehaviour
                     monsterIndex = i;
                 }
                 #region 
-                if (NetworkMaster.player.GetComponent<PlayerScript>().dir == true)
+                if (player.dir == true)
                 {
                     //먼저 앞서가 있는 몬스터를 고름 > pointIndex
                     if (selPoint < selectMonster.transform.position.x)
@@ -64,7 +64,7 @@ public class OverlapScript : MonoBehaviour
                 }
 
             }
-            if (NetworkMaster.player.GetComponent<PlayerScript>().dir == true)
+            if (player.dir == true)
             {
                 //가장 먼저 태어난 몬스터의 x좌표+보정값 보다 앞서있는 몬스터의 x좌표 값이 더 크다면 생성순서를 뒤바꿔준다.
                 if (OverlapUnits[monsterIndex].GetComponent<monsterScript>().transform.position.x + 0.3f < OverlapUnits[pointIndex].GetComponent<monsterScript>().transform.position.x)

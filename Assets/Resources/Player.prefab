@@ -642,6 +642,7 @@ MonoBehaviour:
   hasThornsBuffFlag: 0
   hasPoisionFlag: 0
   effectScript: []
+  myPlayer: {fileID: 0}
 --- !u!61 &8873828932401422363
 BoxCollider2D:
   m_ObjectHideFlags: 0
