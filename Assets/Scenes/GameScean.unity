@@ -10031,7 +10031,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 2466012382156406627, guid: 7d84bc0ced8a2f14fa948af382eaf3d4,
     type: 3}
-  gameMode: 0
   pv: {fileID: 283321296}
   background: {fileID: 957050660}
   creatnumber: 0
@@ -10139,7 +10138,6 @@ MonoBehaviour:
   goldText: {fileID: 574876095}
   dropGoldEff: 0.3
   focus: {fileID: 0}
-  nowBoss: {fileID: 0}
   nowMonster: {fileID: 0}
   nowSkill: {fileID: 0}
   bossUI: {fileID: 267590026}
@@ -86021,7 +86019,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d08f82993fdc1848b4960c3b3a5f54c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  userName: 
+  money: 0
+  allMoney: 0
   player: {fileID: 0}
+  getMoneyTime: 0
+  perMoney: 0
+  playerBuliding: 0
+  touchLevel: 0
+  touchDropGold: 0
+  attackSpeed: 0
+  bonusDamage: 0
+  goldEff: 1
 --- !u!4 &1703223674
 Transform:
   m_ObjectHideFlags: 0

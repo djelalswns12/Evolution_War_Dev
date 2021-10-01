@@ -5,6 +5,8 @@ using Photon.Pun;
 using UnityEngine.UI;
 using Firebase.Database;
 using System.Collections;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
+
 #pragma warning disable 649
 [System.Serializable]
 public class MapList
@@ -31,7 +33,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
     [Tooltip("The prefab to use for representing the player")]
     [SerializeField]
     private GameObject playerPrefab;
-    public int gameMode;
+    public Hashtable gameMode;
     public static GameObject player = null, otherPlayer;
     public PhotonView pv;
     public GameObject background;
@@ -72,6 +74,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
     /// </summary>
     void Start()
     {
+
         EndingMsgBox.SetActive(false);
         endPoint = 0;
         Instance = this;
@@ -89,7 +92,11 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         else
         {
             MakePlayer(PhotonNetwork.IsMasterClient==true? StartPlayerPos:!StartPlayerPos);
-            MakePlayer(PhotonNetwork.IsMasterClient == false ? StartPlayerPos : !StartPlayerPos);
+            gameMode = PhotonNetwork.CurrentRoom.CustomProperties;
+            if (GetMode()== "AI")
+            {
+                MakePlayer(PhotonNetwork.IsMasterClient == false ? StartPlayerPos : !StartPlayerPos);
+            }
             if (photonView.IsMine)
                 {
                     StartCoroutine(SetBoss("DragonBoss"));
@@ -134,8 +141,8 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         //Debug.Log(MainGameManager.mainGameManager.GetMoney());
         if (PhotonNetwork.IsConnected == false)
         {
-            
             //SceneManager.LoadScene("LobbyScean");
+
             SceneManager.LoadScene("LoginScean");
         }
         float playerpos = background.GetComponent<SpriteRenderer>().bounds.size.x / 2 * 0.85f;
@@ -160,10 +167,10 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
                         endPoint = 1;
                         pv.RPC("Win", RpcTarget.All, dir, playTime);
                     }
-                    if ((otherPlayer == null||otherPlayer.GetComponent<monsterScript>().pv.IsMine==true )&& otherPlayerHasBeen)
+                    if (otherPlayer && otherPlayer.GetComponent<PhotonView>().IsMine && otherPlayerHasBeen)
                     {
                         //상대방이 들어온적이 있는데 튕겨서 나가진거라면
-                        if (gameMode == 0)
+                        if (GetMode() != "AI")
                         {
                             otherPlayer.GetComponent<monsterScript>().hp = 0;
                             endPoint = 1;
@@ -251,16 +258,16 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
                 }
                 else
                 {
-                if (player == NetworkMaster.player) SendGameMsgFunc("알맞지 않은 시대라 업그레이드 할 수 없습니다.",0);
-                else  Debug.Log("알맞지 않은 시대라 업그레이드 할 수 없습니다.");
+                if (player == NetworkMaster.player) SendGameMsgFunc("더이상 업그레이드 할 수 없습니다.",0);
+                else  Debug.Log("더이상 업그레이드 할 수 없습니다.");
                 return false;
                 }
             
         }
         else
         {
-            if (player == NetworkMaster.player) SendGameMsgFunc("플레이어 건물 종류를 넘어서서 업그레이드 하려합니다.", 0);
-            else Debug.Log("플레이어 건물 종류를 넘어서서 업그레이드 하려합니다.");
+            if (player == NetworkMaster.player) SendGameMsgFunc("알맞지 않은 시대라 업그레이드 할 수 없습니다.", 0);
+            else Debug.Log("알맞지 않은 시대라 업그레이드 할 수 없습니다.");
             return false;
         }
     }
@@ -275,19 +282,29 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         var nowBuild = int.Parse(NetworkMaster.Instance.GetMonsterOption(nowPlayerName, "icon")) - 3000;
         if (nowMonster == null)
         {
-            Debug.Log("업그레이드할 트랩이 존재하지 않습니다.");
-            //SendGameMsgFunc("업그레이드할 트랩이 존재하지 않습니다.", 0);
+            if (player == NetworkMaster.player)
+            {
+                SendGameMsgFunc("업그레이드할 트랩이 존재하지 않습니다.", 0);
+            }else Debug.Log("업그레이드할 트랩이 존재하지 않습니다.");
             return;
         }
         var nowMonsterScript = nowMonster.GetComponent<monsterScript>();
         if (SceneVarScript.Instance.GetOptionByName(nowMonsterScript.myName, "canBuild", SceneVarScript.Instance.trapOption) == "null")
         {
-            Debug.Log("더이상 업그레이드 못함");
+            if (player == NetworkMaster.player)
+            {
+                SendGameMsgFunc("더이상 업그레이드 할 수 없습니다.", 0);
+            }
+            else Debug.Log("더이상 업그레이드 못함");
             return;
         }
         if (nowBuild < int.Parse(SceneVarScript.Instance.GetOptionByName(nowMonsterScript.myName, "canBuild", SceneVarScript.Instance.trapOption)))
         {
-            Debug.Log("건물 업그레이드 부족");
+            if (player == NetworkMaster.player)
+            {
+                SendGameMsgFunc("건물 업그레이드가 부족합니다.", 0);
+            }
+            else Debug.Log("건물 업그레이드 부족");
             return;
         }
         if (player == NetworkMaster.player)
@@ -562,9 +579,9 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
     public bool CreateTrap(string myname, GameObject player, Vector2 mousePos, int layer)
     {
         Vector2 bossPos;
-        if (MainGameManager.mainGameManager.nowBoss != null)
+        if (MainGameManager.mainGameManager.GetNowBoss() != null)
         {
-            bossPos = MainGameManager.mainGameManager.nowBoss.transform.position;
+            bossPos = MainGameManager.mainGameManager.GetNowBoss().transform.position;
             if (Mathf.Abs(mousePos.x - bossPos.x) < 3 && layer == 1)
             {
                 if (player == NetworkMaster.player) SendGameMsgFunc("보스 근처에는 생성할 수 없습니다.", 0);
@@ -616,6 +633,10 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
                     }
                 }
             }
+            else
+            {
+                //AI 소유 유닛중 AI플레이어와 가장 먼거리에 있는 유닛사이의 거리가 아니라면 시야가 없어서 설치 불가.
+            }
         }
         if (player == NetworkMaster.player)
         {
@@ -659,8 +680,15 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
             SetCreatureInfo(otherPlayer, "Player1",otherPlayer);
             otherPlayer.layer = LayerMask.NameToLayer("centerunit");
             otherPlayer.GetComponent<PlayerScript>().myplayer = false;
-            gameMode = 1;
         }
+    }
+    public string GetMode()
+    {
+        return (string)gameMode["Mode"];
+    }
+    public void SetMode(string mode)
+    {
+        gameMode["Mode"]=mode;
     }
     public void SendGameMsgFunc(string s, int type=0)
     {

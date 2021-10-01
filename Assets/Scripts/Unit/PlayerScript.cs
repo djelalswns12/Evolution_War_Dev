@@ -49,7 +49,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks,IPunObservable
         sp.flipX = dir;
         if (myplayer == false)
         {
-            if (NetworkMaster.Instance.gameMode == 1)
+            if (NetworkMaster.Instance.GetMode()=="AI")
             {
                 userName = AIManager.Instance.userName;
                 allMoney = AIManager.Instance.allMoney;
@@ -60,7 +60,6 @@ public class PlayerScript : MonoBehaviourPunCallbacks,IPunObservable
             MainGameManager.mainGameManager.enemyUseSkill = UseSKill;
             MainGameManager.mainGameManager.enemyAllMoney = allMoney;
             MainGameManager.mainGameManager.enemyUserName = userName;
-        
             return;
         }
         //아래부터 IsMine 이라면

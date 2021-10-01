@@ -1819,6 +1819,7 @@ MonoBehaviour:
   hasThornsBuffFlag: 0
   hasPoisionFlag: 0
   effectScript: []
+  myPlayer: {fileID: 0}
 --- !u!114 &746471165221201053
 MonoBehaviour:
   m_ObjectHideFlags: 0

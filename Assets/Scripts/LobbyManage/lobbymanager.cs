@@ -11,7 +11,6 @@ using UnityEngine.SceneManagement;
 public class lobbymanager : MonoBehaviourPunCallbacks
 {
     public static lobbymanager Instance;
-    public int gameMode;
     public GameObject matchingObj;
     public Text nametext;
     public Text infotext;
@@ -52,9 +51,8 @@ public class lobbymanager : MonoBehaviourPunCallbacks
     public SkillBtn[] useSkillList;
     public Stack<SkillBtn> hasSkillList=new Stack<SkillBtn>();
 
-    
     // Start is called before the first frame update
-
+    private int randomTime;
     private void Awake()
     {
         Instance = this;
@@ -129,30 +127,20 @@ public class lobbymanager : MonoBehaviourPunCallbacks
         }
         else
         {
-            if (PhotonNetwork.CurrentRoom.PlayerCount > 1 )
+            if (isStart == false)
             {
-                if (isStart == false)
+                FindingGameAction();
+                if (FindTime > SceneVarScript.Instance.findTime+randomTime+2)
                 {
-                    isStart = true;
-                    LobbySoundManager.Instance.BGMSoundStop();
-                    infotext.text = "잠시후 게임이 시작 됩니다.";
-                    LobbySoundManager.Instance.MatchingSoundPlay();
-                    timeStamp.text = "잠시후 시작됩니다.";
-                    StopBtn.gameObject.SetActive(false);
-                    StartCoroutine(IntoTheRoom());
-                    return;
+                    EnterGameAction("AI");
+                }
+                else if (PhotonNetwork.CurrentRoom.PlayerCount > 1)
+                {
+                    EnterGameAction("PVP");
                 }
             }
-            else
-            {
-                matchingObj.SetActive(true);
-                joinBtn.interactable = false;
-                StopBtn.interactable = true;
-                FindTime += Time.deltaTime;
-                timeStamp.text = $"( {(Mathf.Floor(FindTime / 60) < 10 ? "0" + Mathf.Floor(FindTime / 60).ToString("N0") : Mathf.Floor(FindTime / 60).ToString("N0"))} : {(Mathf.Floor(FindTime % 60) < 10 ? "0" + Mathf.Floor(FindTime % 60).ToString("N0") : Mathf.Floor(FindTime % 60).ToString("N0"))} )"; ;
-
-            }
         }
+
         if (RoomWait == 1)
         {
             //매칭완료 3초후 입장상태
@@ -161,6 +149,25 @@ public class lobbymanager : MonoBehaviourPunCallbacks
             StopBtn.gameObject.SetActive(false);
             StopBtn.interactable = false;
         }
+    }
+    public void FindingGameAction()
+    {
+        matchingObj.SetActive(true);
+        joinBtn.interactable = false;
+        StopBtn.interactable = true;
+        FindTime += Time.deltaTime;
+        timeStamp.text = $"( {(Mathf.Floor(FindTime / 60) < 10 ? "0" + Mathf.Floor(FindTime / 60).ToString("N0") : Mathf.Floor(FindTime / 60).ToString("N0"))} : {(Mathf.Floor(FindTime % 60) < 10 ? "0" + Mathf.Floor(FindTime % 60).ToString("N0") : Mathf.Floor(FindTime % 60).ToString("N0"))} )\n예상 대기 시간 : {SceneVarScript.Instance.findTime+randomTime} 초";
+
+    }
+    public void EnterGameAction(string mode)
+    {
+        isStart = true;
+        LobbySoundManager.Instance.BGMSoundStop();
+        infotext.text = "잠시후 게임이 시작 됩니다.";
+        LobbySoundManager.Instance.MatchingSoundPlay();
+        timeStamp.text = "잠시후 시작됩니다.";
+        StopBtn.gameObject.SetActive(false);
+        StartCoroutine(IntoTheRoom(mode));
     }
     public int SetUseSkillNumByDrag(GameObject obj)
     {
@@ -299,14 +306,14 @@ public class lobbymanager : MonoBehaviourPunCallbacks
             goldTxt.text = "-";
         }
     }
-    IEnumerator IntoTheRoom()
+    IEnumerator IntoTheRoom(string mode)
     {
-       
             Hashtable CP = PhotonNetwork.CurrentRoom.CustomProperties;
             if ((bool)CP["isTest"] != false)
             {
                 //테스트버전일때 조작할것
             }
+        CP["Mode"] = mode;
         if (PhotonNetwork.IsMasterClient)
         {
             PhotonNetwork.CurrentRoom.IsOpen = false; //방 온/오프 
@@ -348,18 +355,18 @@ public class lobbymanager : MonoBehaviourPunCallbacks
             yield break;
         }
         Debug.Log("데이터 확인 완료");
-        bool noneSkill=false;
+        bool noneSkill = true;
         yesOrNoInput = 0;
         for (int i = 0; i < SceneVarScript.MAX_SKILL_COUNT; i++) {
-            if(SceneVarScript.Instance.GetUserOption("skill" + i) == "-1")
+            if(SceneVarScript.Instance.GetUserOption("skill" + (i+1)) != "-1")
             {
-                noneSkill = true;
+                noneSkill = false;
                 break;
             }
          }
         if (noneSkill)
         {
-            SetLobbyYesOrNoMsg("미장착된 스킬 슬롯이 있습니다.\n스킬을 장착하시겠습니까?");
+            SetLobbyYesOrNoMsg("장착된 스킬이 없습니다. \n스킬을 장착하시겠습니까?");
             yield return new WaitUntil(() => uiList[4].activeSelf == false);
         }
         if (yesOrNoInput == 1)
@@ -405,11 +412,12 @@ public class lobbymanager : MonoBehaviourPunCallbacks
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
         //빈방이 없을때 실행되는 함수 JoinRandomRoom이 실패할경우 실행된다.
+        randomTime = Random.Range(-2, 6);
         infotext.text = "빈방이 없으므로 방을 하나 새로 만듭니다.";
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = 2;
         roomOptions.CleanupCacheOnLeave = false;
-        roomOptions.CustomRoomProperties = new Hashtable { { "isTest", testUser } };
+        roomOptions.CustomRoomProperties = new Hashtable { { "isTest", testUser },{ "Mode", 0 } };
         PhotonNetwork.CreateRoom(null, roomOptions);
     }
 
@@ -418,7 +426,7 @@ public class lobbymanager : MonoBehaviourPunCallbacks
         FindTime = 0;
         if (testUser == true)
         {
-            StartCoroutine(IntoTheRoom());
+            EnterGameAction("AI");
             testUser = false;
         }
     }

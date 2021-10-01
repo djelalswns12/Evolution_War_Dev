@@ -16,6 +16,13 @@ public class CornTrapScript : TrapScript
     public void GetGold()
     {
         var point = int.Parse(SceneVarScript.Instance.GetOptionByName(myName, "perMoney", SceneVarScript.Instance.trapOption));
-        MainGameManager.mainGameManager.CreatGoldEffect(transform.position, (int)point);
+        if (NetworkMaster.otherPlayer == monster.myPlayer && NetworkMaster.Instance.GetMode()=="AI")
+        {
+            AIManager.Instance.CalMoney(point);
+        }
+        else
+        {
+            MainGameManager.mainGameManager.CreatGoldEffect(transform.position, (int)point);
+        }
     }
 }

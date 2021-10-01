@@ -54,7 +54,7 @@ public class BossScript : MonoBehaviourPunCallbacks, IPunObservable
             {
                 if (TouchUI() == true)
                 {
-                    TouchObj();
+                    TouchObj(Camera.main.ScreenToWorldPoint(Input.mousePosition),NetworkMaster.player);
                 }
             }
         }
@@ -64,19 +64,28 @@ public class BossScript : MonoBehaviourPunCallbacks, IPunObservable
             MonsterAttack();
         }
     }
-    private bool TouchObj()
+    public bool TouchObj(Vector3 pos,GameObject player)
     {
-        var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        var mousePos = pos;
         ray = new Ray2D(mousePos, Vector2.zero);
         foreach (RaycastHit2D hit in Physics2D.RaycastAll(ray.origin, ray.direction))
         {
             if (hit.transform.gameObject == gameObject)
             {
-                Instantiate(touchEffectObj, (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition), Quaternion.identity);
-                MainGameManager.mainGameManager.CreatGoldEffect(mousePos, bossDropGold + MainGameManager.mainGameManager.GetTouchDropGold());
-                monster.RpcCallGetDamage(MainGameManager.mainGameManager.GetTouchDamge(), dieMoneyGet, NetworkMaster.Instance.dir, 0, mousePos.x, mousePos.y);
-                StartCoroutine(colorCo());
-                MainGameManager.mainGameManager.CoolTouchAttack();
+                if (player == NetworkMaster.player)
+                {
+                    Instantiate(touchEffectObj, (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition), Quaternion.identity);
+                    MainGameManager.mainGameManager.CreatGoldEffect(mousePos, bossDropGold + MainGameManager.mainGameManager.GetTouchDropGold());
+                    monster.RpcCallGetDamage(MainGameManager.mainGameManager.GetTouchDamge(), dieMoneyGet, NetworkMaster.Instance.dir, 0, mousePos.x, mousePos.y);
+                    StartCoroutine(colorCo());
+                    MainGameManager.mainGameManager.CoolTouchAttack();
+                }
+                else
+                {
+                    AIManager.Instance.CalMoney(bossDropGold +AIManager.Instance.GetTouchDropGold());
+                    monster.RpcCallGetDamage(AIManager.Instance.GetTouchDamge(), dieMoneyGet, !NetworkMaster.Instance.dir, 0, mousePos.x, mousePos.y);
+                    StartCoroutine(colorCo());
+                }
                 return true;
             }
         }

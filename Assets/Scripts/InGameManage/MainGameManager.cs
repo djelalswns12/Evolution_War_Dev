@@ -19,7 +19,7 @@ public class MainGameManager : MonoBehaviour
     public Text goldText; 
     public float dropGoldEff; // 처치 골드 효율
     public GameObject focus; // 시야 포커스
-    public GameObject nowBoss; // 현재 소환된 보스
+    private GameObject nowBoss; // 현재 소환된 보스
     public GameObject nowMonster; // 클릭된 몬스터
     public GameObject nowSkill; // 클릭된 스킬
     public GameObject bossUI;
@@ -113,12 +113,12 @@ public class MainGameManager : MonoBehaviour
         UISelecterClear();
 
         //보스 UI 관련
-        if (nowBoss != null)
+        if (GetNowBoss() != null)
         {
             //Debug.Log(NetworkMaster.Instance.GetMonsterOption(nowBoss.GetComponent<monsterScript>().myName, "icon"));
-            bossIcon.sprite = bossIconList[int.Parse(NetworkMaster.Instance.GetMonsterOption(nowBoss.GetComponent<monsterScript>().myName,"icon"))-1000];
+            bossIcon.sprite = bossIconList[int.Parse(NetworkMaster.Instance.GetMonsterOption(GetNowBoss().GetComponent<monsterScript>().myName,"icon"))-1000];
             bossUI.SetActive(true);
-            nowBossScript = nowBoss.GetComponent<monsterScript>();
+            nowBossScript = GetNowBoss().GetComponent<monsterScript>();
             if (nowBossScript.redPoint + nowBossScript.bluePoint > 0)
             {
                 var maxWidth= UI_bossHpBar.sizeDelta.x*((nowBossScript.mhp - nowBossScript.hp) / nowBossScript.mhp);
@@ -288,7 +288,6 @@ public class MainGameManager : MonoBehaviour
     }
     public int TouchDamageTheory(int n=-1/*is null*/)
     {
-        
         if (n == -1)
         {
             return (int)Mathf.Ceil(touchLevel * touchLevel * 0.2f)+touchLevel + 6;
@@ -342,6 +341,10 @@ public class MainGameManager : MonoBehaviour
     public void SetNowBoss(GameObject obj)
     {
         nowBoss = obj;
+    }
+    public GameObject GetNowBoss()
+    {
+        return nowBoss;
     }
     public void SetPlayerBuliding(int n)
     {

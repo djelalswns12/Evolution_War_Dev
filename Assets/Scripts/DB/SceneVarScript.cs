@@ -38,7 +38,8 @@ public class SceneVarScript : MonoBehaviour
     public static SceneVarScript Instance;
     public IDictionary[] monsterOption, trapOption, bossOption, playerOption, skillOption,usersOption,noticeOption,skillShopOption;
     public IDictionary userInfo;
-    public bool isVersionCheck,isDataConnect, monsterDBConnecting, trapDBConnecting, bossDBConnecting, playerDBConnecting, skillDBConnecting,usersDBConnecting,noticeDBConnecting,skillShopDBConnecting;
+    public float findTime;
+    public bool isVersionCheck,isDataConnect, monsterDBConnecting, trapDBConnecting, bossDBConnecting, playerDBConnecting, skillDBConnecting,usersDBConnecting,noticeDBConnecting,skillShopDBConnecting,findTimeDBConnecting;
     public string authCode;
 
     public bool tryConnect;
@@ -495,6 +496,30 @@ public class SceneVarScript : MonoBehaviour
             }
         });
     }
+    public void RequestFindTime()
+    {
+        findTimeDBConnecting = false;
+        DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
+        FirebaseDatabase.DefaultInstance
+        .GetReference("FindTime")
+        .GetValueAsync().ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+            {
+                findTimeDBConnecting = false;
+                Debug.Log("findTimeDB 연결 실패");
+                // Handle the error...
+            }
+            else if (task.IsCompleted)
+            {
+                findTimeDBConnecting = true;
+                Debug.Log("시간 찾기!!!!!!!!!");
+                DataSnapshot snapshot = task.Result;
+                findTime=float.Parse(snapshot.Value.ToString());
+                // Do something with snapshot...
+            }
+        });
+    }
     public void RequestSkillShopDB()
     {
         skillShopDBConnecting = false;
@@ -537,6 +562,7 @@ public class SceneVarScript : MonoBehaviour
         skillDBConnecting = false;
         skillShopDBConnecting = false;
         isVersionCheck = false;
+        findTimeDBConnecting = false;
         RequestGameVersion();
         RequestMonsterDB();
         RequestTrapDB();
@@ -546,6 +572,7 @@ public class SceneVarScript : MonoBehaviour
         RequestusersDB();
         RequestNoticeDB();
         RequestSkillShopDB();
+        RequestFindTime();
     }
     public void test()
     {

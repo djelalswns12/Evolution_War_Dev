@@ -21,6 +21,7 @@ public class TrapTouch : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.Log(gameObject.name + "why ??");
         AttackTrap();
     }
     IEnumerator colorCo()

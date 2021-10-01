@@ -67,7 +67,8 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
         {
             if (lostTarget == 1)
             {
-                Destroy(gameObject);
+                if(pv.IsMine)
+                PhotonNetwork.Destroy(gameObject);
             }
             sp.enabled = false;
         }
@@ -76,7 +77,8 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
 
     if(anim.GetCurrentAnimatorStateInfo(0).IsName("hit")&& anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.98f)
         {
-            pv.RPC("ThrowDestroy", RpcTarget.All);
+            if (pv.IsMine)
+                PhotonNetwork.Destroy(gameObject);
         }
 
     }
@@ -109,11 +111,6 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
                 }
             }
         }
-    }
-    [PunRPC]
-    public void ThrowDestroy()
-    {
-        Destroy(gameObject);
     }
     
     [PunRPC]
