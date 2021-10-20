@@ -344,7 +344,11 @@ public class MainGameManager : MonoBehaviour
     }
     public GameObject GetNowBoss()
     {
-        return nowBoss;
+        if (nowBoss != null)
+        {
+            return nowBoss;
+        }
+        return null;
     }
     public void SetPlayerBuliding(int n)
     {

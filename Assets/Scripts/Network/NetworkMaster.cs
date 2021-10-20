@@ -68,6 +68,20 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
             //SceneManager.LoadScene("PunBasics-Launcher");
             return;
         }
+        gameMode = PhotonNetwork.CurrentRoom.CustomProperties;
+        if (GetMode() == "AI")
+        {
+            var startLocate = Random.Range(0, 2);
+
+            if (startLocate == 0)
+            {
+                StartPlayerPos = true;
+            }
+            else
+            {
+                StartPlayerPos = false;
+            }
+        }
     }
     /// <summary>
     /// MonoBehaviour method called on GameObject by Unity during initialization phase.
@@ -92,7 +106,6 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         else
         {
             MakePlayer(PhotonNetwork.IsMasterClient==true? StartPlayerPos:!StartPlayerPos);
-            gameMode = PhotonNetwork.CurrentRoom.CustomProperties;
             if (GetMode()== "AI")
             {
                 MakePlayer(PhotonNetwork.IsMasterClient == false ? StartPlayerPos : !StartPlayerPos);

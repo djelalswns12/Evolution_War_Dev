@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 public class SceneVarScript : MonoBehaviour
 {
     public static readonly string gameVersion = "v4";
+
     public class User
     {
         public string username;
@@ -34,6 +35,7 @@ public class SceneVarScript : MonoBehaviour
             this.skill1 = skill2 = skill3 = "-1";
         }
     }
+
     private FirebaseUser myUser;
     public static SceneVarScript Instance;
     public IDictionary[] monsterOption, trapOption, bossOption, playerOption, skillOption,usersOption,noticeOption,skillShopOption;
