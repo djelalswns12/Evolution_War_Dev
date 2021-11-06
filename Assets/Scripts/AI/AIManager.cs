@@ -25,6 +25,9 @@ public class AIManager : MonoBehaviour
     [Header("∏ÛΩ∫≈Õ ∫∏≥ Ω∫ ø…º«")]
     public float attackSpeed;
     public float bonusDamage;
+    public int touchAttackBossCount;
+    public float maxTouchActionTime;
+    public float minTouchActionTime;
     public float goldEff;
     // Start is called before the first frame update
     private void Awake()
@@ -49,9 +52,12 @@ public class AIManager : MonoBehaviour
         {
             return;
         }
-
-        player = NetworkMaster.otherPlayer;
-        GetMoneyPerTime();
+        if (player != null)
+        {
+            SetOption(int.Parse(SceneVarScript.Instance.GetUserOption("rating")));
+            player = NetworkMaster.otherPlayer;
+            GetMoneyPerTime();
+        }
     }
     public void Auto()
     {
@@ -89,6 +95,39 @@ public class AIManager : MonoBehaviour
     public void TargetAttack(GameObject obj)
     {
         obj.GetComponent<monsterScript>().RpcCallGetDamage(GetTouchDamge(), 0, !NetworkMaster.Instance.dir);
+    }
+    public void SetOption(int rating)
+    {
+        int index;
+        if (rating < 1000)
+        {
+            index = 0;
+        }else if (rating < 1100)
+        {
+            index = 1;
+        }else if(rating < 1200)
+        {
+            index = 2;
+        }else if(rating < 1400)
+        {
+            index = 3;
+        }else if (rating < 1600)
+        {
+            index = 5;
+        }else if(rating < 1800)
+        {
+            index = 6;
+        }
+        else
+        {
+            index= 7;
+        }
+        attackSpeed= float.Parse(SceneVarScript.Instance.GetOptionByIndex(index.ToString(), "AttackSpeed", SceneVarScript.Instance.AIOption));
+        bonusDamage= float.Parse(SceneVarScript.Instance.GetOptionByIndex(index.ToString(), "BonusDamage", SceneVarScript.Instance.AIOption));
+        touchAttackBossCount= int.Parse(SceneVarScript.Instance.GetOptionByIndex(index.ToString(), "TouchAttackBossCount", SceneVarScript.Instance.AIOption));
+        minTouchActionTime= float.Parse(SceneVarScript.Instance.GetOptionByIndex(index.ToString(), "MinTouchActionTime", SceneVarScript.Instance.AIOption));
+        maxTouchActionTime = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index.ToString(), "MaxTouchActionTime", SceneVarScript.Instance.AIOption));
+        goldEff =float.Parse(SceneVarScript.Instance.GetOptionByIndex(index.ToString(), "GoldEff", SceneVarScript.Instance.AIOption));
     }
     IEnumerator AI_TouchUpgrade()
     {
@@ -129,12 +168,15 @@ public class AIManager : MonoBehaviour
         Vector3 pos= NetworkMaster.player.transform.position;
         while (true)
         {
-            if (bossAttackCount < 10)
+            if (bossAttackCount < touchAttackBossCount)
             {
                 bossAttackCount++;
-                TouchAttack();
+                if (TouchAttack() == false)
+                {
+                    bossAttackCount = touchAttackBossCount;
+                }
             }
-            else if(trapFindCount<3 && target==null)
+            else if(trapFindCount<5 && target==null)
             {
                 trapFindCount++;
                 for (int i = 0; i < trapList.Count; i++)
@@ -145,17 +187,24 @@ public class AIManager : MonoBehaviour
                         {
                             if (NetworkMaster.Instance.dir)
                             {
-                                if (enemyMonsterList[trapList[i]][0].transform.position.x > pos.x - 3.5f)
+                                if (enemyMonsterList[trapList[i]][0] != null)
                                 {
-                                    target = enemyMonsterList[trapList[i]][0];
-                                    break;
+                                    if (enemyMonsterList[trapList[i]][0].transform.position.x > pos.x - 3.5f)
+                                    {
+                                        target = enemyMonsterList[trapList[i]][0];
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        if (enemyMonsterList[trapList[i]][0].transform.position.x < pos.x + 3.5f)
+                                        {
+                                            target = enemyMonsterList[trapList[i]][0];
+                                            break;
+                                        }
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                if (enemyMonsterList[trapList[i]][0].transform.position.x < pos.x + 3.5f)
+                                else
                                 {
-                                    target = enemyMonsterList[trapList[i]][0];
                                     break;
                                 }
                             }
@@ -176,7 +225,7 @@ public class AIManager : MonoBehaviour
                 trapFindCount = 0;
                 continue;
             }
-            waitTime = Random.Range(0.5f, 1);
+            waitTime = Random.Range(minTouchActionTime,maxTouchActionTime);
             yield return new WaitForSeconds(waitTime);
         }
     }
@@ -207,9 +256,10 @@ public class AIManager : MonoBehaviour
 
                 if (playerBuliding == 0)
                 {
-                    if (CreatePalaeozoic())
+                    var name = CreatePalaeozoic();
+                    if (name != "null")
                     {
-                        waitTime = Random.Range(3f, 5f);
+                        waitTime = float.Parse(SceneVarScript.Instance.GetOptionByName(name, "cool", SceneVarScript.Instance.monsterOption));
                     }
                     else
                     {
@@ -218,12 +268,15 @@ public class AIManager : MonoBehaviour
                 }
                 else if (playerBuliding == 1)
                 {
-                    if (CreateMesozoic())
+                    var name = CreateMesozoic();
+                    if (name != "null")
                     {
-                        waitTime = Random.Range(3f, 5f);
+                        name = CreatePalaeozoic();
                     }
-                    else if(CreatePalaeozoic()) {
-                        waitTime = Random.Range(3f, 5f);
+
+                    if (name != "null")
+                    {
+                        waitTime = float.Parse(SceneVarScript.Instance.GetOptionByName(name, "cool", SceneVarScript.Instance.monsterOption));
                     }
                     else
                     {
@@ -232,15 +285,15 @@ public class AIManager : MonoBehaviour
                 }
                 else if (playerBuliding > 1)
                 {
-                    if (CreateCenozoic())
+                    var name = CreateCenozoic();
+                        name = name == "null" ? CreateMesozoic() : CreatePalaeozoic();
+
+                    if (name != "null")
                     {
-                        waitTime = Random.Range(3f, 5f);
+                        waitTime = float.Parse(SceneVarScript.Instance.GetOptionByName(name, "cool", SceneVarScript.Instance.monsterOption));
                     }
-                    else if (CreateMesozoic())
+                    else
                     {
-                        waitTime = Random.Range(3f, 5f);
-                    }
-                    else if(CreatePalaeozoic()){
                         waitTime = Random.Range(3f, 5f);
                     }
                 }
@@ -252,9 +305,10 @@ public class AIManager : MonoBehaviour
 
                 if (playerBuliding == 0)
                 {
-                    if (CreatePalaeozoic())
+                    var name = CreatePalaeozoic();
+                    if (name != "null")
                     {
-                        waitTime = Random.Range(5f, 8f);
+                        waitTime = float.Parse(SceneVarScript.Instance.GetOptionByName(name, "cool", SceneVarScript.Instance.monsterOption));
                     }
                     else
                     {
@@ -263,13 +317,15 @@ public class AIManager : MonoBehaviour
                 }
                 else if (playerBuliding == 1)
                 {
-                    if (CreateMesozoic())
+                    var name = CreateMesozoic();
+                    if (name != "null")
                     {
-                        waitTime = Random.Range(5f, 8f);
+                        name = CreatePalaeozoic();
                     }
-                    else if (CreatePalaeozoic())
+
+                    if (name != "null")
                     {
-                        waitTime = Random.Range(5f, 8f);
+                        waitTime = float.Parse(SceneVarScript.Instance.GetOptionByName(name, "cool", SceneVarScript.Instance.monsterOption));
                     }
                     else
                     {
@@ -278,15 +334,14 @@ public class AIManager : MonoBehaviour
                 }
                 else if (playerBuliding > 1)
                 {
-                    if (CreateCenozoic())
+                    var name = CreateCenozoic();
+                    name = name == "null" ? CreateMesozoic() : CreatePalaeozoic();
+
+                    if (name != "null")
                     {
-                        waitTime = Random.Range(5f, 8f);
+                        waitTime = float.Parse(SceneVarScript.Instance.GetOptionByName(name, "cool", SceneVarScript.Instance.monsterOption));
                     }
-                    else if (CreateMesozoic())
-                    {
-                        waitTime = Random.Range(5f, 8f);
-                    }
-                    else if (CreatePalaeozoic())
+                    else
                     {
                         waitTime = Random.Range(5f, 8f);
                     }
@@ -316,11 +371,11 @@ public class AIManager : MonoBehaviour
                 case 0:
                     if (NetworkMaster.Instance.dir)
                     {
-                        range = Random.Range(-22f, 0f);
+                        range = Random.Range(10f, 22f);
                     }
                     else
                     {
-                        range = Random.Range(0, 22f);
+                        range = Random.Range(-22, -10f);
                     }
                     break;
                 case 1:
@@ -336,11 +391,11 @@ public class AIManager : MonoBehaviour
                 case 2:
                     if (NetworkMaster.Instance.dir)
                     {
-                        range = Random.Range(6f, 22f);
+                        range = Random.Range(-22f, -6f);
                     }
                     else
                     {
-                        range = Random.Range(-22, -6f);
+                        range = Random.Range(6, 22f);
                     }
                     break;
                 default:
@@ -387,12 +442,14 @@ public class AIManager : MonoBehaviour
     {
         return MainGameManager.mainGameManager.TouchDamageTheory(touchLevel);
     }
-    public void TouchAttack()
+    public bool TouchAttack()
     {
         if (MainGameManager.mainGameManager.GetNowBoss() != null)
         {
             MainGameManager.mainGameManager.GetNowBoss().GetComponent<BossScript>().TouchObj(MainGameManager.mainGameManager.GetNowBoss().transform.position, player);
+            return true;
         }
+        return false;
     }
     public void GetMoneyPerTime()
     {
@@ -405,7 +462,7 @@ public class AIManager : MonoBehaviour
             {
                 getMoneyTime -= MainGameManager.mainGameManager.getPerTime;
                 CalMoney((int)perMoney);
-                Debug.Log("µ∑ »πµÊ:" + perMoney);
+                //Debug.Log("µ∑ »πµÊ:" + perMoney);
             }
         }
     }
@@ -418,7 +475,7 @@ public class AIManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("∞ÒµÂ∞° ∫Œ¡∑«’¥œ¥Ÿ");
+            //Debug.Log("∞ÒµÂ∞° ∫Œ¡∑«’¥œ¥Ÿ");
             return false;
         }
     }
@@ -434,7 +491,7 @@ public class AIManager : MonoBehaviour
     {
         return playerBuliding;
     }
-    public bool CreatePalaeozoic()
+    public string CreatePalaeozoic()
     {
         List<string> monsters = new List<string>();
         for (int i = 0; i < 3; i++)
@@ -445,14 +502,14 @@ public class AIManager : MonoBehaviour
         if (SpentGold(int.Parse(SceneVarScript.Instance.GetOptionByName(target, "cost", SceneVarScript.Instance.monsterOption))))
         {
             CreateMonster(target, 0, 0, Random.Range(0, 2));
-            return true;
+            return target;
         }
         else
         {
-            return false;
+            return "null";
         }
     }
-    public bool CreateMesozoic()
+    public string CreateMesozoic()
     {
         List<string> monsters = new List<string>();
         for (int i = 3; i < 6; i++)
@@ -463,14 +520,14 @@ public class AIManager : MonoBehaviour
         if (SpentGold(int.Parse(SceneVarScript.Instance.GetOptionByName(target, "cost", SceneVarScript.Instance.monsterOption))))
         {
             CreateMonster(target, 0, 0, Random.Range(0, 2));
-            return true;
+            return target;
         }
         else
         {
-            return false;
+            return null;
         }
     }
-    public bool CreateCenozoic()
+    public string CreateCenozoic()
     {
         List<string> monsters = new List<string>();
         for (int i = 6; i < 9; i++)
@@ -481,11 +538,11 @@ public class AIManager : MonoBehaviour
         if (SpentGold(int.Parse(SceneVarScript.Instance.GetOptionByName(target, "cost", SceneVarScript.Instance.monsterOption))))
         {
             CreateMonster(target, 0, 0, Random.Range(0, 2));
-            return true;
+            return target;
         }
         else
         {
-            return false;
+            return null;
         }
     }
 
@@ -501,7 +558,7 @@ public class AIManager : MonoBehaviour
     {
         //∆Æ∑¶ x π¸¿ß¥¬ -22~22 
         // EX ) CreateTrap("BambooSpear", Random.Range(-22f,22f),Random.Range(0,1));
-        NetworkMaster.Instance.CreateTrap(name, player, new Vector2(type_x, player.transform.position.y), layer);
+        NetworkMaster.Instance.CreateTrap(name, player, new Vector2(type_x,(layer==0?NetworkMaster.Instance.downSetPos.y:NetworkMaster.Instance.upSetPos.y) ), layer);
     }
     public void SetMoney(int num)
     {
@@ -513,11 +570,14 @@ public class AIManager : MonoBehaviour
     }
     public void CalMoney(int num)
     {
-        num = (int)(num * (1 + goldEff));
-        if (num >= 0)
+        if (NetworkMaster.Instance.endPoint == 0)
         {
-            allMoney += num;
+            if (num >= 0)
+            {
+                num = (int)(num * goldEff);
+                allMoney += num;
+            }
+            money += num;
         }
-        money += num;
     }
 }

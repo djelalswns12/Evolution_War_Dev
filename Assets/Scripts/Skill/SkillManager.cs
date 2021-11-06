@@ -9,6 +9,7 @@ public class SkillManager : MonoBehaviour
     public static SkillManager Instance;
     //public delegate void SetSkill(string index);
     public Dictionary<string, List<GameObject>> list;
+    public Dictionary<string, SkillScript> skillList;
     public GameObject[] skillBtn;
     public GameObject[] skillCoolImage;
     public ParticleSystem[] skillOnParticle;
@@ -26,6 +27,8 @@ public class SkillManager : MonoBehaviour
     }
     void Start()
     {
+        skillList = new Dictionary<string, SkillScript>();
+        SetSkillList();
         list = MainGameManager.GetMonsterList();
         startSkillBtnPosX = skillBtn[0].transform.position.x;
         skillActiveList = new bool[SceneVarScript.Instance.skillOption.Length];
@@ -46,347 +49,63 @@ public class SkillManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        SKillUniqueEffect(); //스킬 고유효과 적용
-        SetSkillBtn();
+        SetSkill();
+
         SkillCoolManager(); //
-        for (int i = 0; i < SceneVarScript.Instance.skillOption.Length; i++)
-        {
-            UseSkill(i.ToString());
-        }
+        
     }
-    public void UseSkill(string index)
+    public void SetSkillList()
     {
-        switch (index)
+        foreach (var skill in SceneVarScript.Instance.skillOption)
         {
-            /*
-             bool skillActiveList[];
-            -----------------------------------------------
-             해당 인덱스 스킬이 발동할 효과(기본 지속 효과 , 사용시 효과)를 설정
-             효과를 발생시키는 함수가 true를 반환하면 해당 스킬의 사용 조건이 만족되었음을 의미한다.
-             */
-            case "0":
-                skillActiveList[int.Parse(index)] = skill0_Assemble(index);
-                break;
-            case "1":
-                skillActiveList[int.Parse(index)] = skill1_SuperTutle(index);
-                break;
-            case "2":
-                skillActiveList[int.Parse(index)] = skill2_GoldBanana(index);
-                break;
-            case "3":
-                skillActiveList[int.Parse(index)] = skill3_Stronger(index);
-                break;
-            case "4":
-                skillActiveList[int.Parse(index)] = skill4_PoisonSpear(index);
-                break;
-            default:
-                break;
-        }
-    }
-    public bool skill0_Assemble(string index)
-    {
-        int slotNum = SkillCheckIsTake(index);
-        if (slotNum == -1)
-        {
-            return false;
-        }
-        if (SkillCheckNeedMoney(index) == false || SkillCheckNeedMonster(index) == false)
-        {
-            skill0_Assemble_passive(false, index);
-            skillOnParticle[slotNum].gameObject.SetActive(false);
-            return false;
-        }
-        //사용 여부 ON/OFF
-        skillOnParticle[slotNum].gameObject.SetActive(true);
-
-        //기본  지속 효과
-        skill0_Assemble_passive(true, index);
-
-        return true;
-    }
-    public bool skill1_SuperTutle(string index)
-    {
-        int slotNum = SkillCheckIsTake(index);
-        if (slotNum == -1)
-        {
-            return false;
-        }
-        if (SkillCheckNeedMoney(index) == false || SkillCheckNeedMonster(index) == false)
-        {
-            skillOnParticle[slotNum].gameObject.SetActive(false);
-            return false;
-        }
-        skillOnParticle[slotNum].gameObject.SetActive(true);
-        return true;
-    }
-    public bool skill2_GoldBanana(string index)
-    {
-        int slotNum = SkillCheckIsTake(index);
-        if (slotNum == -1)
-        {
-            return false;
-        }
-        if (SkillCheckNeedMoney(index) == false || SkillCheckNeedMonster(index) == false)
-        {
-            skill2_GoldBanana_passive(false, index);
-            skillOnParticle[slotNum].gameObject.SetActive(false);
-            return false;
-        }
-        //사용 여부 ON/OFF
-        skillOnParticle[slotNum].gameObject.SetActive(true);
-
-        //기본  지속 효과
-        skill2_GoldBanana_passive(true, index);
-
-        return true;
-
-    }
-    public bool skill3_Stronger(string index)
-    {
-        int slotNum = SkillCheckIsTake(index);
-        if (slotNum == -1)
-        {
-            return false;
-        }
-        if (SkillCheckNeedMoney(index) == false || SkillCheckNeedMonster(index) == false)
-        {
-            skillOnParticle[slotNum].gameObject.SetActive(false);
-            return false;
-        }
-        //사용 여부 ON/OFF
-        skillOnParticle[slotNum].gameObject.SetActive(true);
-
-        //기본  지속 효과
-
-        return true;
-    }
-    public bool skill4_PoisonSpear(string index)
-    {
-        int slotNum = SkillCheckIsTake(index);
-        if (slotNum == -1)
-        {
-            return false;
-        }
-        if (SkillCheckNeedMoney(index) == false || SkillCheckNeedMonster(index) == false)
-        {
-            skillOnParticle[slotNum].gameObject.SetActive(false);
-            return false;
-        }
-        //사용 여부 ON/OFF
-        skillOnParticle[slotNum].gameObject.SetActive(true);
-
-        //기본  지속 효과
-        return true;
-    }
-    #region 엑티브 효과
-    //////////////////////////    엑티브 효과      ////////////////////////////
-    public void skill1_SuperTutle_Active(string index)
-    {
-        skillCool[int.Parse(index)]= float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "cool", SceneVarScript.Instance.skillOption));
-        //차출될 몬스터 이름 설정
-        var settingName = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByIndex(index, "needMonster", SceneVarScript.Instance.skillOption)).Split(',')[0];
-        Debug.Log(settingName);
-        //차출몬스터 필요 갯수 설정
-        var settingNeed = int.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "need0", SceneVarScript.Instance.skillOption));
-
-        //소환될 몬스터 이름 설정
-        var spawnMonster = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByIndex(index, "spawnMonster", SceneVarScript.Instance.skillOption));
-
-        //플레이어로부터 가장 멀리있는 거북이 10마리 차출
-
-        int spawnLayer = -1;
-        for (int i = 0; i < list[settingName].Count; i++)
-        {
-            float setDistance = Mathf.Abs(list[settingName][i].transform.position.x - NetworkMaster.player.transform.position.x);
-            for (int j = i; j < list[settingName].Count; j++)
+            switch (int.Parse(skill["index"].ToString()))
             {
-                float distance = Mathf.Abs(list[settingName][j].transform.position.x - NetworkMaster.player.transform.position.x);
-                if (setDistance < distance)
-                {
-                    GameObject tmp = list[settingName][j];
-                    list[settingName][j] = list[settingName][i];
-                    list[settingName][i] = tmp;
-                    setDistance = distance;
-                }
-            }
-        }
-        Debug.Log("플레이어와 거북이 거리를 기준으로 내림차순 정렬 완료");
-        //차출된 거북이를 사망시키면서 마지막에 플레이어로 부터 가장 가까운 거북이의 레이어를 구해오기
-        for (int i = 0; i < settingNeed; i++)
-        {
-            //10마리 모두 사망시키기
-            list[settingName][i].GetComponent<monsterScript>().hp = 0;
-        }
-        list[settingName][list[settingName].Count-1].GetComponent<monsterScript>().GetLayerNum();
-        //저장된 레이어에 거북이 소환시키기
-        NetworkMaster.Instance.CreatMonster(spawnMonster, 1, NetworkMaster.Instance.CreatPosXOffset(NetworkMaster.player), spawnLayer,NetworkMaster.player);
-        NetworkMaster.Instance.SendGameMsgFunc("슈퍼 거북이가 전장에 출현했습니다!",1);
-    }
-
-
-    public void skill3_Stronger_Active(string index)
-    {
-        skillCool[int.Parse(index)] = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "cool", SceneVarScript.Instance.skillOption));
-        var perTime = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "perTime", SceneVarScript.Instance.skillOption));
-        var perAttackSpeed =float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "perAttackSpeed", SceneVarScript.Instance.skillOption))/100;
-        foreach (var item in list["Lion"])
-        {
-            item.GetComponent<monsterScript>().FuncLionAttackSpeedBuff(perTime,perAttackSpeed);
-        }
-        //foreach(var item in list)
-        //{
-        //    foreach(var ele in list[item.Key])
-        //    {
-        //        ele.GetComponent<monsterScript>().FuncLionAttackSpeedBuff(perTime, perAttackSpeed);
-        //    }
-        //}
-        NetworkMaster.Instance.SendGameMsgFunc("약육강식이 발동되었습니다!");
-    }
-    public void skill4_PoisonSpear_Active(string index)
-    {
-        skillCool[int.Parse(index)] = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "cool", SceneVarScript.Instance.skillOption));
-        var perTime = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "perTime", SceneVarScript.Instance.skillOption)); // 지속시간
-        var addSpeed = (100-float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "addSpeed", SceneVarScript.Instance.skillOption))) / 100; //이속 감소량
-        var addDamage = float.Parse(SceneVarScript.Instance.GetOptionByIndex(index, "addDamage", SceneVarScript.Instance.skillOption)) / 100; // 도트 데미지량
-        if (list.ContainsKey("OldHuman")) { 
-        foreach (var item in list["OldHuman"])
-        {
-            item.GetComponent<monsterScript>().FuncOldHumanBuff(perTime, addDamage,addSpeed);
-        }
-        }
-        NetworkMaster.Instance.SendGameMsgFunc("독창 전술이 발동되었습니다!");
-    }
-    #endregion
-
-
-    #region 패시브 스킬
-    //////////////////////////패시브 스킬 설명 ( 기본 지속 효과 )////////////////////////////
-    public void skill0_Assemble_passive(bool isActive, string skill_Index)
-    {
-        if (isActive)
-        {
-            float perTime = float.Parse(SceneVarScript.Instance.GetOptionByIndex(skill_Index, "perTime", SceneVarScript.Instance.skillOption));
-            assembleTime += Time.deltaTime;
-            if (assembleTime > perTime)
-            {
-                assembleTime = 0;
-                string data = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByIndex(skill_Index, "needMonster", SceneVarScript.Instance.skillOption));
-                string[] moneys= SceneVarScript.Instance.GetOptionByIndex(skill_Index, "perMoney", SceneVarScript.Instance.skillOption).Split('/');
-                int perMoney = int.Parse(moneys[MainGameManager.mainGameManager.GetPlayerBuliding()]);
-                //Debug.Log("필요 데이터:" + data);
-                var needs = data.Split(',');
-                for (int i = 0; i < needs.Length / 2; i++)
-                {
-                    foreach (var obj in list[needs[i * 2]])
-                    {
-                        MainGameManager.mainGameManager.CreatGoldEffect(obj.transform.position, perMoney);
-                    }
-                }
-            }
-        }
-        else
-        {
-            assembleTime = 0;
-        }
-    }
-    public void skill2_GoldBanana_passive(bool isActive, string skill_Index)
-    {
-        if (isActive)
-        {
-            //원숭이 공격속도
-            monkeyAttackSpeed = (float.Parse(SceneVarScript.Instance.GetOptionByIndex(skill_Index, "perAttackSpeed", SceneVarScript.Instance.skillOption)) / 100);
-            //바나나 공격 성공시 추가 골드
-            var moneys= SceneVarScript.Instance.GetOptionByIndex(skill_Index, "perMoney", SceneVarScript.Instance.skillOption).Split('/');
-            bananaBonusGold = int.Parse(moneys[MainGameManager.mainGameManager.GetPlayerBuliding()]);
-        }
-        else
-        {
-            monkeyAttackSpeed = 0;
-            bananaBonusGold = 0;
-        }
-    }
-
-    //////////////////////////패시브 스킬 설명 ( 기본 지속 효과 )////////////////////////////
-    #endregion
-
-    #region 고유효과
-    ////////////////////////// 스킬 설명 (고유 효과 )////////////////////////////
-    public void skill3_Stronger_Unique(bool isActive, string skill_Index)
-    {
-        if (isActive)
-        {
-            //사자 보스 뽀공
-            lionBossBonusDamage = (float.Parse(SceneVarScript.Instance.GetOptionByIndex(skill_Index, "addDamage", SceneVarScript.Instance.skillOption)) / 100);
-        }
-        else
-        {
-            lionBossBonusDamage = 0;
-
-        }
-    }
-
-    #endregion
-    public void SKillUniqueEffect()
-    {
-        bool[] OnSKillList = new bool[SceneVarScript.Instance.skillOption.Length];
-        //전체 스킬DB를 읽어와서 착용중인 스킬인지 체크하는 변수이다.
-
-        foreach (var item in skillBtn)
-        {
-            //장착중인 스킬의 인덱스 번호를 구한다.
-            var findIndex = SceneVarScript.Instance.GetOptionByName(
-                item.GetComponent<SkillBtn>().myName,
-                "index", SceneVarScript.Instance.skillOption
-                );
-            if (findIndex != "null")
-            {
-                //해당 인덱스를 가지는 스클이 착용중인 스킬임을 명시한다
-                OnSKillList[int.Parse(SceneVarScript.Instance.GetOptionByName(
-                    item.GetComponent<SkillBtn>().myName,
-                    "index", SceneVarScript.Instance.skillOption)
-                    )] = true;
-            }
-        }
-        for (int i = 0; i < OnSKillList.Length; i++)
-        {
-            switch (i)
-            {
-                /*
-                 해당 인덱스를 가지는 스킬이 발동할 효과(고유 효과)를 설정
-                 */
+                case 0:
+                    skillList.Add(skill["index"].ToString(), new Assemble(skill["index"].ToString()));
+                    break;
+                case 1:
+                    skillList.Add(skill["index"].ToString(), new SuperTutle(skill["index"].ToString()));
+                    break;
+                case 2:
+                    skillList.Add(skill["index"].ToString(), new GoldBanana(skill["index"].ToString()));
+                    break;
                 case 3:
-                    skill3_Stronger_Unique(OnSKillList[i], i.ToString());
+                    skillList.Add(skill["index"].ToString(), new Stronger(skill["index"].ToString()));
+                    break;
+                case 4:
+                    skillList.Add(skill["index"].ToString(), new PoisonSpear(skill["index"].ToString()));
+                    break;
+                case 5:
+                    skillList.Add(skill["index"].ToString(), new BuildingDestroy(skill["index"].ToString()));
+                    break;
+                case 6:
+                    skillList.Add(skill["index"].ToString(), new BuildingDestroy(skill["index"].ToString()));
+                    break;
+                case 7:
+                    skillList.Add(skill["index"].ToString(), new BuildingDestroy(skill["index"].ToString()));
+                    break;
+                default:
                     break;
             }
-
         }
     }
     public void SkillActive()
     {
         var skillName = MainGameManager.mainGameManager.GetNowSkill().GetComponent<SkillBtn>();
         var useSkillIndex = int.Parse(SceneVarScript.Instance.GetOptionByName(skillName.myName, "index", SceneVarScript.Instance.skillOption));
+
         if (skillCool[useSkillIndex] > 0)
         {
             NetworkMaster.Instance.SendGameMsgFunc("재사용 대기시간이 남았습니다.");
             return;
         }
-        if (skillActiveList[useSkillIndex] == false)
+        if (skillList[useSkillIndex.ToString()].NeedsCheck() != 0)
         {
-            NetworkMaster.Instance.SendGameMsgFunc("스킬 사용 조건이 부족합니다.");
+            NetworkMaster.Instance.SendGameMsgFunc("조건이 만족되지 않았습니다.");
             return;
         }
-        switch (useSkillIndex)
-        {
-            case 1:
-                skill1_SuperTutle_Active(useSkillIndex.ToString());
-                break;
-            case 3:
-                skill3_Stronger_Active(useSkillIndex.ToString());
-                break;
-            case 4:
-                skill4_PoisonSpear_Active(useSkillIndex.ToString());
-                break;
-        }
+        skillList[useSkillIndex.ToString()].Active();
+        skillCool[useSkillIndex] = float.Parse(SceneVarScript.Instance.GetOptionByIndex(useSkillIndex.ToString(), "cool", SceneVarScript.Instance.skillOption));
     }
     public void SkillCoolManager()
     {
@@ -400,7 +119,6 @@ public class SkillManager : MonoBehaviour
                     skillCoolImage[slotNum].GetComponentInChildren<Text>().text = skillCool[i].ToString("N1");
                     skillCoolImage[slotNum].SetActive(true);
                 }
-                
                 skillCool[i] -= Time.deltaTime;
             }
             else
@@ -471,16 +189,61 @@ public class SkillManager : MonoBehaviour
         Debug.Log($"(needMonster {index} )index is Not Load So return true");
         return true;
     }
-    public void SetSkillBtn()
+    public bool SkillCheckAnyMonster(string index)
+    {
+        if (SceneVarScript.Instance.GetOptionByIndex(index, "anyMonster", SceneVarScript.Instance.skillOption) != "null")
+        {
+            string data = SceneVarScript.Instance.GetDBSource(SceneVarScript.Instance.GetOptionByIndex(index, "anyMonster", SceneVarScript.Instance.skillOption));
+            //Debug.Log("필요 데이터:" + data);
+            var needs = data.Split('/');
+            List<bool> checkList = new List<bool>(needs.Length);
+            for (int i = 0; i < needs.Length; i++)
+            {
+                checkList[i] = false;
+                int count=0;
+                var monsters = needs[i].Split(',');
+                for (int j=0;i<monsters.Length-1;j++)
+                {
+                    count += list[SceneVarScript.Instance.GetDBSource(monsters[j])].Count;
+                    if (count >= int.Parse(monsters[monsters.Length - 1]))
+                    {
+                        checkList[i] = true;
+                        break;
+                    }
+                }
+            }
+            foreach(bool check in checkList)
+            {
+                if (check == false)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        Debug.Log($"(needMonster {index} )index is Not Load So return true");
+        return true;
+    }
+    public void SetSkill()
     {
         //인게임 스킬 아이콘의 값을 설정한다.
-
         for (int i = 0; i < skillBtn.Length; i++)
         {
-            if (SceneVarScript.Instance.GetUserOption("skill" + (i + 1)) != null)
+            var skillIndex = SceneVarScript.Instance.GetUserOption("skill" + (i + 1));
+            if (SceneVarScript.Instance.GetOptionByIndex(skillIndex ,"index", SceneVarScript.Instance.skillOption) != "null")
             {
-                skillBtn[i].GetComponent<SkillBtn>().myName = SceneVarScript.Instance.GetOptionByIndex(SceneVarScript.Instance.GetUserOption("skill" + (i + 1)), "name", SceneVarScript.Instance.skillOption);
-
+                skillBtn[i].GetComponent<SkillBtn>().myName = SceneVarScript.Instance.GetOptionByIndex(skillIndex, "name", SceneVarScript.Instance.skillOption);
+                skillList[SceneVarScript.Instance.GetOptionByIndex(skillIndex, "index", SceneVarScript.Instance.skillOption)].Unique();
+                if (skillList[SceneVarScript.Instance.GetOptionByIndex(skillIndex, "index", SceneVarScript.Instance.skillOption)].NeedsCheck() == 0)
+                {
+                    skillOnParticle[SkillCheckIsTake(skillIndex)].gameObject.SetActive(true);
+                    skillList[SceneVarScript.Instance.GetOptionByIndex(skillIndex, "index", SceneVarScript.Instance.skillOption)].Passive();
+                }
+                else
+                {
+                    skillOnParticle[SkillCheckIsTake(skillIndex)].gameObject.SetActive(false);
+                    skillList[SceneVarScript.Instance.GetOptionByIndex(skillIndex, "index", SceneVarScript.Instance.skillOption)].UnPassive();
+                }
             }
         }
     }

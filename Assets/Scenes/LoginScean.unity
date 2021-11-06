@@ -1633,21 +1633,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1116853592991514103, guid: b0a254dd925434d4a8184731489133b9,
-        type: 3}
-      propertyPath: clip
-      value: 
-      objectReference: {fileID: 8300000, guid: 72cc54f7d22c7e44eba9f174e7a2dbc1, type: 3}
-    - target: {fileID: 5409297044789886880, guid: b0a254dd925434d4a8184731489133b9,
-        type: 3}
-      propertyPath: m_audioClip
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 5409297044789886880, guid: b0a254dd925434d4a8184731489133b9,
-        type: 3}
-      propertyPath: m_PlayOnAwake
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6123790212997968792, guid: b0a254dd925434d4a8184731489133b9,
         type: 3}
       propertyPath: m_RootOrder
@@ -1708,63 +1693,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SceneVariable
       objectReference: {fileID: 0}
-    - target: {fileID: 6123790212997968799, guid: b0a254dd925434d4a8184731489133b9,
-        type: 3}
-      propertyPath: noneSkillIcon
-      value: 
-      objectReference: {fileID: 8606922013201467065, guid: e909753c09d57e94687456b2f3750b6f,
-        type: 3}
-    - target: {fileID: 6123790212997968799, guid: b0a254dd925434d4a8184731489133b9,
-        type: 3}
-      propertyPath: skillIcon.Array.size
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 6123790212997968799, guid: b0a254dd925434d4a8184731489133b9,
-        type: 3}
-      propertyPath: skillIcon.Array.data[0]
-      value: 
-      objectReference: {fileID: 9189358215307616868, guid: 92fd23ed288547647b8ef654e3dab807,
-        type: 3}
-    - target: {fileID: 6123790212997968799, guid: b0a254dd925434d4a8184731489133b9,
-        type: 3}
-      propertyPath: skillIcon.Array.data[1]
-      value: 
-      objectReference: {fileID: -3953690400076805791, guid: 92fd23ed288547647b8ef654e3dab807,
-        type: 3}
-    - target: {fileID: 6123790212997968799, guid: b0a254dd925434d4a8184731489133b9,
-        type: 3}
-      propertyPath: skillIcon.Array.data[2]
-      value: 
-      objectReference: {fileID: 6773118235982958952, guid: 92fd23ed288547647b8ef654e3dab807,
-        type: 3}
-    - target: {fileID: 6123790212997968799, guid: b0a254dd925434d4a8184731489133b9,
-        type: 3}
-      propertyPath: skillIcon.Array.data[3]
-      value: 
-      objectReference: {fileID: -5836485331821424452, guid: 92fd23ed288547647b8ef654e3dab807,
-        type: 3}
-    - target: {fileID: 6123790212997968799, guid: b0a254dd925434d4a8184731489133b9,
-        type: 3}
-      propertyPath: skillIcon.Array.data[4]
-      value: 
-      objectReference: {fileID: 7726564024472560038, guid: 92fd23ed288547647b8ef654e3dab807,
-        type: 3}
-    - target: {fileID: 6123790212997968799, guid: b0a254dd925434d4a8184731489133b9,
-        type: 3}
-      propertyPath: skillIcon.Array.data[5]
-      value: 
-      objectReference: {fileID: 7726564024472560038, guid: 92fd23ed288547647b8ef654e3dab807,
-        type: 3}
-    - target: {fileID: 6900991407926921914, guid: b0a254dd925434d4a8184731489133b9,
-        type: 3}
-      propertyPath: clip
-      value: 
-      objectReference: {fileID: 8300000, guid: 734d8ffc474c42444a4a7f23b64484e6, type: 3}
-    - target: {fileID: 7915377853993476960, guid: b0a254dd925434d4a8184731489133b9,
-        type: 3}
-      propertyPath: clip
-      value: 
-      objectReference: {fileID: 8300000, guid: 734d8ffc474c42444a4a7f23b64484e6, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b0a254dd925434d4a8184731489133b9, type: 3}
 --- !u!1 &1153508423
@@ -1961,7 +1889,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2.7396, y: 16.3814}
+  m_AnchoredPosition: {x: 4.37, y: 14.95}
   m_SizeDelta: {x: 2045.571, y: 1237.6484}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1263797730
@@ -7085,7 +7013,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\u203B\uC774\uBBF8 \uC0AC\uC6A9\uC911\uC785\uB2C8\uB2E4."
+  m_Text: "\u203B\uC774\uBBF8 \uC0AC\uC6A9\uC911\uC774\uAC70\uB098 \uBD80\uC801\uC808\uD55C
+    \uB2C9\uB124\uC784 \uC785\uB2C8\uB2E4."
 --- !u!222 &1535341083
 CanvasRenderer:
   m_ObjectHideFlags: 0

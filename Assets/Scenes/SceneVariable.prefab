@@ -56,8 +56,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 2f9051a0649ac39408437c1fe59b5b3b, type: 3}
-  m_PlayOnAwake: 1
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
   m_Volume: 0.345
   m_Pitch: 1
   Loop: 0
@@ -334,6 +334,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b1eb39d07fe05f4b8a5e0eea2561a66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  findTime: 0
+  isVersionCheck: 0
   isDataConnect: 0
   monsterDBConnecting: 0
   trapDBConnecting: 0
@@ -343,16 +345,28 @@ MonoBehaviour:
   usersDBConnecting: 0
   noticeDBConnecting: 0
   skillShopDBConnecting: 0
+  findTimeDBConnecting: 0
+  AIDBConnecting: 0
   authCode: 
   tryConnect: 0
   isUserGetting: 0
   isUserCreating: 0
+  SetWinLoseGoldProcessing: 0
   hasUser: 0
   noticeReset: 0
   usersReset: 0
   tmpRating: 0
-  skillIcon: []
-  noneSkillIcon: {fileID: 0}
+  skillIcon:
+  - {fileID: 9189358215307616868, guid: 92fd23ed288547647b8ef654e3dab807, type: 3}
+  - {fileID: -3953690400076805791, guid: 92fd23ed288547647b8ef654e3dab807, type: 3}
+  - {fileID: 6773118235982958952, guid: 92fd23ed288547647b8ef654e3dab807, type: 3}
+  - {fileID: -5836485331821424452, guid: 92fd23ed288547647b8ef654e3dab807, type: 3}
+  - {fileID: 7726564024472560038, guid: 92fd23ed288547647b8ef654e3dab807, type: 3}
+  - {fileID: 7726564024472560038, guid: 92fd23ed288547647b8ef654e3dab807, type: 3}
+  - {fileID: 7726564024472560038, guid: 92fd23ed288547647b8ef654e3dab807, type: 3}
+  - {fileID: 7726564024472560038, guid: 92fd23ed288547647b8ef654e3dab807, type: 3}
+  noneSkillIcon: {fileID: 8606922013201467065, guid: e909753c09d57e94687456b2f3750b6f,
+    type: 3}
 --- !u!114 &6056282577607995578
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -260,8 +260,8 @@ MonoBehaviour:
   size: {x: 0.17, y: 1.07}
   attOffset2: {x: -1.38, y: 0.06}
   size2: {x: 0.28, y: 1.96}
-  attOffset3: {x: -2.12, y: 0.11}
-  size3: {x: 1.78, y: 1.99}
+  attOffset3: {x: -2, y: 0.11}
+  size3: {x: 1.45, y: 1.99}
   throwPos: {x: 0, y: 0}
   spawnPos: {x: 0, y: -0.57}
   hitParticle: {fileID: 0}

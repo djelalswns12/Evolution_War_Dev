@@ -61,16 +61,19 @@ public class LayerSpawner : MonoBehaviour
     }
     public void DeleteCreature(GameObject obj)
     {
+        //소환 실패되었는데 대기열에서 제거 할때
         for (int i = 0; i < creatures.Length; i++)
         {
             if (creatures[i] == obj)
             {
-                SpawnManager.DeleteSpawnerList(myLayer, i);
+                nowCool[i] = 0;
+                SpawnManager.DeleteSpawnerList(myLayer, i,true);
             }
         }
     }
     public void DeleteCreature(GameObject obj, bool moneyBack)
     {
+        //소환 완료시
         for (int i = 0; i < creatures.Length; i++)
         {
             if (creatures[i] == obj)

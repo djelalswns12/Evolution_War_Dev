@@ -7,7 +7,7 @@ using System;
 using UnityEngine.SceneManagement;
 public class SceneVarScript : MonoBehaviour
 {
-    public static readonly string gameVersion = "v4";
+    public static readonly string gameVersion = "v11";
 
     public class User
     {
@@ -38,10 +38,10 @@ public class SceneVarScript : MonoBehaviour
 
     private FirebaseUser myUser;
     public static SceneVarScript Instance;
-    public IDictionary[] monsterOption, trapOption, bossOption, playerOption, skillOption,usersOption,noticeOption,skillShopOption;
+    public IDictionary[] monsterOption, trapOption, bossOption, playerOption, skillOption,usersOption,noticeOption,skillShopOption,AIOption;
     public IDictionary userInfo;
     public float findTime;
-    public bool isVersionCheck,isDataConnect, monsterDBConnecting, trapDBConnecting, bossDBConnecting, playerDBConnecting, skillDBConnecting,usersDBConnecting,noticeDBConnecting,skillShopDBConnecting,findTimeDBConnecting;
+    public bool isVersionCheck,isDataConnect, monsterDBConnecting, trapDBConnecting, bossDBConnecting, playerDBConnecting, skillDBConnecting,usersDBConnecting,noticeDBConnecting,skillShopDBConnecting,findTimeDBConnecting,AIDBConnecting;
     public string authCode;
 
     public bool tryConnect;
@@ -306,7 +306,7 @@ public class SceneVarScript : MonoBehaviour
                 foreach (DataSnapshot data in snapshot.Children)
                 {
                     string loadName = (string)(data.Child("username").Value);
-                    if (name.Equals(loadName))
+                    if (name.Equals(loadName) || name.Length<2)
                     {
                         isChecked = false;
                         isEnd = true;
@@ -498,6 +498,38 @@ public class SceneVarScript : MonoBehaviour
             }
         });
     }
+    public void RequestAIDB()
+    {
+        AIDBConnecting = false;
+        DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
+        FirebaseDatabase.DefaultInstance
+        .GetReference("AIDB")
+        .GetValueAsync().ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+            {
+                AIDBConnecting = false;
+                Debug.Log("AIDB 연결 실패");
+                // Handle the error...
+            }
+            else if (task.IsCompleted)
+            {
+                int index = 0;
+                AIDBConnecting = true;
+                Debug.Log("찾았어요!!");
+                DataSnapshot snapshot = task.Result;
+                AIOption = new IDictionary[snapshot.ChildrenCount];
+                foreach (DataSnapshot data in snapshot.Children)
+                {
+                    //받은 데이터들을 하나씩 잘라 string 배열에 저장
+                    AIOption[index] = (IDictionary)data.Value;
+                    //Debug.Log("skill is:"+skillShopOption[index]["index"]);
+                    index++;
+                }
+                // Do something with snapshot...
+            }
+        });
+    }
     public void RequestFindTime()
     {
         findTimeDBConnecting = false;
@@ -565,6 +597,7 @@ public class SceneVarScript : MonoBehaviour
         skillShopDBConnecting = false;
         isVersionCheck = false;
         findTimeDBConnecting = false;
+        AIDBConnecting = false;
         RequestGameVersion();
         RequestMonsterDB();
         RequestTrapDB();
@@ -573,6 +606,7 @@ public class SceneVarScript : MonoBehaviour
         RequestSkillDB();
         RequestusersDB();
         RequestNoticeDB();
+        RequestAIDB();
         RequestSkillShopDB();
         RequestFindTime();
     }
@@ -601,7 +635,14 @@ public class SceneVarScript : MonoBehaviour
                     {
                         break;
                     }
-                    return option[colume].ToString();
+                    if (option[colume].ToString().Length > 0)
+                    {
+                        return option[colume].ToString();
+                    }
+                    else
+                    {
+                        return "null";
+                    }
                 }
             }
         return "null";
@@ -621,7 +662,14 @@ public class SceneVarScript : MonoBehaviour
                     {
                         break;
                     }
-                    return option[colume].ToString();
+                    if (option[colume].ToString().Length > 0)
+                    {
+                        return option[colume].ToString();
+                    }
+                    else
+                    {
+                        return "null";
+                    }
                 }
             }
         return "null";
@@ -939,7 +987,7 @@ public class SceneVarScript : MonoBehaviour
             }
             if (task.IsCompleted)
             {
-                Debug.Log("점수 설정 성공.");
+                //Debug.Log("점수 설정 성공.");
             }
         });
     }
@@ -949,7 +997,7 @@ public class SceneVarScript : MonoBehaviour
     }
     public void AddGold(int point)
     {
-        Debug.Log("골드설정"+point);
+        //Debug.Log("골드설정"+point);
         MainGameManager.mainGameManager.getRewardMoney = point.ToString();
         StartCoroutine(SetWinLoseGoldByAsync(point, "money"));
     }
@@ -957,10 +1005,10 @@ public class SceneVarScript : MonoBehaviour
     {
         yield return new WaitUntil(() => isUserGetting == false);
         SetWinLoseGoldProcessing = true;
-        Debug.Log("유저 정보 요청");
+        //Debug.Log("유저 정보 요청");
         GetUserByAuthCodeFun(GetAuthCode());
         yield return new WaitUntil(() => isUserGetting == false);
-        Debug.Log("유저 정보 획득 완료!!");
+        //Debug.Log("유저 정보 획득 완료!!");
         int SetValue = point + int.Parse(GetUserOption(type));
         if (SetValue <= 0)
         {

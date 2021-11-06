@@ -254,33 +254,36 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
                     return false;
                 }
             }
-                if (nowBuild + 1 < buildMaxCnt)
+            if (nowBuild + 1 < buildMaxCnt)
+            {
+                var nextPlayerName = "Player" + (int.Parse(NetworkMaster.Instance.GetMonsterOption(NetworkMaster.player.GetComponent<monsterScript>().myName, "icon")) - 3000 + 2);
+                playerScript.hp += int.Parse(NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "mhp")) * 0.5f;
+                SetCreatureInfo(player, "Player" + (nowBuild + 1), player);
+                if (player == NetworkMaster.player)
                 {
-                    var nextPlayerName = "Player" + (int.Parse(NetworkMaster.Instance.GetMonsterOption(NetworkMaster.player.GetComponent<monsterScript>().myName, "icon")) - 3000 + 2);
-                    playerScript.hp += int.Parse(NetworkMaster.Instance.GetMonsterOption(nextPlayerName, "mhp")) * 0.5f;
-                    SetCreatureInfo(player, "Player" + (nowBuild + 1),player);
-                    if (player == NetworkMaster.player)
-                    {
-                        MainGameManager.mainGameManager.SetPlayerBuliding(nowBuild);
-                    }
-                    else if (player == NetworkMaster.otherPlayer)
-                    {
-                        AIManager.Instance.SetPlayerBuliding(nowBuild);
-                    }
+                    MainGameManager.mainGameManager.SetPlayerBuliding(nowBuild);
+                }
+                else if (player == NetworkMaster.otherPlayer)
+                {
+                    AIManager.Instance.SetPlayerBuliding(nowBuild);
+                }
                 return true;
-                }
-                else
-                {
-                if (player == NetworkMaster.player) SendGameMsgFunc("더이상 업그레이드 할 수 없습니다.",0);
-                else  Debug.Log("더이상 업그레이드 할 수 없습니다.");
+            }
+            else
+            {
+                if (player == NetworkMaster.player) SendGameMsgFunc("더이상 업그레이드 할 수 없습니다.", 0);
+                else Debug.Log("더이상 업그레이드 할 수 없습니다.");
                 return false;
-                }
-            
+            }
+
         }
         else
         {
-            if (player == NetworkMaster.player) SendGameMsgFunc("알맞지 않은 시대라 업그레이드 할 수 없습니다.", 0);
-            else Debug.Log("알맞지 않은 시대라 업그레이드 할 수 없습니다.");
+            if (player == NetworkMaster.player) { SendGameMsgFunc("알맞지 않은 시대라 업그레이드 할 수 없습니다.", 0); }
+            else
+            {
+                //Debug.Log("알맞지 않은 시대라 업그레이드 할 수 없습니다.");
+            }
             return false;
         }
     }
@@ -358,10 +361,11 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
             }
         return "null";
     }
-    public void CreatThrow(string name, Vector2 creatpos, int damage, monsterScript creatmonster, GameObject targetmonster,float bonusMoney=0)
+    public void CreatThrow(string name, Vector2 creatpos, int damage, monsterScript creatmonster, GameObject targetmonster,monsterScript par, float bonusMoney=0)
     {
         GameObject throwObject = PhotonNetwork.Instantiate(name, creatpos, Quaternion.identity, 0);
         var script = throwObject.GetComponent<ThrowScript>();
+        script.par = par;
         script.target = targetmonster.transform.position;
         script.damage = damage;
         script.dir = creatmonster.dir;
@@ -709,6 +713,19 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         {
             //개인 메세지
             textExpress.setNewText(s);
+        }
+        else if (type == 1)
+        {
+            //공통 메세지
+            pv.RPC("SendGameMsg", RpcTarget.All, s);
+        }
+    }
+    public void SendGameMsgFunc(string s,Color color, int type)
+    {
+        if (type == 0)
+        {
+            //개인 메세지
+            textExpress.setNewText(s,color);
         }
         else if (type == 1)
         {

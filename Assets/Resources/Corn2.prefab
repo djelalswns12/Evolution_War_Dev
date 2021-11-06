@@ -867,6 +867,9 @@ MonoBehaviour:
   whatIsLayer:
     serializedVersion: 2
     m_Bits: 0
+  FrontUnitLayer:
+    serializedVersion: 2
+    m_Bits: 0
   whatIsLayer2:
     serializedVersion: 2
     m_Bits: 0
@@ -909,6 +912,7 @@ MonoBehaviour:
   hasThornsBuffFlag: 0
   hasPoisionFlag: 0
   effectScript: []
+  myPlayer: {fileID: 0}
 --- !u!114 &797338476367912722
 MonoBehaviour:
   m_ObjectHideFlags: 0

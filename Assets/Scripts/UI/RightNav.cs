@@ -160,7 +160,15 @@ public class RightNav : MonoBehaviour
                     uiSkillImg.sprite = SceneVarScript.Instance.skillIcon[int.Parse(SceneVarScript.Instance.GetOptionByName(skillName, "icon", SceneVarScript.Instance.skillOption))];
                     if (SceneVarScript.Instance.GetOptionByName(skillName, "state", SceneVarScript.Instance.skillOption) == "Active") {
                         uiSkillActiveBtn.SetActive(true);
-                        uiSkillMask.enabled = !SkillManager.Instance.skillActiveList[int.Parse(SceneVarScript.Instance.GetOptionByName(skillName, "index", SceneVarScript.Instance.skillOption))];
+                        //uiSkillMask.enabled = !SkillManager.Instance.skillActiveList[int.Parse(SceneVarScript.Instance.GetOptionByName(skillName, "index", SceneVarScript.Instance.skillOption))];
+                        if(SkillManager.Instance.skillList[SceneVarScript.Instance.GetOptionByName(skillName, "index", SceneVarScript.Instance.skillOption)].NeedsCheck()==0)
+                        {
+                            uiSkillMask.enabled = false;
+                        }
+                        else
+                        {
+                            uiSkillMask.enabled = true;
+                        }
                     }
                     else
                     {

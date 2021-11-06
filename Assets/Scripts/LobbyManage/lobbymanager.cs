@@ -69,7 +69,7 @@ public class lobbymanager : MonoBehaviourPunCallbacks
         {
             testJoinBtn.gameObject.SetActive(false);
         }
-        AdsManager.Instance.ShowBanner();
+
         RoomWait = 0;
         if (SceneVarScript.Instance == null)
         {
@@ -114,7 +114,7 @@ public class lobbymanager : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
-  
+        AdsManager.Instance.ShowBanner();
         SetSkillList(); // 모든 스킬 렌더링 ( 오브젝트 복사로)
         SetSkillDescUI();
         SetUseSkillList();

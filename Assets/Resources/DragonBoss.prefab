@@ -873,10 +873,15 @@ MonoBehaviour:
   spawnPos: {x: 0, y: 0}
   hitParticle: {fileID: 0}
   hasLionBuffFlag: 0
+  isPlayerMultiAttack: 0
   hasGoldBananaFlag: 0
   hasOldHumanBuffFlag: 0
+  thornsFlag: 0
   hasThornsBuffFlag: 0
+  nuckBackFlag: 0
   hasPoisionFlag: 0
+  poisionDamage: 0
+  poisionSpeed: 0
   effectScript: []
   myPlayer: {fileID: 0}
 --- !u!50 &7235073620437742222

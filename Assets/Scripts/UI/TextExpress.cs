@@ -32,14 +32,14 @@ public class TextExpress : MonoBehaviour
             int pos = 0;
             foreach(GameObject item in textList)
             {
-                if (item.GetComponent<Text>().color.a < 0)
+                if (item.GetComponentInChildren<Text>().color.a < 0)
                 {
                     Destroy(textList.Last.Value);
                     textList.RemoveLast();
                     break;
                 }
                 item.GetComponent<RectTransform>().localPosition = new Vector3(0, offset+pos, 0);
-                pos += 65;
+                pos += 71;
             }
         }
         if (textMainObj.activeSelf == true)
@@ -75,8 +75,24 @@ public class TextExpress : MonoBehaviour
     {
         GameObject newText=GameObject.Instantiate(textObj);
         newText.transform.SetParent(transform,false);
-        newText.GetComponent<Text>().text = s;
-        Debug.Log(s);
+        var textComponent=newText.GetComponentInChildren<Text>();
+        textComponent.text = s;
+        //Debug.Log(s);
+        if (textList.Count > 3)
+        {
+            Destroy(textList.Last.Value);
+            textList.RemoveLast();
+        }
+        textList.AddFirst(newText);
+    }
+    public void setNewText(string s,Color color)
+    {
+        GameObject newText = GameObject.Instantiate(textObj);
+        newText.transform.SetParent(transform, false);
+        var textComponent = newText.GetComponentInChildren<Text>();
+        textComponent.text = s;
+        textComponent.color = color;
+        //Debug.Log(s);
         if (textList.Count > 3)
         {
             Destroy(textList.Last.Value);

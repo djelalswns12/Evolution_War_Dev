@@ -60,7 +60,6 @@ public class MainGameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        AdsManager.Instance.HideBanner();
         skillManager = GetComponent<SkillManager>();
         monsterList = new Dictionary<string, List<GameObject>>();
         popUpMaster = GetComponent<SetPopUP>();
@@ -74,6 +73,7 @@ public class MainGameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        AdsManager.Instance.HideBanner();
         if (SceneVarScript.Instance.GetUserOption("Master") == "1")
         {
             TesterOption.SetActive(true);
@@ -385,7 +385,7 @@ public class MainGameManager : MonoBehaviour
     public void AttackAlam()
     {
         alamRenderingTime = 5;
-        NetworkMaster.Instance.SendGameMsgFunc("<color=red>기지가 공격받고 있습니다!</color>", 0);
+        NetworkMaster.Instance.SendGameMsgFunc("기지가 공격받고 있습니다!",new Color(1,0,0,1),0);
     }
     public void TestGetMoney()
     {

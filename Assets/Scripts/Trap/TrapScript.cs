@@ -15,6 +15,7 @@ public class TrapScript : MonoBehaviour
     public bool isLoad;
     public GameObject bar;
     protected Animator anim;
+    WaitForSeconds oneSec = new WaitForSeconds(1f);
     // Start is called before the first frame update
     void Start()
     {
@@ -29,6 +30,7 @@ public class TrapScript : MonoBehaviour
         myName = monster.myName;
         BarRendering();
         CoolManage();
+        OntheBoss();
         if (isLoad == true && monster.pv.IsMine==true)
         {
             UseSkill();
@@ -39,9 +41,24 @@ public class TrapScript : MonoBehaviour
     {
 
     }
+    IEnumerator OntheBoss()
+    {
+        while (true)
+        {
+            Collider2D[] hit2 = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + (monster.attOffset3.x * (monster.dir == true ? -1 : 1)), transform.position.y + monster.attOffset3.y), monster.size3, 0, monster.whatIsLayer2);
+            for (int i = 0; i < hit2.Length; i++)
+            {
+                if (hit2[i].tag == "boss")
+                {
+                    monster.RpcCallGetDamage((int)Mathf.Ceil(monster.mhp * 0.2f), 1, NetworkMaster.Instance.dir);
+                }
+            }
+            yield return oneSec;
+        }
+    }
     private void CoolManage()
     {
-        setCool = int.Parse(SceneVarScript.Instance.GetOptionByName(myName, "perTime", SceneVarScript.Instance.trapOption));
+        setCool = float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "perTime", SceneVarScript.Instance.trapOption));
         //트랩 DB로 부터 해당 트랩의 이름을 Key값으로 해서 효과 발동에 소모되는 쿨타임값을 가져온다.
         nowCool += Time.deltaTime;
         isLoad = true;
