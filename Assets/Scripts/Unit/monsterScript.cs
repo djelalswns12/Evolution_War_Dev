@@ -34,9 +34,6 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
 
     public int bossAttackSignal;
     public int redPoint, bluePoint;
-    public Text stateText; // 몬스터 체력바 위의 텍스트 이다.
-    [Header("건들여야하는것")]
-
     public Text redtxt;
     public Text bluetxt;
     public float mhp, hp;
@@ -51,13 +48,17 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
     public float bonusDamage; // 일반 보너스 데미지
     public float thornsSpeed; // 가시덤불 디버프 스피드
     public float oldHumanBuffSpeed; // 원시인 디버프 스피드
+    public bool isHitted;
+    public bool isGhost;
+    [Header("초기 생성시 설정 해줘야 합니다.")]
+    public Text stateText; // 몬스터 체력바 위의 텍스트 이다.
     public Canvas monsterUI;
     public Vector2 attOffset, size;//중첩 확인
     public Vector2 attOffset2, size2;//자신앞에 유닛 존재여부 확인
     public Vector2 attOffset3, size3;//공격범위에 적있는지 확인
     public Vector2 throwPos;//던지기 위치
     public Vector2 spawnPos;//태어날 위치
-
+    [Header("끝")]
     public ParticleSystem hitParticle;
     Color orginColor;
     Color redColor = new Color(1, 0, 0);
@@ -83,6 +84,9 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
     public float poisionDamage;//원시인이 줄 수 있는 데미지
     public float poisionSpeed; // 원시인이 줄 수 있는 디버프 속도
 
+
+    Coroutine TrapEnhance;
+    public bool trapEnhanceFlag;
 
     public AttackEffectScript[] effectScript;
     public PlayerScript myPlayer;
@@ -582,11 +586,31 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
         poisionDamage = 0;
         poisionSpeed = 0;
     }
-    public IEnumerator PlayerMultiAttack(float time)
+    public void AddBonusDamage(float time,float value)
     {
-        isPlayerMultiAttack = true;
+        StartCoroutine(CoAddBonusDamage(time, value));
+    }
+    public void FuncTrapEnhanceBuff(float time, float damage)
+    {
+        StartCoroutine(TrapEnhanceBuff(time, damage));
+    }
+    IEnumerator TrapEnhanceBuff(float time,float damage)
+    {
+        trapEnhanceFlag = true;
+        AddBonusDamage(time, damage);
         yield return new WaitForSeconds(time);
-        isPlayerMultiAttack = false;
+        trapEnhanceFlag = false;
+    }
+    IEnumerator CoAddBonusDamage(float time,float value)
+    {
+        float realValue = value / 100;
+        bonusDamage += realValue;
+        yield return new WaitForSeconds(time);
+        bonusDamage -= realValue;
+    }
+    public void SetPlayerMultiAttack(bool set)
+    {
+        isPlayerMultiAttack = set;
     }
     public void Setdir()
     {
@@ -634,12 +658,14 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
     }
     bool FrontEnemyThere()
     {
+        monsterScript monster;
         //자신앞에 유닛 존재여부 확인
         Collider2D[] hit2 = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + (attOffset3.x * (dir == true ? -1 : 1)), transform.position.y + attOffset3.y), size3, 0, whatIsLayer2);
         for (int i = 0; i < hit2.Length; i++)
         {
+            monster = hit2[i].GetComponent<monsterScript>();
             //if ((dir == false && hit2[i].transform.position.x < transform.position.x) || (dir == true && hit2[i].transform.position.x > transform.position.x))
-            if (hit2[i].GetComponent<monsterScript>().dir != dir || hit2[i].tag == "boss")
+            if (monster.dir != dir || hit2[i].tag == "boss")
             {
                 if (hit2[i].gameObject == gameObject)
                 {
@@ -648,6 +674,10 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
                 if (hit2[i].gameObject == myPlayer.gameObject)
                 {
                     //Debug.Log("본인 player 콜라이더가 걸렸으므로 무시해야함");
+                    continue;
+                }
+                if (monster.isGhost == true)
+                {
                     continue;
                 }
                 if (hit2[i].tag == "boss" || hit2[i].tag == "Test" || (hit2[i].tag == "Player"&&isPlayerMultiAttack))
@@ -661,7 +691,7 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
                     attackPlayer = false;
                 }
                 //가로막는 유닛이 다중공격대상이 아니라면 가로막힌것이므로 전진불가
-                if (hit2[i].GetComponent<monsterScript>().attackPlayer == false)
+                if (monster.attackPlayer == false)
                 {
                     someThingBlock = true;
                     return true;
@@ -688,6 +718,10 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
                 if (monster.gameObject == myPlayer.gameObject)
                 {
                     // Debug.Log("본인 player 콜라이더가 걸렸으므로 무시해야함");
+                    continue;
+                }
+                if (monster.isGhost==true)
+                {
                     continue;
                 }
                 if (monster.tag == "boss" || (monster.tag=="Player" && isPlayerMultiAttack))
@@ -743,6 +777,10 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
                 for (int i = 0; i < hitArea.Length; i++)
                 {
                     monsterScript tmpTarget = hitArea[i].gameObject.GetComponent<monsterScript>();
+                    if (tmpTarget.isGhost == true)
+                    {
+                        continue;
+                    }
                     if (tmpTarget.myPlayer!=this.myPlayer || tmpTarget.tag=="boss")
                     {
                         if (target != null)
@@ -836,6 +874,10 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
                 for (int i = 0; i < hitArea.Length; i++)
                 {
                     monsterScript tmpTarget = hitArea[i].gameObject.GetComponent<monsterScript>();
+                    if (tmpTarget.isGhost == true)
+                    {
+                        continue;
+                    }
                     if (tmpTarget.myPlayer != this.myPlayer || tmpTarget.tag == "boss")
                     {
                         if (target != null)
@@ -940,7 +982,6 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
     #region Method > OnlineMetohd
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-
         if (stream.IsWriting)
         {
             stream.SendNext(dir);
@@ -959,6 +1000,8 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
             stream.SendNext(hasThornsBuffFlag);
             stream.SendNext(hasGoldBananaFlag);
             stream.SendNext(sp.flipX);
+            stream.SendNext(trapEnhanceFlag);
+            stream.SendNext(attackSpeed);
         }
         else
         {
@@ -978,6 +1021,8 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
             hasThornsBuffFlag = (bool)stream.ReceiveNext();
             hasGoldBananaFlag = (bool)stream.ReceiveNext();
             sp.flipX = (bool)stream.ReceiveNext();
+            trapEnhanceFlag = (bool)stream.ReceiveNext();
+            attackSpeed = (float)stream.ReceiveNext();
         }
     }
     [PunRPC]
@@ -1120,7 +1165,11 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
     }
-
+    public void SetToDie()
+    {
+        hp = 0;
+        killTarget = false;
+    }
     public void RpcCallGetDamage(int damage, int dieMoneyGet, bool dir, int type = 0)
     {
         pv.RPC("GetDamage", RpcTarget.All, damage, dieMoneyGet, dir, type, 0f, 0f);
@@ -1135,6 +1184,7 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
         //type :0:기본타입 1>>독공격
         //moneyGet=1 이면 중립공격(돈 획득 불가) 0 이면 상대방의 공격(돈 획득)
         //requestDir => true 왼쪽(red) false 오른쪽(blue)
+        isHitted = true;
         if (gameObject.tag == "monster")
         {
             StartCoroutine(colorCo());

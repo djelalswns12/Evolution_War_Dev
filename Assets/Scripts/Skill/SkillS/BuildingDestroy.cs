@@ -21,10 +21,12 @@ public class BuildingDestroy : SkillScript
             {
                 if (monster != null)
                 {
+
                     monsterScript mob = monster.GetComponent<monsterScript>();
                     if (!mob.isPlayerMultiAttack)
                     {
-                        mob.StartCoroutine(mob.PlayerMultiAttack(9999));
+                        
+                        mob.SetPlayerMultiAttack(true);
                     }
                 }
             }
@@ -46,7 +48,7 @@ public class BuildingDestroy : SkillScript
                 if (monster != null)
                 {
                     monsterScript mob = monster.GetComponent<monsterScript>();
-                    mob.isPlayerMultiAttack = false;
+                    mob.SetPlayerMultiAttack(false);
                 }
             }
         }

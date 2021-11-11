@@ -7,7 +7,7 @@ using System;
 using UnityEngine.SceneManagement;
 public class SceneVarScript : MonoBehaviour
 {
-    public static readonly string gameVersion = "v11";
+    public static readonly string gameVersion = "v13";
 
     public class User
     {
@@ -28,7 +28,7 @@ public class SceneVarScript : MonoBehaviour
         
             this.username = username;
             this.authCode = authCode;
-            this.money = "0";
+            this.money = "3000";
             this.win = 0;
             this.lose = 0;
             this.rating = 1000;
@@ -76,7 +76,7 @@ public class SceneVarScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        FirebaseDatabase.DefaultInstance.SetPersistenceEnabled(false);
+        FirebaseDatabase.DefaultInstance.SetPersistenceEnabled(false); //캐시 사용 여부
         RequestAllDB();
 
         //reference.ValueChanged += HandleValueChanged;
@@ -194,10 +194,10 @@ public class SceneVarScript : MonoBehaviour
     public void SnapshotAllDataRead(DataSnapshot Snapshot)
     {
         return;
-        foreach (var item in Snapshot.Children)
-        {
-            Debug.Log(item.Child("skill1").Value + " / " + item.Child("skill2").Value + " / " + item.Child("skill3").Value);
-        }
+        //foreach (var item in Snapshot.Children)
+        //{
+        //    Debug.Log(item.Child("skill1").Value + " / " + item.Child("skill2").Value + " / " + item.Child("skill3").Value);
+        //}
     }
     // Update is called once per frame
     void Update()
@@ -612,7 +612,7 @@ public class SceneVarScript : MonoBehaviour
     }
     public void test()
     {
-           
+
             MainGameManager.mainGameManager.AttackAlam();
             SpawnManager.Instance.spawnSpeed += 7;
             NetworkMaster.Instance.gameStage++;

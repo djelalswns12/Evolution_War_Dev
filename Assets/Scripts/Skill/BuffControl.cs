@@ -93,6 +93,15 @@ public class BuffControl : MonoBehaviour
             buffDelete("GoldBananaBuff");
         }
         /////////////////////////////////////////
+        if (monster.trapEnhanceFlag)
+        {
+            buffInsert("trapEnhanceFlag", "3"); //¹Ù³ª³ª
+        }
+        else
+        {
+            buffDelete("trapEnhanceFlag");
+        }
+        /////////////////////////////////////////
     }
     void buffInsert(string myName,string icon)
     {

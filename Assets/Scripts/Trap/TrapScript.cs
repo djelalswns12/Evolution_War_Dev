@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class TrapScript : MonoBehaviour
+using Photon.Pun;
+public class TrapScript : MonoBehaviourPunCallbacks , IPunObservable
 {
     public int level;
     public float addMoney;
-    protected monsterScript monster;
+    public monsterScript monster;
     public string myName;
 
     public float setCool;
@@ -15,6 +15,8 @@ public class TrapScript : MonoBehaviour
     public bool isLoad;
     public GameObject bar;
     protected Animator anim;
+
+    public float effectSpeed;
     WaitForSeconds oneSec = new WaitForSeconds(1f);
     // Start is called before the first frame update
     void Start()
@@ -31,7 +33,7 @@ public class TrapScript : MonoBehaviour
         BarRendering();
         CoolManage();
         OntheBoss();
-        if (isLoad == true && monster.pv.IsMine==true)
+        if (isLoad == true && monster.pv.IsMine == true)
         {
             UseSkill();
         }
@@ -56,15 +58,20 @@ public class TrapScript : MonoBehaviour
             yield return oneSec;
         }
     }
-    private void CoolManage()
+    protected virtual void CoolManage()
     {
-        setCool = float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "perTime", SceneVarScript.Instance.trapOption));
+        var cool = float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "perTime", SceneVarScript.Instance.trapOption));
+        setCool = cool * (1 - effectSpeed);
         //트랩 DB로 부터 해당 트랩의 이름을 Key값으로 해서 효과 발동에 소모되는 쿨타임값을 가져온다.
         nowCool += Time.deltaTime;
         isLoad = true;
     }
     private void BarRendering()
     {
+        if (bar == null)
+        {
+            return;
+        }
         if (nowCool > setCool)
         {
             bar.transform.localScale = new Vector3(1, 1, 1);
@@ -83,6 +90,33 @@ public class TrapScript : MonoBehaviour
         if (setCool <= nowCool)
         {
             //사용될 효과 자식 클래스에서 서술
+        }
+    }
+    public void SetEffectSpeed(float num)
+    {
+        effectSpeed = num / 100;
+    }
+    public void TrapEnhance(float time, float damage, float attackSpeed)
+    {
+        monster.FuncTrapEnhanceBuff(time, damage);
+        StartCoroutine(CoTrapEnhance(time, attackSpeed));
+    }
+    public IEnumerator CoTrapEnhance(float time, float attackSpeed)
+    {
+        SetEffectSpeed(attackSpeed);
+        yield return new WaitForSeconds(time);
+        SetEffectSpeed(0);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(effectSpeed);
+        }
+        else
+        {
+            effectSpeed = (float)stream.ReceiveNext();
         }
     }
 }

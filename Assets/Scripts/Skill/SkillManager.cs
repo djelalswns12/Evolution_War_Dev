@@ -79,10 +79,10 @@ public class SkillManager : MonoBehaviour
                     skillList.Add(skill["index"].ToString(), new BuildingDestroy(skill["index"].ToString()));
                     break;
                 case 6:
-                    skillList.Add(skill["index"].ToString(), new BuildingDestroy(skill["index"].ToString()));
+                    skillList.Add(skill["index"].ToString(), new DeathBee(skill["index"].ToString()));
                     break;
                 case 7:
-                    skillList.Add(skill["index"].ToString(), new BuildingDestroy(skill["index"].ToString()));
+                    skillList.Add(skill["index"].ToString(), new TrapMaster(skill["index"].ToString()));
                     break;
                 default:
                     break;
@@ -226,7 +226,6 @@ public class SkillManager : MonoBehaviour
     }
     public void SetSkill()
     {
-        //인게임 스킬 아이콘의 값을 설정한다.
         for (int i = 0; i < skillBtn.Length; i++)
         {
             var skillIndex = SceneVarScript.Instance.GetUserOption("skill" + (i + 1));
@@ -234,6 +233,7 @@ public class SkillManager : MonoBehaviour
             {
                 skillBtn[i].GetComponent<SkillBtn>().myName = SceneVarScript.Instance.GetOptionByIndex(skillIndex, "name", SceneVarScript.Instance.skillOption);
                 skillList[SceneVarScript.Instance.GetOptionByIndex(skillIndex, "index", SceneVarScript.Instance.skillOption)].Unique();
+                skillList[SceneVarScript.Instance.GetOptionByIndex(skillIndex, "index", SceneVarScript.Instance.skillOption)].setSlot = i+1;
                 if (skillList[SceneVarScript.Instance.GetOptionByIndex(skillIndex, "index", SceneVarScript.Instance.skillOption)].NeedsCheck() == 0)
                 {
                     skillOnParticle[SkillCheckIsTake(skillIndex)].gameObject.SetActive(true);

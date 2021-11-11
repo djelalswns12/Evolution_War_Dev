@@ -68,6 +68,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bfaffa5775079f42b37e931caf737c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  par: {fileID: 0}
   canAttack: 0
   damage: 0
   speed: 13
@@ -75,6 +76,7 @@ MonoBehaviour:
   target: {x: 0, y: 0}
   pv: {fileID: 0}
   sp: {fileID: 0}
+  anim: {fileID: 0}
   dir: 0
   attOffset3: {x: 0, y: 0}
   size3: {x: 0, y: 0}

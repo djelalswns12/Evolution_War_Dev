@@ -5,6 +5,7 @@ using UnityEngine;
 public abstract class SkillScript
 {
     public string index;
+    public int setSlot;
     public abstract void Active();
     public abstract void Passive();
     public abstract void UnPassive();
@@ -73,7 +74,7 @@ public abstract class SkillScript
             }
             return true;
         }
-        Debug.Log($"(needMonster {index} )index is Not Load So return true");
+        //Debug.Log($"(needMonster {index} )index is Not Load So return true");
         return true;
     }
     public bool SkillCheckAnyMonster(string index)

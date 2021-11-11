@@ -372,7 +372,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         script.whatIsLayer2 = creatmonster.whatIsLayer2;
         script.bonusMoney = bonusMoney;
     }
-    public void CreatMonster(string name, int createType /*0이 아닌경우는 특정위치에서 소환되어야 할때 */, float posX ,int setLayer,GameObject player)
+    public GameObject CreatMonster(string name, int createType /*0이 아닌경우는 특정위치에서 소환되어야 할때 */, float posX ,int setLayer,GameObject player)
     {
         //UpLayer:1
         //DownLayer:0
@@ -384,7 +384,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
         if (creatIndex == -1)
         {
             Debug.Log($"존재하지 않는 몬스터입니다 요청 몬스터:{name}");
-            return;
+            return null;
         }
         GameObject monster;
         Vector3 creatpos = player.transform.position;
@@ -424,6 +424,7 @@ public class NetworkMaster : MonoBehaviourPunCallbacks
             }
         }
         SetCreatureInfo(monster, name,player);
+        return monster;
     }
     public float CreatPosXOffset(GameObject player)
     {

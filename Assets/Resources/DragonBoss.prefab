@@ -846,7 +846,6 @@ MonoBehaviour:
   bossAttackSignal: 0
   redPoint: 0
   bluePoint: 0
-  stateText: {fileID: 0}
   redtxt: {fileID: 5834261465086832153}
   bluetxt: {fileID: 785658339160781176}
   mhp: 1000
@@ -862,6 +861,9 @@ MonoBehaviour:
   bonusDamage: 0
   thornsSpeed: 0
   oldHumanBuffSpeed: 0
+  isHitted: 0
+  isGhost: 0
+  stateText: {fileID: 0}
   monsterUI: {fileID: 0}
   attOffset: {x: 0, y: 0}
   size: {x: 0, y: 0}
@@ -882,6 +884,7 @@ MonoBehaviour:
   hasPoisionFlag: 0
   poisionDamage: 0
   poisionSpeed: 0
+  trapEnhanceFlag: 0
   effectScript: []
   myPlayer: {fileID: 0}
 --- !u!50 &7235073620437742222

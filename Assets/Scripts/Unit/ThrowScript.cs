@@ -13,7 +13,7 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
     public PhotonView pv;
     bool lifeCycle;
     public SpriteRenderer sp;
-    Animator anim;
+    public Animator anim;
     public bool dir;
     public Vector2 attOffset3, size3;//공격범위에 적있는지 확인
     public LayerMask whatIsLayer2;
@@ -21,7 +21,7 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
     public int dieMoneyGet;
     public float bonusMoney;
     // Start is called before the first frame update
-    void Start()
+    public virtual void Start()
     {
         lostTarget = 0;
         canAttack = true;
@@ -32,7 +32,7 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
     }
 
     // Update is called once per frame
-    void Update()
+    public virtual void Update()
     {
         sp.flipX = dir;
         //gameObject.GetComponentInChildren<SpriteRenderer>().enabled = lifeCycle;
@@ -52,6 +52,7 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
                     }
                     if (Vector2.Distance((Vector2)transform.position, target) <= 0.05f)
                     {
+                        
                         pv.RPC("Hitted", RpcTarget.All);
                         //이미 생성자 pc에선 삭제되었음
                     }
@@ -83,7 +84,7 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
         }
 
     }
-    public void MonsterAttack() {
+    public virtual void MonsterAttack() {
         Collider2D[] hitArea = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + (attOffset3.x * (dir == true ? -1 : 1)), transform.position.y + attOffset3.y), size3, 0, whatIsLayer2);
             if (hitArea.Length > 0)
             {
@@ -91,7 +92,11 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
                 for (int i = 0; i < hitArea.Length; i++)
                 {
                     monsterScript tmpTarget = hitArea[i].gameObject.GetComponent<monsterScript>();
-                    if (tmpTarget.myPlayer != par.myPlayer || tmpTarget.tag == "boss")
+                    if (tmpTarget.isGhost == true)
+                    {
+                        continue;
+                    }
+                if (tmpTarget.myPlayer != par.myPlayer || tmpTarget.tag == "boss")
                     {
                         if (target != null)
                         {
@@ -122,33 +127,6 @@ public class ThrowScript : MonoBehaviourPunCallbacks,IPunObservable
                     canAttack = false;
             }
             }
-
-
-        /* if (hitArea.Length > 0)
-        {
-            for (int i = 0; i < hitArea.Length; i++)
-            {
-                
-                monsterScript target = hitArea[i].gameObject.GetComponent<monsterScript>();
-                if ((target.dir != this.dir && (target.tag == "monster" || target.tag == "Player")) || target.tag == "boss" || target.tag == "Test")
-                {
-                    if (hitArea.Length > 2 && hitArea[i].tag == "Player")
-                    {
-                        continue;
-                        //플레이어 공격중에 캐릭터 생성된다면 공격타겟을 바꿔줘야하기 때문
-                    }
-                    canAttack = false;
-                    pv.RPC("Hitted", RpcTarget.All); // 애니메이션 변경
-                    if ((int)bonusMoney > 0)
-                    {
-                        MainGameManager.mainGameManager.CreatGoldEffect(transform.position,(int)bonusMoney);
-                    }
-                    if (target != null)
-                        target.RpcCallGetDamage(damage, dieMoneyGet,dir);
-                    return;
-                }
-            }
-        }*/
     }
     
     [PunRPC]

@@ -701,7 +701,6 @@ MonoBehaviour:
   bossAttackSignal: 0
   redPoint: 0
   bluePoint: 0
-  stateText: {fileID: 2970293664486621671}
   redtxt: {fileID: 0}
   bluetxt: {fileID: 0}
   mhp: 50
@@ -717,6 +716,9 @@ MonoBehaviour:
   bonusDamage: 0
   thornsSpeed: 0
   oldHumanBuffSpeed: 0
+  isHitted: 0
+  isGhost: 0
+  stateText: {fileID: 2970293664486621671}
   monsterUI: {fileID: 6092015144602936242}
   attOffset: {x: 0, y: 0.07}
   size: {x: 0.21, y: 0.53}
@@ -737,6 +739,7 @@ MonoBehaviour:
   hasPoisionFlag: 0
   poisionDamage: 0
   poisionSpeed: 0
+  trapEnhanceFlag: 0
   effectScript: []
   myPlayer: {fileID: 0}
 --- !u!114 &568385568633542560
@@ -758,7 +761,7 @@ MonoBehaviour:
     SynchronizeType: 2
     Name: attack
   - Type: 1
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: AttackSpeed
   m_SynchronizeLayers:
   - SynchronizeType: 2

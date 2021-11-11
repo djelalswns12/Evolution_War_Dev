@@ -86030,6 +86030,9 @@ MonoBehaviour:
   touchDropGold: 0
   attackSpeed: 0.2
   bonusDamage: 0.5
+  touchAttackBossCount: 0
+  maxTouchActionTime: 0
+  minTouchActionTime: 0
   goldEff: 2.2
 --- !u!4 &1703223674
 Transform:
