@@ -180,6 +180,7 @@ MonoBehaviour:
   target: {x: 0, y: 0}
   pv: {fileID: 0}
   sp: {fileID: 0}
+  anim: {fileID: 0}
   dir: 0
   attOffset3: {x: 0, y: 0}
   size3: {x: 0.45, y: 0.37}

@@ -30,7 +30,7 @@ public class BuffControl : MonoBehaviour
             {
                 buffSprites[index].maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
                 buffSprites[index].sortingLayerName = sp.sortingLayerName;
-                buffSprites[index].sprite = MainGameManager.mainGameManager.buffIconList[int.Parse(item.Value)];
+                buffSprites[index].sprite = SceneVarScript.Instance.skillIcon[int.Parse(item.Value)];
                 buffSprites[index].gameObject.SetActive(true);
                 index++;
             }
@@ -42,7 +42,7 @@ public class BuffControl : MonoBehaviour
         ////////////////////////////////////
         if (monster.hasLionBuffFlag)
         {
-            buffInsert("LionBuff","0");
+            buffInsert("LionBuff","3");
         }
         else
         {
@@ -53,7 +53,7 @@ public class BuffControl : MonoBehaviour
         /////////////////////////////////////
         if (monster.hasOldHumanBuffFlag)
         {
-            buffInsert("OldHumanBuff", "1");
+            buffInsert("OldHumanBuff", "4");
         }
         else
         {
@@ -64,7 +64,7 @@ public class BuffControl : MonoBehaviour
         /////////////////////////////////////////
         if (monster.hasPoisionFlag)
         {
-            buffInsert("PoisionBuff","2");
+            buffInsert("PoisionBuff","8");
         }
         else
         {
@@ -75,7 +75,7 @@ public class BuffControl : MonoBehaviour
         /////////////////////////////////////////
         if (monster.hasThornsBuffFlag)
         {
-            buffInsert("ThornsBuff","4"); //
+            buffInsert("ThornsBuff","9"); //
         }
         else
         {
@@ -86,7 +86,7 @@ public class BuffControl : MonoBehaviour
         /////////////////////////////////////////
         if (monster.hasGoldBananaFlag)
         {
-            buffInsert("GoldBananaBuff", "3"); //바나나
+            buffInsert("GoldBananaBuff", "2"); //바나나
         }
         else
         {
@@ -95,7 +95,7 @@ public class BuffControl : MonoBehaviour
         /////////////////////////////////////////
         if (monster.trapEnhanceFlag)
         {
-            buffInsert("trapEnhanceFlag", "3"); //바나나
+            buffInsert("trapEnhanceFlag", "7"); //트랩마스터 아이콘 7
         }
         else
         {

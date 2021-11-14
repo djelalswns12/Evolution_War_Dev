@@ -255,6 +255,7 @@ MonoBehaviour:
   thornsSpeed: 0
   oldHumanBuffSpeed: 0
   isHitted: 0
+  isGhost: 0
   stateText: {fileID: 7368373344554482770}
   monsterUI: {fileID: 8429392975783693113}
   attOffset: {x: 0, y: -0.05}

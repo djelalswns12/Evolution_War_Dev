@@ -330,7 +330,6 @@ MonoBehaviour:
   bossAttackSignal: 0
   redPoint: 0
   bluePoint: 0
-  stateText: {fileID: 4088511061701332469}
   redtxt: {fileID: 0}
   bluetxt: {fileID: 0}
   mhp: 50
@@ -347,6 +346,8 @@ MonoBehaviour:
   thornsSpeed: 0
   oldHumanBuffSpeed: 0
   isHitted: 0
+  isGhost: 0
+  stateText: {fileID: 4088511061701332469}
   monsterUI: {fileID: 7407220653735039713}
   attOffset: {x: 0.15, y: 0.28}
   size: {x: -0.26, y: 0.48}

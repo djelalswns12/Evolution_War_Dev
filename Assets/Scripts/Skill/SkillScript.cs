@@ -95,7 +95,9 @@ public abstract class SkillScript
                 {
                     if (list.ContainsKey(monsters[j]))
                     {
+                       
                         count += list[monsters[j]].Count;
+                        //Debug.Log(monsters[j] + ":"+list[monsters[j]].Count+"/"+count+"(max:"+ monsters[monsters.Length - 1]);
                     }
                     if (count >= int.Parse(monsters[monsters.Length - 1]))
                     {

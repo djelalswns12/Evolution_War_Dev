@@ -820,6 +820,52 @@ public class monsterScript : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
     }
+    public void MultiAttack()
+    {
+        if (pv.IsMine == true)
+        {
+            Collider2D[] hitArea = Physics2D.OverlapBoxAll(new Vector2(transform.position.x + (attOffset3.x * (dir == true ? -1 : 1)), transform.position.y + attOffset3.y), size3, 0, whatIsLayer2);
+            if (hitArea.Length > 0)
+            {
+                monsterScript target = null;
+                for (int i = 0; i < hitArea.Length; i++)
+                {
+
+                    target = hitArea[i].gameObject.GetComponent<monsterScript>();
+                    if (target.isGhost == true)
+                    {
+                        continue;
+                    }
+                    if (target.myPlayer == this.myPlayer && target.tag != "boss")
+                    {
+                        continue;
+                    }
+
+                    if (target != null)
+                    {
+                        int calDamage = (int)(damage * (1 + bonusDamage) * (1 + AIManager.Instance.GetBonusDamage(myPlayer.gameObject)));
+                        if (target.tag == "boss")
+                        {
+                            calDamage = (int)(calDamage * (1 + bossBonusDamage));
+                        }
+                        if (hasOldHumanBuffFlag)
+                        {
+                            target.pv.RPC("GetPoision", RpcTarget.All, poisionDamage, poisionSpeed);
+                        }
+                        if (nuckBackFlag)
+                        {
+                            target.pv.RPC("CrowdControl", RpcTarget.All, 0, float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "nuckBackX", SceneVarScript.Instance.trapOption)), float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "nuckBackY", SceneVarScript.Instance.trapOption)));
+                        }
+                        if (thornsFlag)
+                        {
+                            target.pv.RPC("GetThorns", RpcTarget.All, (100 - float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "slow", SceneVarScript.Instance.trapOption))) / 100, float.Parse(SceneVarScript.Instance.GetOptionByName(myName, "slowTime", SceneVarScript.Instance.trapOption)));
+                        }
+                        target.RpcCallGetDamage(calDamage, dieMoneyGet, myPlayer.dir);
+                    }
+                }
+            }
+        }
+    }
     public void MonsterAttack()
     {
         if (pv.IsMine == true)

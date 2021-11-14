@@ -1803,6 +1803,7 @@ MonoBehaviour:
   thornsSpeed: 0
   oldHumanBuffSpeed: 0
   isHitted: 0
+  isGhost: 0
   stateText: {fileID: 4345164997580951309}
   monsterUI: {fileID: 9083677574417164038}
   attOffset: {x: 0, y: -0.05}
